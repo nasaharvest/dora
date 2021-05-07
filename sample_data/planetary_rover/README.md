@@ -36,7 +36,7 @@ comparison:
   if desired.
   
 - `aegis_executions_sol1343-sol1400.json` : JSON file containing all
-  targets from the source image.  This file also contains the AEGIS
+  targets from the source images.  This file also contains the AEGIS
   features used to represent each target and their pixel locations
   within their source images.  It is needed by both the simulator and
   the visualization script.
@@ -64,7 +64,9 @@ Saved image to sol01371/SOL01371NLB_519216253EDR_F0542784CCAM15900M1-novel.png
 ```
 
 You can then compare your new output in `exp/sol01731/` to the output
-in `results/`. 
+in `results/`.  Note: git is configured to ignore this new output
+directory so that it will not be accidentally committed back to the
+repository. 
 
 ---
 Contact: Kiri Wagstaff, kiri.wagstaff@jpl.nasa.gov
