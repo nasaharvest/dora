@@ -52,7 +52,7 @@ directory and running the Bash script:
 --- Loaded package version information ---
 [QUESTION] Output directory /home/wkiri/Research/DORA/git/sample_data/planetary_rover/exp/sol01371 exists. Do you want to delete all files and directories in the out_dir? (y/n)y
 [INFO] All files and directories have been deleted.
-Loaded known novel targets in 42 sols
+Loaded known novel targets in 4 sols
 Drew 8 candidate targets.
 Drew 1 aegis targets.
 Drew 1 demud-k-3 targets.
@@ -64,9 +64,14 @@ Saved image to sol01371/SOL01371NLB_519216253EDR_F0542784CCAM15900M1-novel.png
 ```
 
 You can then compare your new output in `exp/sol01731/` to the output
-in `results/`.  Note: git is configured to ignore this new output
-directory so that it will not be accidentally committed back to the
-repository. 
+in `results/`.
+
+```Console
+> diff -r ../results/ sol01371/
+```
+
+Note: git is configured to ignore this new output directory so that it
+will not be accidentally committed back to the repository. 
 
 ---
 Contact: Kiri Wagstaff, kiri.wagstaff@jpl.nasa.gov

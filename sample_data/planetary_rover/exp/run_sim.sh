@@ -14,4 +14,5 @@ python $sim/simulator.py -o $outdir -l $outdir/sim.log $config_file
 
 # Visualize the results
 targets_file=aegis_executions_sol1343-sol1400.json
-$sim/viz_overlays.py $outdir -i navcam -m 1 -r -w -a $targets_file
+novel_file=novel_sol1343-sol1400.csv
+$sim/viz_overlays.py $outdir -i navcam -m 1 -r -w -a $targets_file -n $novel_file
