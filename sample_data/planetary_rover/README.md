@@ -9,7 +9,7 @@ rocks, soil patches).  Each image contains one or more targets.
 Data
 ----
 
-The 'images/' directory contains images from the Mars Science
+The `images/` directory contains images from the Mars Science
 Laboratory rover's Navcam instrument, using the directory structure
 employed by the mission in its deliveries to the Planetary Data System
 archive.  Within `MSLNAV_0XXX/DATA/` there are per-sol directories for
@@ -18,7 +18,7 @@ sols 1343, 1347, 1349, and 1371, with one image product per sol.
 Experiments
 -----------
 
-The 'exp/' directory contains the files needed to run a simple
+The `exp/` directory contains the files needed to run a simple
 experiment with the CIF simulator as well as the expected results for
 comparison:
 
@@ -41,7 +41,7 @@ comparison:
   within their source images.  It is needed by both the simulator and
   the visualization script.
 
-The 'results/' directory contains the expected results of running the
+The `results/` directory contains the expected results of running the
 `run_sim.sh` script.
 
 Expected output at the command line after changing into the `exp/`
