@@ -13,21 +13,21 @@
 import sys
 import warnings
 import numpy as np
-from ranking import Ranking
-from util import load_images
-from util import DEFAULT_DATA_DIR
-from util import get_image_file_list
+from src.ranking import Ranking
+from src.util import load_images
+from src.util import DEFAULT_DATA_DIR
+from src.util import get_image_file_list
 
 try:
     import cosmic_demud
     from cosmic_demud.dataset import Dataset
 except ImportError:
-    print 'This script requires the COSMIC_DEMUD python library.'
-    print 'Please follow these steps:'
-    print ' git clone git@github-fn.jpl.nasa.gov:COSMIC/COSMIC_DEMUD.git'
-    print ' cd COSMIC_DEMUD'
-    print ' git checkout feature-config-files'
-    print ' python setup.py install (with --user if desired)'
+    print('This script requires the COSMIC_DEMUD python library.')
+    print('Please follow these steps:')
+    print('git clone git@github-fn.jpl.nasa.gov:COSMIC/COSMIC_DEMUD.git')
+    print('cd COSMIC_DEMUD')
+    print('git checkout feature-config-files')
+    print('python setup.py install (with --user if desired)')
     sys.exit(1)
 
 
@@ -87,7 +87,7 @@ class DEMUDRanking(Ranking):
 
         # Allow specification of separate dir for prior sol targets
         # If not specified, use the original data_dir
-        if prior_dir == None:
+        if prior_dir is None:
             prior_dir = data_dir
 
         # Read in the image data to be ranked
@@ -123,7 +123,7 @@ def start(start_sol, end_sol, data_dir, prior_dir, out_dir, k, min_prior, max_pr
 
     # Allow specification of separate dir for prior sol targets
     # If not specified, use the original data_dir
-    if prior_dir == None:
+    if prior_dir is None:
         prior_dir = data_dir
 
     demud_params = {
@@ -138,7 +138,7 @@ def start(start_sol, end_sol, data_dir, prior_dir, out_dir, k, min_prior, max_pr
         demud_ranking.run(data_dir, prior_dir, start_sol, end_sol, out_dir, seed,
                           **demud_params)
     except RuntimeError as e:
-        print e
+        print(e)
         sys.exit(1)
 
 
@@ -151,9 +151,11 @@ def main():
     parser.add_argument('-e', '--end_sol', type=int, default=1343,
                         help='maximum (ending) sol (default 1343)')
     parser.add_argument('-d', '--data_dir', default=DEFAULT_DATA_DIR,
-                        help='target image data directory (default: %(default)s)')
+                        help='target image data directory '
+                             '(default: %(default)s)')
     parser.add_argument('-pd', '--prior_dir', default=None,
-                        help='prior sols target image data directory (default: same as data_dir)')
+                        help='prior sols target image data directory '
+                             '(default: same as data_dir)')
     parser.add_argument('-o', '--out_dir', default='.',
                         help='output directory (default: .)')
     parser.add_argument('-k', type=int, default=10,

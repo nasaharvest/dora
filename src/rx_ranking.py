@@ -13,22 +13,22 @@
 import sys
 import warnings
 import numpy as np
-from ranking import Ranking
-from util import load_images
-from util import DEFAULT_DATA_DIR
-from util import get_image_file_list
+from src.ranking import Ranking
+from src.util import load_images
+from src.util import DEFAULT_DATA_DIR
+from src.util import get_image_file_list
 
 
 class RXRanking(Ranking):
     def __init__(self):
         super(RXRanking, self).__init__('rx')
 
-    def _rank_internal(self, data_dir, prior_dir, start_sol, end_sol, seed, min_prior,
-                       max_prior):
+    def _rank_internal(self, data_dir, prior_dir, start_sol, end_sol, seed,
+                       min_prior, max_prior):
 
         # Allow specification of separate dir for prior sol targets
         # If not specified, use the original data_dir
-        if prior_dir == None:
+        if prior_dir is None:
             prior_dir = data_dir
 
         # catalog available images to read in
@@ -149,7 +149,7 @@ def start(start_sol, end_sol, data_dir, prior_dir, out_dir, min_prior, max_prior
         rx_ranking.run(data_dir, prior_dir, start_sol, end_sol, out_dir, seed,
                        **rx_params)
     except RuntimeError as e:
-        print e
+        print(e)
         sys.exit(1)
 
 
@@ -163,9 +163,11 @@ def main():
     parser.add_argument('-e', '--end_sol', type=int, default=1343,
                         help='maximum (ending) sol (default 1343)')
     parser.add_argument('-d', '--data_dir', default=DEFAULT_DATA_DIR,
-                        help='target image data directory (default: %(default)s)')
+                        help='target image data directory '
+                             '(default: %(default)s)')
     parser.add_argument('-pd', '--prior_dir', default=None,
-                        help='prior sols target image data directory (default: same as data_dir)')
+                        help='prior sols target image data directory '
+                             '(default: same as data_dir)')
     parser.add_argument('-o', '--out_dir', default='.',
                         help='output directory (default: .)')
     parser.add_argument('-p', '--min_prior', type=int, default=-1,

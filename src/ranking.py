@@ -11,9 +11,9 @@ import numpy as np
 from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
-from util import save_results
-from util import verify_common_input_args
-from util import save_features_csv
+from src.util import save_results
+from src.util import verify_common_input_args
+from src.util import save_features_csv
 
 
 RANKING_ALG_POOL = []
@@ -71,8 +71,9 @@ class Ranking(object):
                                self._ranking_alg_name)
 
         if 'ind' not in results.keys() or 'img_id' not in results.keys() or \
-             'sel_ind' not in results.keys() or 'scores' not in results.keys() or \
-             'explanations' not in results.keys():
+                'sel_ind' not in results.keys() or \
+                'scores' not in results.keys() or \
+                'explanations' not in results.keys():
             raise RuntimeError("Unexpected results format: %s" %
                                self._ranking_alg_name)
 
@@ -121,8 +122,9 @@ class Ranking(object):
                                self._ranking_alg_name)
 
         if 'ind' not in results.keys() or 'img_id' not in results.keys() or \
-             'sel_ind' not in results.keys() or 'scores' not in results.keys() or \
-             'explanations' not in results.keys():
+                'sel_ind' not in results.keys() or \
+                'scores' not in results.keys() or \
+                'explanations' not in results.keys():
             raise RuntimeError("Unexpected results format: %s" %
                                self._ranking_alg_name)
 

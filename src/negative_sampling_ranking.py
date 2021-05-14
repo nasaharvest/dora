@@ -11,7 +11,7 @@
 #
 
 import numpy as np
-from ranking import Ranking
+from src.ranking import Ranking
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier

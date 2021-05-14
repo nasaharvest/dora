@@ -10,9 +10,9 @@ import shutil
 import logging
 import numpy as np
 from PIL import Image
-from sim_data_loader import im_crop
-from sim_feature import extract_1d_features
-from sim_feature import extract_2d_features
+from src.sim_data_loader import im_crop
+from src.sim_feature import extract_1d_features
+from src.sim_feature import extract_2d_features
 
 # Define constants
 NAVCAM_DATA_DIR = '/proj/cif-novelty/data/navcam-rockster-targets-onboard-64x64/'
@@ -110,7 +110,7 @@ def remove_all(dir_path):
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
         except Exception as e:
-            print 'Failed to delete %s. Reason: %s' % (file_path, e)
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
 # Save ranking results in the following format:

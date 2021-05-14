@@ -10,10 +10,10 @@
 
 import sys
 import numpy as np
-from ranking import Ranking
-from util import load_images
-from util import DEFAULT_DATA_DIR
-from util import get_image_file_list
+from src.ranking import Ranking
+from src.util import load_images
+from src.util import DEFAULT_DATA_DIR
+from src.util import get_image_file_list
 
 
 class LocalRXRanking(Ranking):
@@ -181,7 +181,7 @@ def start(start_sol, end_sol, data_dir, out_dir, inner_window, outer_window,
         lrx_ranking.run(data_dir, start_sol, end_sol, out_dir, seed,
                         **lrx_params)
     except RuntimeError as e:
-        print e
+        print(e)
         sys.exit(1)
 
 
@@ -195,7 +195,8 @@ def main():
     parser.add_argument('-e', '--end_sol', type=int, default=1343,
                         help='maximum (ending) sol (default 1343)')
     parser.add_argument('-d', '--data_dir', default=DEFAULT_DATA_DIR,
-                        help='target image data directory (default: %(default)s)')
+                        help='target image data directory '
+                             '(default: %(default)s)')
     parser.add_argument('-o', '--out_dir', default='.',
                         help='output directory (default: .)')
     parser.add_argument('-i', '--inner_window', type=int, default=3,

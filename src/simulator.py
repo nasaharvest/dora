@@ -11,27 +11,25 @@
 import os
 import sys
 import json
-from sim_config import SimulatorConfig
-from sim_data_loader import get_data_loader_by_name
-from sim_data_finder import get_data_finder_by_name
-from sim_feature import z_score_normalize
-from ranking import get_ranking_alg_by_name
-from ranking import register_ranking_alg
-from aegis_ranking import AEGISRanking
-from demud_ranking import DEMUDRanking
-from iforest_ranking import IForestRanking
-from pca_ranking import PCARanking
-from lrx_ranking import LocalRXRanking
-from rx_ranking import RXRanking
-from random_ranking import RandomRanking
-from negative_sampling_ranking import NegativeSamplingRanking
-from util import load_crop_features
-from util import LogUtil
+from src.sim_config import SimulatorConfig
+from src.sim_data_loader import get_data_loader_by_name
+from src.sim_data_finder import get_data_finder_by_name
+from src.sim_feature import z_score_normalize
+from src.ranking import get_ranking_alg_by_name
+from src.ranking import register_ranking_alg
+from src.demud_ranking import DEMUDRanking
+from src.iforest_ranking import IForestRanking
+from src.pca_ranking import PCARanking
+from src.lrx_ranking import LocalRXRanking
+from src.rx_ranking import RXRanking
+from src.random_ranking import RandomRanking
+from src.negative_sampling_ranking import NegativeSamplingRanking
+from src.util import load_crop_features
+from src.util import LogUtil
 
 
 def register_ranking_algs():
     # Create ranking algorithms
-    aegis_ranking = AEGISRanking()
     demud_ranking = DEMUDRanking()
     iforest_ranking = IForestRanking()
     pca_ranking = PCARanking()
@@ -41,7 +39,6 @@ def register_ranking_algs():
     negative_sampling_ranking = NegativeSamplingRanking()
 
     # Register ranking algorithms
-    register_ranking_alg(aegis_ranking)
     register_ranking_alg(demud_ranking)
     register_ranking_alg(iforest_ranking)
     register_ranking_alg(pca_ranking)
@@ -56,8 +53,8 @@ def start(config_file, out_dir=None, start_sol=None, end_sol=None,
           disable_dir_checks=False, seed=1234, save_features=False):
 
     if not os.path.exists(config_file):
-        print '[ERROR] Configuration file not found: %s' % \
-              os.path.abspath(config_file)
+        print('[ERROR] Configuration file not found: %s' %
+              os.path.abspath(config_file))
         sys.exit(1)
 
     logger = None

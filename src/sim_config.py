@@ -7,7 +7,7 @@ import os
 import sys
 import yaml
 import json
-from util import remove_all
+from src.util import remove_all
 
 
 CONFIG_KEYWORDS = ['data_type', 'data_root', 'start_sol', 'end_sol', 'out_dir',
@@ -105,7 +105,7 @@ class SimulatorConfig(object):
 
     def verify_config_parameters(self, logger, disable_dir_checks=True):
         # Verify `data_type` field
-        if not isinstance(self.data_type, basestring):
+        if not isinstance(self.data_type, str):
             raise RuntimeError('data_type must be a string')
 
         if self.data_type.lower() not in SUPPORTED_DATA_TYPE:
@@ -115,7 +115,7 @@ class SimulatorConfig(object):
             )
 
         # Verify `data_root`
-        if not isinstance(self.data_root, basestring):
+        if not isinstance(self.data_root, str):
             raise RuntimeError('data_root must be a string')
 
         if not os.path.exists(self.data_root):
@@ -138,7 +138,7 @@ class SimulatorConfig(object):
 
         # Verify `test_image`
         if self.test_image is not None and \
-                not isinstance(self.test_image, basestring):
+                not isinstance(self.test_image, str):
             raise RuntimeError('test_image must be a string')
 
         # Verify `use_prior`, 'min_prior', and `max_prior`
@@ -189,20 +189,20 @@ class SimulatorConfig(object):
         if not disable_dir_checks:
             # Verify `out_dir`
             if not os.path.exists(self.out_dir):
-                user_input = raw_input(
+                user_input = input(
                     '[QUESTION] Output directory %s does not exist. Do you '
                     'want to create it? (y/n)' % os.path.abspath(self.out_dir)
                 )
 
                 if user_input.lower() == 'y':
                     os.makedirs(self.out_dir)
-                    print '[INFO] Create output directory: %s' % \
-                        os.path.abspath(self.out_dir)
+                    print('[INFO] Create output directory: %s' %
+                          os.path.abspath(self.out_dir))
                     if logger is not None:
                         logger.text('out_dir does not exist. Created out_dir: '
                                     '%s' % os.path.abspath(self.out_dir))
                 elif user_input.lower() == 'n':
-                    print '[INFO] Exit.'
+                    print('[INFO] Exit.')
                     if logger is not None:
                         logger.text('out_dir does not exist. Program exits '
                                     'based on user input.')
@@ -211,7 +211,7 @@ class SimulatorConfig(object):
                     raise RuntimeError('User input %s not understand.' %
                                        user_input)
             else:
-                user_input = raw_input(
+                user_input = input(
                     '[QUESTION] Output directory %s exists. Do you want to '
                     'delete all files and directories in the out_dir? (y/n)' %
                     os.path.abspath(self.out_dir)
@@ -219,13 +219,13 @@ class SimulatorConfig(object):
 
                 if user_input.lower() == 'y':
                     remove_all(self.out_dir)
-                    print '[INFO] All files and directories have been deleted.'
+                    print('[INFO] All files and directories have been deleted.')
 
                     if logger is not None:
                         logger.text('out_dir exists. Results in out_dir will '
                                     'be overwritten')
                 elif user_input.lower() == 'n':
-                    print '[INFO] Exit.'
+                    print('[INFO] Exit.')
                     if logger is not None:
                         logger.text('out_dir exists. Program exits based on '
                                     'user input.')
@@ -249,7 +249,7 @@ class SimulatorConfig(object):
                 )
 
             if 'flattened_pixel_values' not in \
-                self.features['one_dimensional'].keys():
+                    self.features['one_dimensional'].keys():
                 raise RuntimeError(
                     'If enable_explanation is True, only flattened_pixel_values'
                     ' feature in one_dimensional group can be used'

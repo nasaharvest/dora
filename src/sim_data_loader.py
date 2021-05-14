@@ -125,7 +125,6 @@ class DataLoader(object):
     def load(self, file_path):
         im_data = self._load(file_path)
 
-        # TODO: returned data should be verified. Depth (8-bit)? Dimensionality?
         return im_data
 
     @abstractmethod
