@@ -1,0 +1,155 @@
+# The instrument/camera in which the images to be analyzed are taken.
+# Valid values include "Navcam", "Mastcam", "Mastcam Multispectral",
+# and "Mastcam Grayscale". The value is case-insensitive.
+data_type: 'Mastcam Grayscale'
+
+# The complete path of the root data directory.
+data_root: '/proj/cif-novelty/data/mcam_test_dataset_edr'
+
+# Minimum starting SOL
+start_sol: 1343
+
+# Maximum ending SOL
+end_sol: 1343
+
+# `test_image` is optional. If its value is not None, the simulator will use
+#  the value provided to search for the image in the sol range defined by
+#  `start_sol` and `end_sol`.
+# For MSL Navcam and Mastcam images, the value of `test_image` must match the
+# value of `navcam_source_id` or `mastcam_source_id` in the JSON file.
+# For MSL multispectral image, the value of `test_image` must match the
+# first 13 characters of the RGB image name. For example, if the RGB image name
+# is 0640ML0027180000302738E01, the value of `test_image` must be 0640ML0027180
+test_image: None
+
+# A flag to control whether or not to use prior information. Note that for
+# ranking algorithms don't need prior information, these parameters will be
+# ignored.
+use_prior: True
+
+# Minimum prior sol
+min_prior: 1343
+
+# Maximum prior sol
+max_prior: 1343
+
+# `crop_shape` determines the shape of cropped images used for feature
+# extraction and ranking algorithms.
+# Supported `crop_shape` values are "square" and "rectangle".
+# Rockster identifies targets in polygons. "rectangle" is the smallest rectangle
+# with no rotation surrounding an identified polygon. "square" is the largest
+# square from "rectangle".
+crop_shape: 'square'
+
+# Minimum cropping area. If the area of a cropped image is smaller than the
+# value of `crop_min_area`, it will be skipped. The value must be an integer.
+min_crop_area: 100
+
+# We use the information within the source file to know (1) which image(s)
+# should be ranked and (2) locations of targets.
+# For MSL Navcam images, the `source_file` must be the aegis file.
+# For other images (e.g. Mastcam), the `source_file` must contain the
+# information described in (1) and (2) above.
+# NOTE: When the real-time Rockster detection capability is available, we will
+# no longer need to know the locations of targets as they are going to be
+# detected in real time.
+source_file: '/proj/cif-novelty/ref/rockster_mcam_executions_sol1343-sol1505.json'
+
+# The output directory of an experiment run.
+out_dir: '/PATH/TO/OUTPUT/DIRECTORY/'
+
+# A boolean parameter to turn on/off explanations for ranking methods.
+# Currently, only lrx, rx, and pca ranking methods have explanation capability
+# implemented. Other methods will generate explanations as 64 x 64 empty images.
+# Note that the explanation capability can be enabled only when
+# `flatten_pixel_values` feature is used alone.
+enable_explanation: False
+
+# A boolean parameter to turn on/off z-score normalization on feature vectors.
+# When `enable_normalization` is turned on, the mean and standard deviation will
+# be calculated from the prior data if available, and applied to the data to be
+# ranked. If prior data isn't available, the mean and standard deviation will
+# be calculated from the ranking data, and then applied to the ranking data.
+enable_normalization: True
+
+# Comment out the features you don't want to include in the experiment run.
+# `one_dimensional` and `two_dimensional` features cannot be enabled at the same
+# within the same experiment.
+features: {
+    one_dimensional: {
+        flattened_pixel_values: {
+            # optional parameter; if defined, the width of the image will be
+            # resized to the value of `width`
+            width: 64,
+            # optional parameter; if defined, the height of the image will be
+            # resized to the value of `height`
+            height: 64
+        },
+        aegis: {
+          feature_names: [
+              "inscribed_cy",
+              "inscribed_cx",
+              "inscribed_dist",
+              "ellipse_cy",
+              "color_std_1",
+              "orientation",
+              "area",
+              "color_mean_2",
+              "ellipse_cx",
+              "color_mean_0",
+              "color_mean_1",
+              "ellipse_semiminor",
+              "perimeter",
+              "ruggedness",
+              "intensity_mean",
+              "color_std_0",
+              "eccentricity",
+              "intensity_std",
+              "color_std_2",
+              "ellipse_semimajor"
+          ]
+        },
+        mean: {},
+        std: {},
+        median: {},
+        skew: {},
+        kurtosis: {},
+        min: {},
+        max: {}
+    },
+    two_dimensional: {
+        raw_pixel_values: {
+             optional parameter; if defined, the width of the image will be
+             resized to the value of `width`
+            width: 64,
+             optional parameter; if defined, the height of the image will be
+             resized to the value of `height`
+            height: 64
+        }
+    }
+}
+
+
+# Comment out the ranking method you don't want to include in the experiment run
+ranking_methods: {
+    aegis: {
+        aegis_file: '/proj/cif-novelty/ref/rockster_mcam_executions_sol1343-sol1505.json'
+    },
+    demud: {
+        k: 10
+    },
+    iforest: {},
+    lrx: {
+        inner_window: 3,
+        outer_window: 5,
+        bands: 1
+    },
+    pca: {
+        k: 10
+    },
+    rx: {},
+    random: {},
+    negative_sampling: {
+        percent_increase: 20
+    }
+}
