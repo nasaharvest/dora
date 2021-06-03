@@ -42,10 +42,11 @@ class DEMUDRanking(Ranking):
     # Returns a dictionary with:
     #   'sels' (data indices in descending score order)
     #   'scores' (score for each data item in original order)
-    def _demud_alg(data, initdata, k, nsel):
+    @classmethod
+    def _demud_alg(DEMUDRanking, data, initdata, k, nsel):
         """
         >>> data = np.array([[0, 0], [-1, 1]]).T
-        >>> demud_res = _demud_alg(data, np.array([]), k=1, nsel=2)
+        >>> demud_res = DEMUDRanking._demud_alg(data, np.array([]), k=1, nsel=2)
         >>> demud_res['sels']
         [1, 0]
         >>> demud_res['scores']
@@ -53,14 +54,34 @@ class DEMUDRanking(Ranking):
 
         Example from CIF benchmarking tests - with prior data
         >>> initdata = np.array([[1, 1], [-1, -1]]).T
-        >>> demud_res = _demud_alg(data, initdata, k=1, nsel=2)
+        >>> demud_res = DEMUDRanking._demud_alg(data, initdata, k=1, nsel=2)
         >>> demud_res['sels']
         [1, 0]
         >>> demud_res['scores']
         [2.0, 0.2222222222222222]
         """
-        pass
+
+        # Check arguments
+
+        res = {}
+
+        # If initial data set is provided, use it to initialize the model
         
+        # Otherwise do full SVD on data
+
+        # Select item with largest reconstruction error
+
+        # Iterative ranking and selection
+        for i in range(nsel):
+            # Select the next item
+            # Update scores of remaining items
+            pass
+        
+        res['sels'] = [0]
+        res['scores'] = [0]
+
+        return res
+
 
     def _demud(self, files, rank_data, prior_data, k, enable_explanation=True):
         """
@@ -70,7 +91,7 @@ class DEMUDRanking(Ranking):
         >>> demud_res = cosmic_demud.demud(ds, k=1, nsel=2, inititem=-1, \
                                            plotresults=False)
         Selected value of k=1 captures 100.00% of the data variance
-        >>> demud_res
+        >>> #demud_res
         >>> demud_res['sels']
         [1, 0]
         >>> demud_res['scores']
