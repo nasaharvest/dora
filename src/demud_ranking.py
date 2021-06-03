@@ -35,6 +35,33 @@ class DEMUDRanking(Ranking):
     def __init__(self):
         super(DEMUDRanking, self).__init__('demud')
 
+    # Simplified DEMUD algorithm:
+    # Specify data as numpy array (d x n), initdata (d x n2) can be [],
+    # k >= 1, nsel = number of items in 'data' to rank.
+    # Note: does not support other initialization methods.
+    # Returns a dictionary with:
+    #   'sels' (data indices in descending score order)
+    #   'scores' (score for each data item in original order)
+    def _demud_alg(data, initdata, k, nsel):
+        """
+        >>> data = np.array([[0, 0], [-1, 1]]).T
+        >>> demud_res = _demud_alg(data, np.array([]), k=1, nsel=2)
+        >>> demud_res['sels']
+        [1, 0]
+        >>> demud_res['scores']
+        [1.6023737137301802e-31, 1.0]
+
+        Example from CIF benchmarking tests - with prior data
+        >>> initdata = np.array([[1, 1], [-1, -1]]).T
+        >>> demud_res = _demud_alg(data, initdata, k=1, nsel=2)
+        >>> demud_res['sels']
+        [1, 0]
+        >>> demud_res['scores']
+        [2.0, 0.2222222222222222]
+        """
+        pass
+        
+
     def _demud(self, files, rank_data, prior_data, k, enable_explanation=True):
         """
         >>> ds = Dataset('', name='test')
