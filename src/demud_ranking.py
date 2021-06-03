@@ -13,10 +13,10 @@
 import sys
 import warnings
 import numpy as np
-from src.ranking import Ranking
-from src.util import load_images
-from src.util import DEFAULT_DATA_DIR
-from src.util import get_image_file_list
+from ranking import Ranking
+from util import load_images
+from util import DEFAULT_DATA_DIR
+from util import get_image_file_list
 
 try:
     import cosmic_demud
@@ -36,6 +36,29 @@ class DEMUDRanking(Ranking):
         super(DEMUDRanking, self).__init__('demud')
 
     def _demud(self, files, rank_data, prior_data, k, enable_explanation=True):
+        """
+        >>> ds = Dataset('', name='test')
+        >>> ds.data = np.array([[0, 0], [-1, 1]]).T
+        >>> ds.labels = ['A', 'B']
+        >>> demud_res = cosmic_demud.demud(ds, k=1, nsel=2, inititem=-1, \
+                                           plotresults=False)
+        Selected value of k=1 captures 100.00% of the data variance
+        >>> demud_res
+        >>> demud_res['sels']
+        [1, 0]
+        >>> demud_res['scores']
+        [1.6023737137301802e-31, 1.0]
+
+        Example from CIF benchmarking tests - with prior data
+        >>> ds.initdata = np.array([[1, 1], [-1, -1]]).T
+        >>> demud_res = cosmic_demud.demud(ds, k=1, nsel=2, inititem=-1, \
+                                           plotresults=False)
+        Selected value of k=1 captures 100.00% of the data variance
+        >>> demud_res['sels']
+        [1, 0]
+        >>> demud_res['scores']
+        [2.0, 0.2222222222222222]
+        """
 
         # Create a DEMUD data set
         ds = Dataset('', name='novelty')
