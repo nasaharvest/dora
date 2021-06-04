@@ -1,52 +1,14 @@
-import sys
-import warnings
 import numpy as np
-from dora_exp_pipeline.outlier_detection import OutlierDetection
-from dora_exp_pipeline.util import DEFAULT_DATA_DIR
 from sklearn.ensemble import IsolationForest
+from dora_exp_pipeline.outlier_detection import OutlierDetection
 
 
 class IForestOutlierDetection(OutlierDetection):
     def __init__(self):
         super(IForestOutlierDetection, self).__init__('iforest')
 
-    def _rank_internal(self, files, rank_data, prior_data, config,
-                                seed):
-        if config.use_prior:
-            data_trn = prior_data
-        else:
-            warnings.warn('use_prior flag is turned off in the config file. '
-                          'Test data will be used as prior data for isolation '
-                          'forest ranking method.')
-
-            data_trn = rank_data
-
-        # Rank targets
-        return self._rank_targets(data_trn, rank_data, files, seed,
-                                  enable_explanation=False)
-
-    def _rank_targets(self, data_train, data_test, files, seed,
-                      enable_explanation=False):
-        # run the isolation forest
-        scores_tst = train_and_run_ISO(data_train, data_test, seed)
-        indices_srt_by_scores = np.argsort(scores_tst)
-
-        # prepare results to return
-        results = dict()
-        results.setdefault('ind', [])
-        results.setdefault('sel_ind', [])
-        results.setdefault('img_id', [])
-        results.setdefault('scores', [])
-        results.setdefault('explanations', [])
-        for i, idx in enumerate(indices_srt_by_scores):
-            results['ind'].append(i)
-            results['sel_ind'].append(idx)
-            results['img_id'].append(files[idx])
-            results['scores'].append(scores_tst[idx])
-
-        results_file_suffix = 'seed-%d' % seed
-
-        return results, results_file_suffix
+    def _rank_internal(self, data_to_fit, data_to_score, seed):
+        return train_and_run_ISO(data_to_fit, data_to_score, seed)
 
 
 def train_and_run_ISO(train, test, seed):
@@ -63,55 +25,6 @@ def train_and_run_ISO(train, test, seed):
     scores_iso = clf_iso.decision_function(test)
 
     return scores_iso
-
-
-def start(start_sol, end_sol, data_dir, prior_dir, out_dir, min_prior,
-          max_prior, seed):
-    iforest_params = {
-        'min_prior': min_prior,
-        'max_prior': max_prior
-    }
-
-    iforest_outlier_detection = IForestOutlierDetection()
-
-    try:
-        iforest_outlier_detection.run(data_dir, prior_dir, start_sol, end_sol,
-                                      out_dir, seed, **iforest_params)
-    except RuntimeError as e:
-        print(e)
-        sys.exit(1)
-
-
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description='Isolation forest ranking algorithm')
-    parser.add_argument('-s', '--start_sol', type=int, default=1343,
-                        help='minimum (starting) sol (default 1343)')
-    parser.add_argument('-e', '--end_sol', type=int, default=1343,
-                        help='maximum (ending) sol (default 1343)')
-    parser.add_argument('-d', '--data_dir', default=DEFAULT_DATA_DIR,
-                        help='target image data directory '
-                             '(default: %(default)s)')
-    parser.add_argument('-pd', '--prior_dir', default=None,
-                        help='prior sols target image data directory '
-                             '(default: same as data_dir)')
-    parser.add_argument('-o', '--out_dir', default='.',
-                        help='output directory (default: .)')
-    parser.add_argument('-p', '--min_prior', type=int, default=-1,
-                        help='minimum prior sol (default -1)')
-    parser.add_argument('-q', '--max_prior', type=int, default=-1,
-                        help='maximum prior  sol (default -1)')
-    parser.add_argument('--seed', type=int, default=1234,
-                        help='Integer used to seed the random generator. '
-                             'Default is 1234.')
-    args = parser.parse_args()
-    start(**vars(args))
-
-
-if __name__ == '__main__':
-    main()
 
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
