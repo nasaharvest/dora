@@ -106,6 +106,18 @@ class DEMUDRanking(Ranking):
         [1, 0]
         >>> demud_res['scores']
         [2.0, 0.2222222222222222]
+
+        Larger example, no prior data
+        >>> ds.data = np.array([[0, 1, 2], [3, 3, 3], [0, 5, 0]]).T
+        >>> ds.labels = ['A', 'B', 'C']
+        >>> ds.initdata = []
+        >>> demud_res = cosmic_demud.demud(ds, k=1, nsel=3, inititem=-1, \
+                                           plotresults=False)
+        Selected value of k=1 captures 56.55% of the data variance
+        >>> demud_res['sels']
+        [0, 2, 1]
+        >>> demud_res['scores']
+        [3.9114893685505607, 20.0, 12.200000000000001]
         """
 
         # Create a DEMUD data set
