@@ -10,10 +10,8 @@
 # Steven Lu, May 13, 2020, refactored the code to extract common functionalities
 #                          out to util.py.
 
-import sys
 import warnings
 import numpy as np
-from dora_exp_pipeline.util import DEFAULT_DATA_DIR
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
 
@@ -21,45 +19,8 @@ class RXOutlierDetection(OutlierDetection):
     def __init__(self):
         super(RXOutlierDetection, self).__init__('rx')
 
-    def _rank_internal(self, files, rank_data, prior_data, config, seed):
-        if config.use_prior:
-            data_trn = prior_data
-        else:
-            warnings.warn('use_prior flag is turned off in the config file. '
-                          'Test data will be used to compute mean and '
-                          'covariance matrix.')
-
-            data_trn = rank_data
-
-        # Rank targets
-        return self._rank_targets(data_trn, rank_data, files,
-                                  config.enable_explanation)
-
-    def _rank_targets(self, data_train, data_test, files,
-                      enable_explanation=False):
-        # get RX scores, then sort in descending order
-        scores_tst, exp_tst = get_RX_scores(data_train, data_test,
-                                            enable_explanation)
-        indices_srt_by_scores = np.argsort(scores_tst)[::-1]
-
-        # prepare results to return
-        results = dict()
-        results.setdefault('ind', [])
-        results.setdefault('sel_ind', [])
-        results.setdefault('img_id', [])
-        results.setdefault('scores', [])
-        results.setdefault('explanations', [])
-
-        for i, idx in enumerate(indices_srt_by_scores):
-            results['ind'].append(i)
-            results['sel_ind'].append(idx)
-            results['img_id'].append(files[idx])
-            results['scores'].append(scores_tst[idx])
-
-            if enable_explanation:
-                results['explanations'].append(exp_tst[idx])
-
-        return results, ''
+    def _rank_internal(self, data_to_fit, data_to_score, seed):
+        return get_RX_scores(data_to_fit, data_to_score, )
 
 
 def compute_bg(train_images):
@@ -75,14 +36,9 @@ def compute_bg(train_images):
     return mu, cov
 
 
-def compute_score(images, mu, cov, enable_explanation=False):
+def compute_score(images, mu, cov):
     rows, cols = images.shape
     scores = np.ndarray(rows)
-
-    explanations = None
-    if enable_explanation:
-        im_height, im_width = int(np.sqrt(cols)), int(np.sqrt(cols))
-        explanations = np.ndarray((rows, im_height, im_width))
 
     for i in range(rows):
         # compute the L2 norm between input and reconstruction
@@ -90,71 +46,16 @@ def compute_score(images, mu, cov, enable_explanation=False):
         rx_score = np.dot(np.dot(sub, cov), sub.T)
         scores[i] = rx_score
 
-        if enable_explanation:
-            rx_exp = np.reshape(sub, (im_height, im_width))
-            rx_exp = np.interp(rx_exp, (rx_exp.min(), rx_exp.max()), (0, 255))
-            explanations[i] = rx_exp
-
     if np.any(scores < 0):
         warnings.warn('Some RX scores are negative.')
 
-    return scores, explanations
+    return scores
 
 
-def get_RX_scores(train, test, enable_explanation=False):
+def get_RX_scores(train, test):
     mu, cov = compute_bg(train)
 
-    return compute_score(test, mu, cov, enable_explanation)
-
-
-def start(start_sol, end_sol, data_dir, prior_dir, out_dir, min_prior,
-          max_prior, seed):
-    rx_params = {
-        'min_prior': min_prior,
-        'max_prior': max_prior
-    }
-
-    rx_outlier_detection = RXOutlierDetection()
-
-    try:
-        rx_outlier_detection.run(data_dir, prior_dir, start_sol, end_sol,
-                                 out_dir, seed, **rx_params)
-    except RuntimeError as e:
-        print(e)
-        sys.exit(1)
-
-
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description='Reed-Xiaoli (RX) ranking algorithm')
-    parser.add_argument('-s', '--start_sol', type=int, default=1343,
-                        help='minimum (starting) sol (default 1343)')
-    parser.add_argument('-e', '--end_sol', type=int, default=1343,
-                        help='maximum (ending) sol (default 1343)')
-    parser.add_argument('-d', '--data_dir', default=DEFAULT_DATA_DIR,
-                        help='target image data directory '
-                             '(default: %(default)s)')
-    parser.add_argument('-pd', '--prior_dir', default=None,
-                        help='prior sols target image data directory '
-                             '(default: same as data_dir)')
-    parser.add_argument('-o', '--out_dir', default='.',
-                        help='output directory (default: .)')
-    parser.add_argument('-p', '--min_prior', type=int, default=-1,
-                        help='minimum prior sol (default -1)')
-    parser.add_argument('-q', '--max_prior', type=int, default=-1,
-                        help='maximum prior  sol (default -1)')
-    parser.add_argument('--seed', type=int, default=1234,
-                        help='Integer used to seed the random generator. This '
-                             'argument is not used in this script.')
-
-    args = parser.parse_args()
-    start(**vars(args))
-
-
-if __name__ == '__main__':
-    main()
+    return compute_score(test, mu, cov)
 
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
