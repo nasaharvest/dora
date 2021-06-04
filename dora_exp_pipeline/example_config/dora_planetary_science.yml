@@ -1,0 +1,31 @@
+# Data loading module parameters
+data_type: 'grayscale image'
+data_to_fit: '/PATH/TO/DIR/'
+data_to_score: '/PATH/TO/DIR/'
+zscore_normalization: False
+
+# Feature extraction module
+features: {
+    flattened_pixel_values: {
+        # optional parameter; if defined, the width of the image will be
+        # resized to the value of `width`
+        width: 64,
+        # optional parameter; if defined, the height of the image will be
+        # resized to the value of `height`
+        height: 64
+    }
+}
+
+# Outlier detection module
+outlier_detection: {
+    pca: {
+        k: 5
+    }
+}
+
+# Results organization module
+results: {
+    save_scores: {
+        'out_dir': 'PATH/TO/OUTPUT/DIR/'
+    }
+}

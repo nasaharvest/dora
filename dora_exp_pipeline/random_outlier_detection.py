@@ -11,14 +11,13 @@
 
 import sys
 import numpy as np
-from src.ranking import Ranking
-from src.util import DEFAULT_DATA_DIR
-from src.util import get_image_file_list
+from dora_exp_pipeline.outlier_detection import OutlierDetection
+from dora_exp_pipeline.util import DEFAULT_DATA_DIR
 
 
-class RandomRanking(Ranking):
+class RandomOutlierDetection(OutlierDetection):
     def __init__(self):
-        super(RandomRanking, self).__init__('random')
+        super(RandomOutlierDetection, self).__init__('random')
 
     def _random(self, files, seed, enable_explanation=True):
         # Random ranking
@@ -46,23 +45,16 @@ class RandomRanking(Ranking):
 
         return results, results_file_suffix
 
-    # prior_dir is ignored for this algorithm
-    def _rank_internal(self, data_dir, prior_dir, start_sol, end_sol, seed):
-        # Get the list of images falling in the sol range
-        files = get_image_file_list(data_dir, start_sol, end_sol)
-
-        return self._random(files, seed, enable_explanation=False)
-
-    def _simulate_rank_internal(self, files, rank_data, prior_data, config, 
-                                seed):
+    def _rank_internal(self, files, rank_data, prior_data, config, seed):
         return self._random(files, seed, config.enable_explanation)
 
 
 def start(start_sol, end_sol, data_dir, out_dir, seed):
-    random_ranking = RandomRanking()
+    random_outlier_detection = RandomOutlierDetection()
 
     try:
-        random_ranking.run(data_dir, start_sol, end_sol, out_dir, seed)
+        random_outlier_detection.run(data_dir, start_sol, end_sol, out_dir,
+                                     seed)
     except RuntimeError as e:
         print(e)
         sys.exit(1)
