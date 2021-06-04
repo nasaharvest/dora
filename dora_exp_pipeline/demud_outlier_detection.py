@@ -11,8 +11,6 @@
 #                          out to util.py.
 
 import sys
-import numpy as np
-from dora_exp_pipeline.util import DEFAULT_DATA_DIR
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
 try:
@@ -32,17 +30,15 @@ class DEMUDOutlierDetection(OutlierDetection):
     def __init__(self):
         super(DEMUDOutlierDetection, self).__init__('demud')
 
-    def _demud(self, files, rank_data, prior_data, k, enable_explanation=True):
-
+    def _demud(self, data_to_fit, data_to_score, k):
         # Create a DEMUD data set
         ds = Dataset('', name='novelty')
-        ds.data = rank_data.T
-        n_items = rank_data.shape[0]
+        ds.data = data_to_score.T
+        n_items = data_to_score.shape[0]
         for i in range(n_items):
-            ds.labels.append(files[i])
+            ds.labels.append(i)
 
-        if prior_data is not None:
-            ds.initdata = np.array(prior_data).T
+        ds.initdata = data_to_fit.T
 
         # Suppress stdout for DEMUD calls
         stdout_ = sys.stdout
@@ -57,87 +53,14 @@ class DEMUDOutlierDetection(OutlierDetection):
         # Restore the previous stdout
         sys.stdout = stdout_
 
-        results = dict()
-        results.setdefault('ind', [])
-        results.setdefault('img_id', [])
-        results.setdefault('sel_ind', demud_results['sels'])
-        results.setdefault('scores', demud_results['scores'])
-        results.setdefault('explanations', [])
-        for ind, selection in enumerate(demud_results['sels']):
-            results['ind'].append(ind)
-            results['img_id'].append(files[selection])
+        return demud_results['scores']
 
-        results_file_suffix = 'k-%d' % k
-
-        return results, results_file_suffix
-
-    def _rank_internal(self, files, rank_data, prior_data, config, seed, k):
+    def _rank_internal(self, data_to_fit, data_to_score, seed, k):
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
 
-        if not config.use_prior:
-            prior_data = None
-
-        return self._demud(files, rank_data, prior_data, k)
-
-
-def start(start_sol, end_sol, data_dir, prior_dir, out_dir, k, min_prior,
-          max_prior, seed):
-
-    # Allow specification of separate dir for prior sol targets
-    # If not specified, use the original data_dir
-    if prior_dir is None:
-        prior_dir = data_dir
-
-    demud_params = {
-        'k': k,
-        'min_prior': min_prior,
-        'max_prior': max_prior
-    }
-
-    demud_outlier_detection = DEMUDOutlierDetection()
-
-    try:
-        demud_outlier_detection.run(data_dir, prior_dir, start_sol, end_sol,
-                                    out_dir, seed, **demud_params)
-    except RuntimeError as e:
-        print(e)
-        sys.exit(1)
-
-
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(description='DEMUD ranking algorithm')
-    parser.add_argument('-s', '--start_sol', type=int, default=1343,
-                        help='minimum (starting) sol (default 1343)')
-    parser.add_argument('-e', '--end_sol', type=int, default=1343,
-                        help='maximum (ending) sol (default 1343)')
-    parser.add_argument('-d', '--data_dir', default=DEFAULT_DATA_DIR,
-                        help='target image data directory '
-                             '(default: %(default)s)')
-    parser.add_argument('-pd', '--prior_dir', default=None,
-                        help='prior sols target image data directory '
-                             '(default: same as data_dir)')
-    parser.add_argument('-o', '--out_dir', default='.',
-                        help='output directory (default: .)')
-    parser.add_argument('-k', type=int, default=10,
-                        help='k (number of principal components, default 10)')
-    parser.add_argument('-p', '--min_prior', type=int, default=-1,
-                        help='minimum prior sol (default -1)')
-    parser.add_argument('-q', '--max_prior', type=int, default=-1,
-                        help='maximum prior  sol (default -1)')
-    parser.add_argument('--seed', type=int, default=1234,
-                        help='Integer used to seed the random generator. This '
-                             'argument is not used in this script.')
-
-    args = parser.parse_args()
-    start(**vars(args))
-
-
-if __name__ == '__main__':
-    main()
+        return self._demud(data_to_fit, data_to_score, k)
 
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
