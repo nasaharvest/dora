@@ -1,52 +1,16 @@
-#!/usr/bin/env python
-# Given a sol range, read in all AEGIS target images and rank them by novelty
-# using Isolation Forest algorithm. See copyright notice at the end.
-#
-# Author (TODO)
-# Date created (TODO)
-#
-# Modification history:
-# Steven Lu, May 13, 2020, refactored the code to extract common functionalities
-#                          out to util.py.
-
 import sys
 import warnings
 import numpy as np
-from src.ranking import Ranking
-from src.util import load_images
-from src.util import DEFAULT_DATA_DIR
-from src.util import get_image_file_list
+from dora_exp_pipeline.outlier_detection import OutlierDetection
+from dora_exp_pipeline.util import DEFAULT_DATA_DIR
 from sklearn.ensemble import IsolationForest
 
 
-class IForestRanking(Ranking):
+class IForestOutlierDetection(OutlierDetection):
     def __init__(self):
-        super(IForestRanking, self).__init__('iforest')
+        super(IForestOutlierDetection, self).__init__('iforest')
 
-    def _rank_internal(self, data_dir, prior_dir, start_sol, end_sol, seed,
-                       min_prior, max_prior):
-        if min_prior < 0 or max_prior < 0 or max_prior < min_prior:
-            raise RuntimeError('Invalid min_prior (%d) or max_prior (%d).' %
-                               (min_prior, max_prior))
-
-        # Allow specification of separate dir for prior sol targets
-        # If not specified, use the original data_dir
-        if prior_dir is None:
-            prior_dir = data_dir
-
-        # catalog available images to read in
-        f_images_trn = get_image_file_list(prior_dir, min_prior, max_prior)
-        f_images_tst = get_image_file_list(data_dir, start_sol, end_sol)
-
-        # get the image data
-        data_trn = load_images(prior_dir, f_images_trn)
-        data_tst = load_images(data_dir, f_images_tst)
-
-        # Rank targets
-        return self._rank_targets(data_trn, data_tst, f_images_tst, seed,
-                                  enable_explanation=False)
-
-    def _simulate_rank_internal(self, files, rank_data, prior_data, config,
+    def _rank_internal(self, files, rank_data, prior_data, config,
                                 seed):
         if config.use_prior:
             data_trn = prior_data
@@ -80,9 +44,6 @@ class IForestRanking(Ranking):
             results['img_id'].append(files[idx])
             results['scores'].append(scores_tst[idx])
 
-            if enable_explanation:
-                results['explanations'].append(np.ones((64, 64)))
-
         results_file_suffix = 'seed-%d' % seed
 
         return results, results_file_suffix
@@ -104,17 +65,18 @@ def train_and_run_ISO(train, test, seed):
     return scores_iso
 
 
-def start(start_sol, end_sol, data_dir, prior_dir, out_dir, min_prior, max_prior, seed):
+def start(start_sol, end_sol, data_dir, prior_dir, out_dir, min_prior,
+          max_prior, seed):
     iforest_params = {
         'min_prior': min_prior,
         'max_prior': max_prior
     }
 
-    iforest_ranking = IForestRanking()
+    iforest_outlier_detection = IForestOutlierDetection()
 
     try:
-        iforest_ranking.run(data_dir, prior_dir, start_sol, end_sol, out_dir, seed,
-                            **iforest_params)
+        iforest_outlier_detection.run(data_dir, prior_dir, start_sol, end_sol,
+                                      out_dir, seed, **iforest_params)
     except RuntimeError as e:
         print(e)
         sys.exit(1)

@@ -11,22 +11,17 @@
 #
 
 import numpy as np
-from src.ranking import Ranking
+from dora_exp_pipeline.outlier_detection import OutlierDetection
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 
 
-class NegativeSamplingRanking(Ranking):
+class NegativeSamplingOutlierDetection(OutlierDetection):
     def __init__(self):
-        super(NegativeSamplingRanking, self).__init__('negative_sampling')
+        super(NegativeSamplingOutlierDetection, self).__init__('negative_sampling')
 
-    def _rank_internal(self, data_dir, prior_dir, start_sol, end_sol, seed,
-                       percent_increase, min_prior, max_prior):
-        raise RuntimeError('Negative sampling ranking is not implemented for '
-                           'run_exp program')
-
-    def _simulate_rank_internal(self, files, rank_data, prior_data, config,
+    def _rank_internal(self, files, rank_data, prior_data, config,
                                 seed, percent_increase):
         if percent_increase < 0 or percent_increase > 100:
             raise RuntimeError('percent_increase parameter must be a number '
@@ -92,9 +87,6 @@ class NegativeSamplingRanking(Ranking):
             results['sel_ind'].append(idx)
             results['img_id'].append(files[idx])
             results['scores'].append(scores[idx])
-
-            if enable_explanation:
-                results['explanations'].append(np.ones(64, 64))
 
         results_file_suffix = 'p-%d' % percent_increase
 

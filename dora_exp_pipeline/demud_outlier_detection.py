@@ -11,12 +11,9 @@
 #                          out to util.py.
 
 import sys
-import warnings
 import numpy as np
-from src.ranking import Ranking
-from src.util import load_images
-from src.util import DEFAULT_DATA_DIR
-from src.util import get_image_file_list
+from dora_exp_pipeline.util import DEFAULT_DATA_DIR
+from dora_exp_pipeline.outlier_detection import OutlierDetection
 
 try:
     import cosmic_demud
@@ -31,9 +28,9 @@ except ImportError:
     sys.exit(1)
 
 
-class DEMUDRanking(Ranking):
+class DEMUDOutlierDetection(OutlierDetection):
     def __init__(self):
-        super(DEMUDRanking, self).__init__('demud')
+        super(DEMUDOutlierDetection, self).__init__('demud')
 
     def _demud(self, files, rank_data, prior_data, k, enable_explanation=True):
 
@@ -70,44 +67,11 @@ class DEMUDRanking(Ranking):
             results['ind'].append(ind)
             results['img_id'].append(files[selection])
 
-            if enable_explanation:
-                # TODO: This is placeholder. Need to be replaced with real
-                # TODO: explanations!
-                results['explanations'].append(np.ones((64, 64)))
-
         results_file_suffix = 'k-%d' % k
 
         return results, results_file_suffix
 
-    def _rank_internal(self, data_dir, prior_dir, start_sol, end_sol, seed, k,
-                       min_prior, max_prior):
-        if k < 1:
-            raise RuntimeError('The number of principal components (k) must '
-                               'be >= 1')
-
-        # Allow specification of separate dir for prior sol targets
-        # If not specified, use the original data_dir
-        if prior_dir is None:
-            prior_dir = data_dir
-
-        # Read in the image data to be ranked
-        files = get_image_file_list(data_dir, start_sol, end_sol)
-        imdata = load_images(data_dir, files)
-
-        init_imdata = None
-        if min_prior < 0 or max_prior < 0 or max_prior < min_prior:
-            warn_msg = ('Invalid min_prior (%d) or max_prior (%d); ignored.'
-                        % (min_prior, max_prior))
-            warnings.warn(warn_msg)
-        else:
-            init_files = get_image_file_list(prior_dir, min_prior, max_prior)
-            init_imdata = load_images(prior_dir, init_files)
-
-        return self._demud(files, imdata, init_imdata, k,
-                           enable_explanation=False)
-
-    def _simulate_rank_internal(self, files, rank_data, prior_data, config,
-                                seed, k):
+    def _rank_internal(self, files, rank_data, prior_data, config, seed, k):
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
@@ -115,11 +79,11 @@ class DEMUDRanking(Ranking):
         if not config.use_prior:
             prior_data = None
 
-        return self._demud(files, rank_data, prior_data, k,
-                           config.enable_explanation)
+        return self._demud(files, rank_data, prior_data, k)
 
 
-def start(start_sol, end_sol, data_dir, prior_dir, out_dir, k, min_prior, max_prior, seed):
+def start(start_sol, end_sol, data_dir, prior_dir, out_dir, k, min_prior,
+          max_prior, seed):
 
     # Allow specification of separate dir for prior sol targets
     # If not specified, use the original data_dir
@@ -132,11 +96,11 @@ def start(start_sol, end_sol, data_dir, prior_dir, out_dir, k, min_prior, max_pr
         'max_prior': max_prior
     }
 
-    demud_ranking = DEMUDRanking()
+    demud_outlier_detection = DEMUDOutlierDetection()
 
     try:
-        demud_ranking.run(data_dir, prior_dir, start_sol, end_sol, out_dir, seed,
-                          **demud_params)
+        demud_outlier_detection.run(data_dir, prior_dir, start_sol, end_sol,
+                                    out_dir, seed, **demud_params)
     except RuntimeError as e:
         print(e)
         sys.exit(1)

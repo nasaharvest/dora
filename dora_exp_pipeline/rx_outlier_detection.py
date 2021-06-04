@@ -13,45 +13,15 @@
 import sys
 import warnings
 import numpy as np
-from src.ranking import Ranking
-from src.util import load_images
-from src.util import DEFAULT_DATA_DIR
-from src.util import get_image_file_list
+from dora_exp_pipeline.util import DEFAULT_DATA_DIR
+from dora_exp_pipeline.outlier_detection import OutlierDetection
 
 
-class RXRanking(Ranking):
+class RXOutlierDetection(OutlierDetection):
     def __init__(self):
-        super(RXRanking, self).__init__('rx')
+        super(RXOutlierDetection, self).__init__('rx')
 
-    def _rank_internal(self, data_dir, prior_dir, start_sol, end_sol, seed,
-                       min_prior, max_prior):
-
-        # Allow specification of separate dir for prior sol targets
-        # If not specified, use the original data_dir
-        if prior_dir is None:
-            prior_dir = data_dir
-
-        # catalog available images to read in
-        f_images_tst = get_image_file_list(data_dir, start_sol, end_sol)
-
-        if min_prior < 0 or max_prior < 0 or max_prior < min_prior:
-            f_images_trn = f_images_tst
-            warnings.warn('Invalid min_prior (%d) or max_prior (%d). Test data '
-                          'will be used to compute mean and covariance matrix' %
-                          (min_prior, max_prior))
-        else:
-            f_images_trn = get_image_file_list(prior_dir, min_prior, max_prior)
-
-        # get the image data
-        data_trn = load_images(prior_dir, f_images_trn)
-        data_tst = load_images(data_dir, f_images_tst)
-
-        # Rank targets
-        return self._rank_targets(data_trn, data_tst, f_images_tst,
-                                  enable_explanation=False)
-
-    def _simulate_rank_internal(self, files, rank_data, prior_data, config,
-                                seed):
+    def _rank_internal(self, files, rank_data, prior_data, config, seed):
         if config.use_prior:
             data_trn = prior_data
         else:
@@ -137,17 +107,18 @@ def get_RX_scores(train, test, enable_explanation=False):
     return compute_score(test, mu, cov, enable_explanation)
 
 
-def start(start_sol, end_sol, data_dir, prior_dir, out_dir, min_prior, max_prior, seed):
+def start(start_sol, end_sol, data_dir, prior_dir, out_dir, min_prior,
+          max_prior, seed):
     rx_params = {
         'min_prior': min_prior,
         'max_prior': max_prior
     }
 
-    rx_ranking = RXRanking()
+    rx_outlier_detection = RXOutlierDetection()
 
     try:
-        rx_ranking.run(data_dir, prior_dir, start_sol, end_sol, out_dir, seed,
-                       **rx_params)
+        rx_outlier_detection.run(data_dir, prior_dir, start_sol, end_sol,
+                                 out_dir, seed, **rx_params)
     except RuntimeError as e:
         print(e)
         sys.exit(1)

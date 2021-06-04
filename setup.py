@@ -21,7 +21,7 @@ setup(
         'Pillow==6.2.1',
         'planetaryimage==0.5.0',
         'pytest==4.6.11',
-        'PyYAML==5.3.1'
+        'PyYAML==5.4.1'
     ],
     provide=[
         'novelty_targeting'

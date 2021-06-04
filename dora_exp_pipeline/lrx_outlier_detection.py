@@ -10,32 +10,18 @@
 
 import sys
 import numpy as np
-from src.ranking import Ranking
-from src.util import load_images
-from src.util import DEFAULT_DATA_DIR
-from src.util import get_image_file_list
+from dora_exp_pipeline.outlier_detection import OutlierDetection
+from dora_exp_pipeline.util import load_images
+from dora_exp_pipeline.util import DEFAULT_DATA_DIR
+from dora_exp_pipeline.util import get_image_file_list
 
 
-class LocalRXRanking(Ranking):
+class LocalRXOutlierDetection(OutlierDetection):
     def __init__(self):
-        super(LocalRXRanking, self).__init__('lrx')
+        super(LocalRXOutlierDetection, self).__init__('lrx')
 
-    # prior_dir is ignored for this algorithm
-    def _rank_internal(self, data_dir, prior_dir, start_sol, end_sol, seed,
+    def _rank_internal(self, files, rank_data, prior_data, config, seed,
                        inner_window, outer_window, bands=1):
-
-        # catalog available images to read in
-        f_images_tst = get_image_file_list(data_dir, start_sol, end_sol)
-
-        # get the image data
-        data_tst = load_images(data_dir, f_images_tst)
-
-        # rank targets
-        return self._rank_targets(data_tst, f_images_tst, inner_window,
-                                  outer_window, bands, enable_explanation=False)
-
-    def _simulate_rank_internal(self, files, rank_data, prior_data, config,
-                                seed, inner_window, outer_window, bands=1):
         if inner_window > outer_window:
             raise RuntimeError('inner_window cannot be bigger than outer_window'
                                ' for %s method.' % self._ranking_alg_name)
@@ -96,12 +82,6 @@ class LocalRXRanking(Ranking):
             results['sel_ind'].append(idx)
             results['img_id'].append(files[idx])
             results['scores'].append(scores_tst[idx])
-
-            if enable_explanation:
-                results['explanations'].append(
-                    np.interp(vis[idx], (vis[idx].min(), vis[idx].max()),
-                              (0, 255))
-                )
 
         results_file_suffix = 'i%d-o%d-b%d' % (inner_window, outer_window,
                                                bands)
@@ -175,11 +155,11 @@ def start(start_sol, end_sol, data_dir, out_dir, inner_window, outer_window,
         'bands': bands
     }
 
-    lrx_ranking = LocalRXRanking()
+    lrx_outlier_detection = LocalRXOutlierDetection()
 
     try:
-        lrx_ranking.run(data_dir, start_sol, end_sol, out_dir, seed,
-                        **lrx_params)
+        lrx_outlier_detection.run(data_dir, start_sol, end_sol, out_dir, seed,
+                                  **lrx_params)
     except RuntimeError as e:
         print(e)
         sys.exit(1)
