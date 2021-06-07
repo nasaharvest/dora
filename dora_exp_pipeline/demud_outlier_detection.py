@@ -11,56 +11,70 @@
 #                          out to util.py.
 
 import sys
+import numpy as np
 from dora_exp_pipeline.outlier_detection import OutlierDetection
-
-try:
-    import cosmic_demud
-    from cosmic_demud.dataset import Dataset
-except ImportError:
-    print('This script requires the COSMIC_DEMUD python library.')
-    print('Please follow these steps:')
-    print('git clone git@github-fn.jpl.nasa.gov:COSMIC/COSMIC_DEMUD.git')
-    print('cd COSMIC_DEMUD')
-    print('git checkout feature-config-files')
-    print('python setup.py install (with --user if desired)')
-    sys.exit(1)
-
 
 class DEMUDOutlierDetection(OutlierDetection):
     def __init__(self):
         super(DEMUDOutlierDetection, self).__init__('demud')
-
-    def _demud(self, data_to_fit, data_to_score, k):
-        # Create a DEMUD data set
-        ds = Dataset('', name='novelty')
-        ds.data = data_to_score.T
-        n_items = data_to_score.shape[0]
-        for i in range(n_items):
-            ds.labels.append(i)
-
-        ds.initdata = data_to_fit.T
-
-        # Suppress stdout for DEMUD calls
-        stdout_ = sys.stdout
-        sys.stdout = open('/dev/null', 'w')
-
-        # Run DEMUD and get selections back
-        # 'sels': list of item indices, in order of selection
-        demud_results = cosmic_demud.demud(
-            ds, k=k, nsel=n_items, inititem=-1, plotresults=False
-        )
-
-        # Restore the previous stdout
-        sys.stdout = stdout_
-
-        return demud_results['scores']
 
     def _rank_internal(self, data_to_fit, data_to_score, seed, k):
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
 
-        return self._demud(data_to_fit, data_to_score, k)
+        # nsel=-1 means to rank all items;
+        # in a future update, the caller may want to limit this
+        return DEMUDOutlierDetection.demud(data=data_to_score,
+                                           initdata=data_to_fit,
+                                           k=k, nsel=-1)
+
+    # Simplified DEMUD algorithm:
+    # Specify data as numpy array (d x n), initdata (d x n2) can be [],
+    # k >= 1, nsel = number of items in 'data' to rank.
+    # Note: does not support other initialization methods.
+    # Returns a dictionary with:
+    #   'sels' (data indices in descending score order)
+    #   'scores' (score for each data item in original order)
+    @classmethod
+    def demud(DEMUDOutlierDetection, data, initdata, k, nsel):
+        """
+        >>> data = np.array([[0, 0], [-1, 1]]).T
+        >>> demud_res = DEMUDOutlierDetection.demud(data, np.array([]), k=1, nsel=2)
+        >>> demud_res['sels']
+        [1, 0]
+        >>> demud_res['scores']
+        [1.6023737137301802e-31, 1.0]
+
+        Example from CIF benchmarking tests - with prior data
+        >>> initdata = np.array([[1, 1], [-1, -1]]).T
+        >>> demud_res = DEMUDOutlierDetection.demud(data, initdata, k=1, nsel=2)
+        >>> demud_res['sels']
+        [1, 0]
+        >>> demud_res['scores']
+        [2.0, 0.2222222222222222]
+        """
+
+        # Check arguments
+
+        res = {}
+
+        # If initial data set is provided, use it to initialize the model
+        
+        # Otherwise do full SVD on data
+
+        # Select item with largest reconstruction error
+
+        # Iterative ranking and selection
+        for i in range(nsel):
+            # Select the next item
+            # Update scores of remaining items
+            pass
+        
+        res['sels'] = [0]
+        res['scores'] = [0]
+
+        return res
 
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
