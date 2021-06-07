@@ -5,6 +5,7 @@
 
 import os
 import glob
+import csv
 import numpy as np
 from PIL import Image
 from six import add_metaclass
@@ -154,6 +155,46 @@ class RGBImageLoader(DataLoader):
 
 rgb_image_loader = RGBImageLoader()
 register_data_loader(rgb_image_loader)
+
+
+class TimeSeriesLoader(DataLoader):
+    def __init__(self):
+        super(TimeSeriesLoader, self).__init__('Time series')
+
+    def _load(self, dir_path: str) -> dict:
+        if not os.path.exists(dir_path):
+            raise RuntimeError(f'Directory not found: '
+                               f'{os.path.abspath(dir_path)}')
+
+        # List of supported file types
+        file_types = ['.csv']
+
+        data_dict = dict()
+        data_dict.setdefault('id', [])
+        data_dict.setdefault('data', [])
+
+        # TODO: add support for other data types 
+        # (e.g., .h5 dataframes, .npy)
+        if dir_path.endswith('.csv'):
+            # Load the csv data
+            with open(dir_path, 'r') as csv_file:
+                csv_reader = csv.reader(csv_file, quoting=csv.QUOTE_NONNUMERIC)
+                # Read each row into the data_dict
+                for row in csv_reader:
+                    # Assumes the first column is the ID 
+                    # and all other columns are time steps
+                    data_dict['id'].append(row[0])
+                    data_dict['data'].append(np.array(row[1:]))
+        else:
+            raise RuntimeError(f'File extension not supported. '
+                               f'Valid file extensions: '
+                               f'{file_types}') 
+
+        return data_dict
+
+
+time_series_loader = TimeSeriesLoader()
+register_data_loader(time_series_loader)
 
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
