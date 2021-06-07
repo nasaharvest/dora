@@ -56,23 +56,49 @@ class DEMUDOutlierDetection(OutlierDetection):
         """
 
         # Check arguments
+        if k < 1:
+            raise RuntimeError('The number of principal components (k) must '
+                               'be >= 1')
 
         res = {}
 
-        # If initial data set is provided, use it to initialize the model
-        
-        # Otherwise do full SVD on data
+        # Initialize DEMUD model variables
+        X = data
+        U = [] # principal components
+        S = np.array([1])
+        mu = [] # data mean
+        n = 0 # number selected
 
-        # Select item with largest reconstruction error
+        # If initial data set is provided, use it to initialize the model
+        if len(initdata) > 0:
+            U, S, mu, n = update_model(initdata, U, S, k, n=0, mu=[])
+        else:
+            # Otherwise do full SVD on data
+            U, S, mu, n = update_model(X, U, S, k, n=0, mu=[])
 
         # Iterative ranking and selection
+        n_items = X.shape[1]
+        orig_ind = np.arange(n_items)
+        seen = initdata
         for i in range(nsel):
-            # Select the next item
-            # Update scores of remaining items
-            pass
-        
-        res['sels'] = [0]
-        res['scores'] = [0]
+            # Select item with largest reconstruction error
+            ind, r, score, scores = select_next(X, U, mu)
+            res['sels'] += [orig_ind[ind]]
+            res['scores'] += [score]
+
+            # Update model with new selection
+            x = X[:, ind]
+            if seen == []:
+                seen = x.reshape(-1, 1)
+            else:
+                seen = np.hstack((seen, x.reshape(-1, 1)))
+            U, S, mu, n = update_model(seen, U, S, k, n, mu)
+
+            # Remove this item from X
+            keep = range(X.shape[1])
+            keep.remove(ind)
+            X = X[:, keep]
+            orig_ind = orig_ind[keep]
 
         return res
 
