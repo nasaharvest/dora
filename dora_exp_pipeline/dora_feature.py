@@ -127,6 +127,29 @@ flattened_pixel_values_extractor = FlattenedPixelValuesExtractor()
 register_extractor(flattened_pixel_values_extractor)
 
 
+# Feature extractor for passing along the raw values.
+class RawValuesExtractor(FeatureExtractor):
+    def __init__(self):
+        super(RawValuesExtractor, self).__init__(
+            'raw_values')
+
+    def extract(self, data_cube, **kwargs):
+        # Get data dimension and type from the first item in the data cube
+        dim = data_cube[0].shape
+        ret_features = np.zeros((len(data_cube), dim[0]), 
+                                dtype=data_cube[0][0].dtype)
+
+        for ind, data in enumerate(data_cube):
+            ret_features[ind, :] = data.flatten()
+
+        return ret_features
+
+
+# Register flattened pixel values extractor into the feature extractor pool
+raw_values_extractor = RawValuesExtractor()
+register_extractor(raw_values_extractor)
+
+
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
