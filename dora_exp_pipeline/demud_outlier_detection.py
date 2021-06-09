@@ -61,6 +61,8 @@ class DEMUDOutlierDetection(OutlierDetection):
                                'be >= 1')
 
         res = {}
+        res['sels'] = []
+        res['scores'] = []
 
         # Initialize DEMUD model variables
         X = data
@@ -71,10 +73,12 @@ class DEMUDOutlierDetection(OutlierDetection):
 
         # If initial data set is provided, use it to initialize the model
         if len(initdata) > 0:
-            U, S, mu, n = update_model(initdata, U, S, k, n=0, mu=[])
+            U, S, mu, n = DEMUDOutlierDetection.update_model(
+                initdata, U, S, k, n=0, mu=[])
         else:
             # Otherwise do full SVD on data
-            U, S, mu, n = update_model(X, U, S, k, n=0, mu=[])
+            U, S, mu, n = DEMUDOutlierDetection.update_model(
+                X, U, S, k, n=0, mu=[])
 
         # Iterative ranking and selection
         n_items = X.shape[1]
@@ -82,26 +86,59 @@ class DEMUDOutlierDetection(OutlierDetection):
         seen = initdata
         for i in range(nsel):
             # Select item with largest reconstruction error
-            ind, r, score, scores = select_next(X, U, mu)
+            ind, r, score, scores = DEMUDOutlierDetection.select_next(
+                X, U, mu)
             res['sels'] += [orig_ind[ind]]
             res['scores'] += [score]
 
             # Update model with new selection
             x = X[:, ind]
-            if seen == []:
+            if len(seen) == 0:
                 seen = x.reshape(-1, 1)
             else:
                 seen = np.hstack((seen, x.reshape(-1, 1)))
-            U, S, mu, n = update_model(seen, U, S, k, n, mu)
+            U, S, mu, n = DEMUDOutlierDetection.update_model(
+                seen, U, S, k, n, mu)
 
             # Remove this item from X
-            keep = range(X.shape[1])
+            keep = list(range(X.shape[1]))
             keep.remove(ind)
             X = X[:, keep]
             orig_ind = orig_ind[keep]
 
         return res
 
+
+    @classmethod
+    def update_model(DEMUDOutlierDetection, X, U, S, k, n, mu):
+        """update_model(X, U, S, k, n, mu):
+
+        Update SVD model U,S (dimensionality k)
+        by either adding items in X to it,
+        or regenerating a new model from X,
+        assuming U already models n items with mean mu.
+        Technically we should have V as well, but it's not needed.
+
+        Return new U, S, mu, n, and percent variances.
+        """
+
+        return U, S, mu, n
+
+
+    @classmethod
+    def select_next(DEMUDOutlierDetection, X, U, mu):
+        """select_next(X, U, mu)
+
+        Select the next most-interesting (max recon. error) item in X,
+        given model U, singular values S, 
+        and mean mu for uninteresting items.
+
+        Return the index of the selected item, its reconstruction,
+        its reconstruction score, and all items' reconstruction scores.
+        """
+
+        return 0, X[:, 0], 0, np.zeros((len(X), 1))
+    
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
