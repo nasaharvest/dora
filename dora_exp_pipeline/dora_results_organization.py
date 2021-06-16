@@ -65,7 +65,7 @@ class SaveScoresCSV(ResultsOrganization):
             os.mkdir(out_dir)
             logger.text(f'Created output directory: {out_dir}')
 
-        out_file = open(f'{out_dir}/selection.csv', 'w')
+        out_file = open(f'{out_dir}/selections.csv', 'w')
         scores = np.argsort(dts_scores)[::-1]
 
         for ind, s_ind in enumerate(scores):
@@ -79,6 +79,21 @@ save_scores_csv = SaveScoresCSV()
 register_org_method(save_scores_csv)
 
 
+# Copyright (c) 2021 California Institute of Technology ("Caltech").
+# U.S. Government sponsorship acknowledged.
+# All rights reserved.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# - Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# - Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# - Neither the name of Caltech nor its operating division, the Jet Propulsion
+#   Laboratory, nor the names of its contributors may be used to endorse or
+#   promote products derived from this software without specific prior written
+#   permission.
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE

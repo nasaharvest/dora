@@ -10,7 +10,6 @@
 
 import os
 import sys
-sys.path.append('.') # TODO: remove this line after package installation
 from dora_exp_pipeline.dora_config import DoraConfig
 from dora_exp_pipeline.dora_data_loader import get_data_loader_by_name
 from dora_exp_pipeline.dora_feature import z_score_normalize
@@ -20,7 +19,7 @@ from dora_exp_pipeline.iforest_outlier_detection import IForestOutlierDetection
 from dora_exp_pipeline.pca_outlier_detection import PCAOutlierDetection
 # from dora_exp_pipeline.lrx_outlier_detection import LocalRXOutlierDetection
 from dora_exp_pipeline.rx_outlier_detection import RXOutlierDetection
-# from dora_exp_pipeline.random_outlier_detection import RandomOutlierDetection
+from dora_exp_pipeline.random_outlier_detection import RandomOutlierDetection
 from dora_exp_pipeline.negative_sampling_outlier_detection import \
     NegativeSamplingOutlierDetection
 from dora_exp_pipeline.util import LogUtil
@@ -49,9 +48,9 @@ def register_od_algs():
     rx_outlier_detection = RXOutlierDetection()
     register_od_alg(rx_outlier_detection)
 
-    # # Register Random outlier detection algorithm in the pool
-    # random_outlier_detection = RandomOutlierDetection()
-    # register_od_alg(random_outlier_detection)
+    # Register Random outlier detection algorithm in the pool
+    random_outlier_detection = RandomOutlierDetection()
+    register_od_alg(random_outlier_detection)
 
     # Register Negative Sampling outlier detection algorithm in the pool
     negative_sampling_outlier_detection = NegativeSamplingOutlierDetection()
@@ -117,6 +116,21 @@ if __name__ == '__main__':
     main()
 
 
+# Copyright (c) 2021 California Institute of Technology ("Caltech").
+# U.S. Government sponsorship acknowledged.
+# All rights reserved.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# - Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# - Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# - Neither the name of Caltech nor its operating division, the Jet Propulsion
+#   Laboratory, nor the names of its contributors may be used to endorse or
+#   promote products derived from this software without specific prior written
+#   permission.
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
