@@ -3,10 +3,7 @@
 #
 # Steven Lu, June 29, 2020
 
-import os
 import numpy as np
-from scipy.stats import skew
-from scipy.stats import kurtosis
 from skimage import transform
 from six import add_metaclass
 from abc import ABCMeta, abstractmethod

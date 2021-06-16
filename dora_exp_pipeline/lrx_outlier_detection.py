@@ -11,9 +11,7 @@
 import sys
 import numpy as np
 from dora_exp_pipeline.outlier_detection import OutlierDetection
-from dora_exp_pipeline.util import load_images
 from dora_exp_pipeline.util import DEFAULT_DATA_DIR
-from dora_exp_pipeline.util import get_image_file_list
 
 
 class LocalRXOutlierDetection(OutlierDetection):
@@ -36,7 +34,7 @@ class LocalRXOutlierDetection(OutlierDetection):
         features_1d = config.features['one_dimensional']
         features_keys = features_1d.keys()
         if 'flattened_pixel_values' not in features_keys or \
-                        len(features_keys) > 1:
+                len(features_keys) > 1:
             raise RuntimeError(
                 'LRX must be used with `flattened_pixel_values` feature alone.'
             )
@@ -91,7 +89,7 @@ class LocalRXOutlierDetection(OutlierDetection):
 
 # Local RX (LRX)
 def get_LRX_scores(images, w_inner, w_outer, bands):
-    # Images has shape N x M where N is number of images and 
+    # Images has shape N x M where N is number of images and
     # M is flattened image dimension. Divide by bands to get
     # image dimensions.
     rows, cols = images.shape
@@ -112,7 +110,7 @@ def get_LRX_scores(images, w_inner, w_outer, bands):
             for j in range(s, im.shape[1]-s):
                 scores[idx, i, j] = lrx(im[i - s: i + s + 1, j - s: j + s + 1],
                                         w_inner)
-    return np.mean(scores[:,s:-s,s:-s], axis=(1, 2)), scores
+    return np.mean(scores[:, s:-s, s:-s], axis=(1, 2)), scores
 
 
 def lrx(patch, w_in):
@@ -183,7 +181,7 @@ def main():
                         help='size of inner window (default 3)')
     parser.add_argument('-u', '--outer_window', type=int, default=5,
                         help='size of outer window (default 5)')
-    parser.add_argument('-b', '--bands', type=int, default=1, 
+    parser.add_argument('-b', '--bands', type=int, default=1,
                         help='number of bands in input images (default 1)')
     parser.add_argument('--seed', type=int, default=1234,
                         help='Integer used to seed the random generator. This '
