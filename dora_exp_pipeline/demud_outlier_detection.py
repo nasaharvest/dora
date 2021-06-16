@@ -1,14 +1,10 @@
 #!/usr/bin/env python
-# Given a sol range, read in all AEGIS target images and rank them by novelty
-# according to DEMUD. Optionally, use a range of prior sol's targets to
-# initialize the DEMUD model. See copyright notice at the end.
+# Apply DEMUD to rank items by reconstruction error
+# using an incrementally growing model of previously selected items.
+# See copyright notice at the end.
 #
 # Kiri Wagstaff
-# April 16, 2020
-#
-# Modification history:
-# Steven Lu, May 13, 2020, refactored the code to extract common functionalities
-#                          out to util.py.
+# May 25, 2021
 
 import sys
 import numpy as np
@@ -113,14 +109,42 @@ class DEMUDOutlierDetection(OutlierDetection):
     def update_model(DEMUDOutlierDetection, X, U, S, k, n, mu):
         """update_model(X, U, S, k, n, mu):
 
-        Update SVD model U,S (dimensionality k)
+        Update SVD model U, S (dimensionality k)
         by either adding items in X to it,
         or regenerating a new model from X,
         assuming U already models n items with mean mu.
         Technically we should have V as well, but it's not needed.
 
-        Return new U, S, mu, n, and percent variances.
+        Return new U, S, mu, n.
         """
+
+        # Check arguments
+        if len(X) == 0:
+            print('Error: No data in X.')
+            return None, None, None, -1
+
+        # If there is no previous U, and we just got a single item in X,
+        # then create a U the same size, first value 1 (rest 0),
+        # and return it with mu.
+        if len(U) == 0 and X.shape[1] == 1:
+            mu = X
+            U = np.zeros_like(mu)
+            U[0] = 1
+            S = np.array([0])
+            n = 1
+            return U, S, mu, n
+
+        # Do a full SVD of mean-subtracted X
+        mu = np.mean(X, axis=1).reshape(-1, 1)
+        X = X - mu
+        U, S, _ = np.linalg.svd(X, full_matrices=False)
+
+        # Update n to number of new items in X
+        n = X.shape[1]
+
+        # Keep only the first k components
+        S = S[0:k]
+        U = U[:, 0:k]
 
         return U, S, mu, n
 
@@ -137,7 +161,51 @@ class DEMUDOutlierDetection(OutlierDetection):
         its reconstruction score, and all items' reconstruction scores.
         """
 
-        return 0, X[:, 0], 0, np.zeros((len(X), 1))
+        # Check arguments
+        if len(U) == 0:
+            print('Empty DEMUD model: selecting item 0')
+            return 0, X[:, 0], 0.0, np.zeros((len(X, )))
+
+        if X.shape[1] < 1 or len(mu) == 0:
+            print('Error: no data in X and/or mu')
+            return None, None, -1, []
+
+        if X.shape[0] != U.shape[0] or X.shape[0] != mu.shape[0]:
+            print('Mismatch in dimensions; must have X mxn, U mxk, mu mx1.')
+            return None, None, -1, []
+
+        # Compute the score and projection for each item
+        (scores, reproj) = DEMUDOutlierDetection.score_items(X, U, mu)
+
+        # Select and return item with max reconstruction error
+        m = scores.argmax()
+
+        return m, reproj[:, m], scores[m], scores
+
+    
+    @classmethod
+    def score_items(DEMUDOutlierDetection, X, U, mu):
+        """score_items(X, U, mu)
+        Calculate the score (reconstruction error) for every item in X,
+        with respect to the SVD model in U and mean mu.
+
+        Return an array of item reconstruction scores and their reprojections.
+        """
+
+        # Use U to model and then reconstruct the data in X.
+        # 1. Project all data in X into space defined by U,
+        #    then reconstruct it.
+        # 1a. Subtract the mean and project onto U
+        proj = np.dot(U.T, (X - mu))
+        # 1b. Reconstruct by projecting back up and adding mean
+        reproj = np.dot(U, proj) + mu
+        # 1c. Compute the residual
+        err = X - reproj
+
+        # 2. Compute reconstruction error
+        scores = np.sum(np.array(np.power(err, 2)), axis=0)
+
+        return (scores, reproj)        
     
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
