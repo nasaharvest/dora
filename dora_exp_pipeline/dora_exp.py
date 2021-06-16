@@ -10,7 +10,6 @@
 
 import os
 import sys
-sys.path.append('.') # TODO: remove this line after package installation
 from dora_exp_pipeline.dora_config import DoraConfig
 from dora_exp_pipeline.dora_data_loader import get_data_loader_by_name
 from dora_exp_pipeline.dora_feature import z_score_normalize
@@ -20,7 +19,7 @@ from dora_exp_pipeline.iforest_outlier_detection import IForestOutlierDetection
 from dora_exp_pipeline.pca_outlier_detection import PCAOutlierDetection
 # from dora_exp_pipeline.lrx_outlier_detection import LocalRXOutlierDetection
 from dora_exp_pipeline.rx_outlier_detection import RXOutlierDetection
-# from dora_exp_pipeline.random_outlier_detection import RandomOutlierDetection
+from dora_exp_pipeline.random_outlier_detection import RandomOutlierDetection
 from dora_exp_pipeline.negative_sampling_outlier_detection import \
     NegativeSamplingOutlierDetection
 from dora_exp_pipeline.util import LogUtil
@@ -49,9 +48,9 @@ def register_od_algs():
     rx_outlier_detection = RXOutlierDetection()
     register_od_alg(rx_outlier_detection)
 
-    # # Register Random outlier detection algorithm in the pool
-    # random_outlier_detection = RandomOutlierDetection()
-    # register_od_alg(random_outlier_detection)
+    # Register Random outlier detection algorithm in the pool
+    random_outlier_detection = RandomOutlierDetection()
+    register_od_alg(random_outlier_detection)
 
     # Register Negative Sampling outlier detection algorithm in the pool
     negative_sampling_outlier_detection = NegativeSamplingOutlierDetection()
