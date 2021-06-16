@@ -65,7 +65,7 @@ class SaveScoresCSV(ResultsOrganization):
             os.mkdir(out_dir)
             logger.text(f'Created output directory: {out_dir}')
 
-        out_file = open(f'{out_dir}/selection.csv', 'w')
+        out_file = open(f'{out_dir}/selections.csv', 'w')
         scores = np.argsort(dts_scores)[::-1]
 
         for ind, s_ind in enumerate(scores):
