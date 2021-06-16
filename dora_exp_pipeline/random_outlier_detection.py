@@ -12,77 +12,24 @@
 import sys
 import numpy as np
 from dora_exp_pipeline.outlier_detection import OutlierDetection
-from dora_exp_pipeline.util import DEFAULT_DATA_DIR
-
 
 class RandomOutlierDetection(OutlierDetection):
     def __init__(self):
         super(RandomOutlierDetection, self).__init__('random')
 
-    def _random(self, files, seed, enable_explanation=True):
+    def _random(self, train, test, seed):
         # Random ranking
-        indices = range(0, len(files))
+        indices = list(range(0, test.shape[0]))
         random_state = np.random.RandomState(seed)
         random_state.shuffle(indices)
 
-        # Prepare results to return
-        results = dict()
-        results.setdefault('ind', [])
-        results.setdefault('sel_ind', [])
-        results.setdefault('img_id', [])
-        results.setdefault('scores', [])
-        results.setdefault('explanations', [])
-        for i, ind in enumerate(indices):
-            results['ind'].append(i)
-            results['sel_ind'].append(ind)
-            results['img_id'].append(files[ind])
-            results['scores'].append(0.0)
+        # This interprets the indices as the scores so when 
+        # the scores are sorted later they will have the 
+        # random order.
+        return indices
 
-            if enable_explanation:
-                results['explanations'].append(np.ones((64, 64)))
-
-        results_file_suffix = 'seed-%d' % seed
-
-        return results, results_file_suffix
-
-    def _rank_internal(self, files, rank_data, prior_data, config, seed):
-        return self._random(files, seed, config.enable_explanation)
-
-
-def start(start_sol, end_sol, data_dir, out_dir, seed):
-    random_outlier_detection = RandomOutlierDetection()
-
-    try:
-        random_outlier_detection.run(data_dir, start_sol, end_sol, out_dir,
-                                     seed)
-    except RuntimeError as e:
-        print(e)
-        sys.exit(1)
-
-
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Random ranking algorithm')
-    parser.add_argument('-s', '--start_sol', type=int, default=1343,
-                        help='minimum (starting) sol (default 1343)')
-    parser.add_argument('-e', '--end_sol', type=int, default=1343,
-                        help='maximum (ending) sol (default 1343)')
-    parser.add_argument('-d', '--data_dir', default=DEFAULT_DATA_DIR,
-                        help='target image data directory '
-                             '(default: %(default)s)')
-    parser.add_argument('-o', '--out_dir', default='.',
-                        help='output directory (default: .)')
-    parser.add_argument('-r', '--seed', type=int, default=1234,
-                        help='random seed to initialize the random number '
-                             'generator. Default is 1234')
-
-    args = parser.parse_args()
-    start(**vars(args))
-
-
-if __name__ == '__main__':
-    main()
+    def _rank_internal(self, data_to_fit, data_to_score, seed):
+        return self._random(data_to_fit, data_to_score, seed)
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").
