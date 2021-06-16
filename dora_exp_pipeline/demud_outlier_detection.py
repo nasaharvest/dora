@@ -9,6 +9,7 @@
 import numpy as np
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
+
 class DEMUDOutlierDetection(OutlierDetection):
     def __init__(self):
         super(DEMUDOutlierDetection, self).__init__('demud')
@@ -35,7 +36,8 @@ class DEMUDOutlierDetection(OutlierDetection):
     def demud(cls, data, initdata, k, nsel):
         """
         >>> data = np.array([[0, 0], [-1, 1]]).T
-        >>> demud_res = DEMUDOutlierDetection.demud(data, np.array([]), k=1, nsel=2)
+        >>> demud_res = DEMUDOutlierDetection.demud(data, np.array([]), \
+                                                    k=1, nsel=2)
         >>> demud_res['sels']
         [1, 0]
         >>> demud_res['scores']
@@ -61,10 +63,10 @@ class DEMUDOutlierDetection(OutlierDetection):
 
         # Initialize DEMUD model variables
         X = data
-        U = [] # principal components
+        U = []   # principal components
         S = np.array([1])
-        mu = [] # data mean
-        n = 0 # number selected
+        mu = []  # data mean
+        n = 0    # number selected
 
         # If initial data set is provided, use it to initialize the model
         if len(initdata) > 0:
@@ -101,7 +103,6 @@ class DEMUDOutlierDetection(OutlierDetection):
             orig_ind = orig_ind[keep]
 
         return res
-
 
     @classmethod
     def update_model(cls, X, U, S, k, n, mu):
@@ -146,7 +147,6 @@ class DEMUDOutlierDetection(OutlierDetection):
 
         return U, S, mu, n
 
-
     @classmethod
     def select_next(cls, X, U, mu):
         """select_next(X, U, mu)
@@ -179,7 +179,6 @@ class DEMUDOutlierDetection(OutlierDetection):
         m = scores.argmax()
 
         return m, reproj[:, m], scores[m], scores
-
 
     @classmethod
     def score_items(cls, X, U, mu):
