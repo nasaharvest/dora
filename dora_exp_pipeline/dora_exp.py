@@ -98,7 +98,7 @@ def start(config_file: str, log_file=None, seed=1234):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description='onboard simulator')
+    parser = argparse.ArgumentParser(description='The DORA Experiment Pipeline')
 
     parser.add_argument('config_file', type=str,
                         help='Path to the configuration file')
@@ -107,7 +107,8 @@ def main():
                              'file will be saved. ')
     parser.add_argument('--seed', type=int, default=1234,
                         help='Integer used to seed the random generator '
-                             'in the simulator. Default is 1234.')
+                             'for the DORA experiment pipeline. Default is '
+                             '1234.')
 
     args = parser.parse_args()
     start(**vars(args))
