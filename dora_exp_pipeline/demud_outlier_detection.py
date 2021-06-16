@@ -6,7 +6,6 @@
 # Kiri Wagstaff
 # May 25, 2021
 
-import sys
 import numpy as np
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
@@ -33,7 +32,7 @@ class DEMUDOutlierDetection(OutlierDetection):
     #   'sels' (data indices in descending score order)
     #   'scores' (score for each data item in original order)
     @classmethod
-    def demud(DEMUDOutlierDetection, data, initdata, k, nsel):
+    def demud(cls, data, initdata, k, nsel):
         """
         >>> data = np.array([[0, 0], [-1, 1]]).T
         >>> demud_res = DEMUDOutlierDetection.demud(data, np.array([]), k=1, nsel=2)
@@ -82,8 +81,7 @@ class DEMUDOutlierDetection(OutlierDetection):
         seen = initdata
         for i in range(nsel):
             # Select item with largest reconstruction error
-            ind, r, score, scores = DEMUDOutlierDetection.select_next(
-                X, U, mu)
+            ind, _, score, _ = DEMUDOutlierDetection.select_next(X, U, mu)
             res['sels'] += [orig_ind[ind]]
             res['scores'] += [score]
 
@@ -106,7 +104,7 @@ class DEMUDOutlierDetection(OutlierDetection):
 
 
     @classmethod
-    def update_model(DEMUDOutlierDetection, X, U, S, k, n, mu):
+    def update_model(cls, X, U, S, k, n, mu):
         """update_model(X, U, S, k, n, mu):
 
         Update SVD model U, S (dimensionality k)
@@ -150,11 +148,11 @@ class DEMUDOutlierDetection(OutlierDetection):
 
 
     @classmethod
-    def select_next(DEMUDOutlierDetection, X, U, mu):
+    def select_next(cls, X, U, mu):
         """select_next(X, U, mu)
 
         Select the next most-interesting (max recon. error) item in X,
-        given model U, singular values S, 
+        given model U, singular values S,
         and mean mu for uninteresting items.
 
         Return the index of the selected item, its reconstruction,
@@ -182,9 +180,9 @@ class DEMUDOutlierDetection(OutlierDetection):
 
         return m, reproj[:, m], scores[m], scores
 
-    
+
     @classmethod
-    def score_items(DEMUDOutlierDetection, X, U, mu):
+    def score_items(cls, X, U, mu):
         """score_items(X, U, mu)
         Calculate the score (reconstruction error) for every item in X,
         with respect to the SVD model in U and mean mu.
@@ -205,8 +203,8 @@ class DEMUDOutlierDetection(OutlierDetection):
         # 2. Compute reconstruction error
         scores = np.sum(np.array(np.power(err, 2)), axis=0)
 
-        return (scores, reproj)        
-    
+        return (scores, reproj)
+
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").
 # U.S. Government sponsorship acknowledged.
