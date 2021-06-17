@@ -12,9 +12,9 @@ setup(
     packages=['dora_exp_pipeline'],
     install_requires=[
         'matplotlib==3.3.4',
-        'numpy==1.20.3',
-        'scipy==1.6.3',
-        'scikit-image==0.18.1',
+        'numpy==1.19.5',
+        'scipy==1.5.4',
+        'scikit-image==0.17.2',
         'scikit-learn==0.24.2',
         'Pillow==8.2.0',
         'planetaryimage==0.5.0',
