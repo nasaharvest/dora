@@ -21,8 +21,9 @@ class DEMUDOutlierDetection(OutlierDetection):
 
         # nsel=-1 means to rank all items;
         # in a future update, the caller may want to limit this
-        return DEMUDOutlierDetection.demud(data=data_to_score,
-                                           initdata=data_to_fit,
+        # Note: DEMUD expects data in d x n order
+        return DEMUDOutlierDetection.demud(data=data_to_score.T,
+                                           initdata=data_to_fit.T,
                                            k=k, nsel=-1)
 
     # Simplified DEMUD algorithm:
@@ -56,6 +57,9 @@ class DEMUDOutlierDetection(OutlierDetection):
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
+        if nsel == -1:
+            # Select all items
+            nsel = data.shape[1]
 
         res = {}
         res['sels'] = []
@@ -102,7 +106,10 @@ class DEMUDOutlierDetection(OutlierDetection):
             X = X[:, keep]
             orig_ind = orig_ind[keep]
 
-        return res
+        #return res
+        # TODO: DORA currently only accepts scores;
+        # need to return sels as well
+        return np.array(res['scores'])
 
     @classmethod
     def update_model(cls, X, U, S, k, n, mu):
