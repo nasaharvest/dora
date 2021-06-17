@@ -11,7 +11,7 @@ setup(
     author_email='you.lu@jpl.nasa.gov',
     packages=['dora_exp_pipeline'],
     install_requires=[
-        'matplotlib==3.4.2',
+        'matplotlib==3.3.4',
         'numpy==1.20.3',
         'scipy==1.6.3',
         'scikit-image==0.18.1',
