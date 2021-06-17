@@ -14,7 +14,7 @@ from dora_exp_pipeline.dora_config import DoraConfig
 from dora_exp_pipeline.dora_data_loader import get_data_loader_by_name
 from dora_exp_pipeline.dora_feature import z_score_normalize
 from dora_exp_pipeline.outlier_detection import register_od_alg
-# from src.demud_outlier_detection import DEMUDOutlierDetection
+from dora_exp_pipeline.demud_outlier_detection import DEMUDOutlierDetection
 from dora_exp_pipeline.iforest_outlier_detection import IForestOutlierDetection
 from dora_exp_pipeline.pca_outlier_detection import PCAOutlierDetection
 # from dora_exp_pipeline.lrx_outlier_detection import LocalRXOutlierDetection
@@ -29,8 +29,8 @@ from dora_exp_pipeline.outlier_detection import get_alg_by_name
 
 def register_od_algs():
     # Register DEMUD outlier detection algorithm in the pool
-    # demud_outlier_detection = DEMUDOutlierDetection()
-    # register_od_alg(demud_outlier_detection)
+    demud_outlier_detection = DEMUDOutlierDetection()
+    register_od_alg(demud_outlier_detection)
 
     # Register Isolation Forest outlier detection algorithm in the pool
     iforest_outlier_detection = IForestOutlierDetection()
