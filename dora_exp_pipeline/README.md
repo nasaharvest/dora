@@ -15,10 +15,18 @@ The DORA Experiment Pipeline provides a `setup.py` file for installing the DORA
 Experiment Pipeline itself and all the dependencies it requires. Note that the 
 DORA Experiment Pipeline has already been installed on MLIA machines (e.g., 
 analysis, paralysis, mlia-compute1, etc.) at `/proj/dora/dora-venv` , and can be 
-invoked using the following command 
+invoked using the following command:
 
 ```
 source /proj/dora/dora-venv/bin/activate
+```
+
+It has also been installed on the UMD gsapp machines (e.g., gsapp6, gsapp17, 
+etc.) at `/gpfs/data1/cmongp1/dora/dora-venv`, and can be invoked using the
+following command:
+
+```
+source /gpfs/data1/cmongp1/dora/dora-venv/bin/activate
 ```
 
 Please following the following steps to install the DORA Experiment Pipeline and 
