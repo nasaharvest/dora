@@ -134,15 +134,7 @@ class RawValuesExtractor(FeatureExtractor):
             'raw_values')
 
     def extract(self, data_cube, **kwargs):
-        # Get data dimension and type from the first item in the data cube
-        dim = data_cube[0].shape
-        ret_features = np.zeros((len(data_cube), dim[0]), 
-                                dtype=data_cube[0][0].dtype)
-
-        for ind, data in enumerate(data_cube):
-            ret_features[ind, :] = data.flatten()
-
-        return ret_features
+        return np.array(data_cube)
 
 
 # Register flattened pixel values extractor into the feature extractor pool
