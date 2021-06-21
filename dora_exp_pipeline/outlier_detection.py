@@ -55,13 +55,13 @@ class OutlierDetection(object):
         dts = dts.astype(np.float32)
 
         # Run outlier detection algorithm
-        results = self._rank_internal(dtf, dts, seed, **kwargs)
+        results = self._rank_internal(dtf, dts, dts_ids, seed, **kwargs)
 
         # Run results organization methods
         for res_org_name, res_org_params in results_org_dict.items():
             res_org_method = get_res_org_method(res_org_name)
-            res_org_method.run(dts_ids, results['scores'], results['sel_ind'],
-                               logger, **res_org_params)
+            res_org_method.run(results['dts_ids'], results['scores'],
+                               results['sel_ind'], logger, **res_org_params)
 
     @abstractmethod
     def _rank_internal(self, data_to_fit, data_to_score, seed, **kwargs):

@@ -7,7 +7,8 @@ class PCAOutlierDetection(OutlierDetection):
     def __init__(self):
         super(PCAOutlierDetection, self).__init__('pca')
 
-    def _rank_internal(self, data_to_fit, data_to_score, seed, k):
+    def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
+                       seed, k):
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
@@ -25,9 +26,11 @@ class PCAOutlierDetection(OutlierDetection):
         results = dict()
         results.setdefault('scores', list())
         results.setdefault('sel_ind', list())
+        results.setdefault('dts_ids', list())
         for ind in selection_indices:
             results['scores'].append(scores[ind])
             results['sel_ind'].append(ind)
+            results['dts_ids'].append(data_to_score_ids[ind])
 
         return results
 

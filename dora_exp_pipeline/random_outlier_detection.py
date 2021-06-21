@@ -17,18 +17,23 @@ class RandomOutlierDetection(OutlierDetection):
     def __init__(self):
         super(RandomOutlierDetection, self).__init__('random')
 
-    def _random(self, train, test, seed):
+    def _random(self, data_to_fit, data_to_score, data_to_score_ids, seed):
         # Random ranking
-        indices = list(range(0, test.shape[0]))
+        indices = list(range(0, data_to_score.shape[0]))
         random_state = np.random.RandomState(seed)
         random_state.shuffle(indices)
+
+        dts_ids = []
+        for ind in indices:
+            dts_ids.append(data_to_score_ids[ind])
 
         # This interprets the indices as the scores so when
         # the scores are sorted later they will have the
         # random order.
         return {
-            'scores': list(np.zeros(test.shape[0], dtype=float)),
-            'sel_ind': indices
+            'scores': list(np.zeros(data_to_score.shape[0], dtype=float)),
+            'sel_ind': indices,
+            'dts_ids': dts_ids
         }
 
     def _rank_internal(self, data_to_fit, data_to_score, seed):
