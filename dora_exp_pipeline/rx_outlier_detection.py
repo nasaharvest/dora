@@ -20,7 +20,17 @@ class RXOutlierDetection(OutlierDetection):
         super(RXOutlierDetection, self).__init__('rx')
 
     def _rank_internal(self, data_to_fit, data_to_score, seed):
-        return get_RX_scores(data_to_fit, data_to_score, )
+        scores = get_RX_scores(data_to_fit, data_to_score)
+        selection_indices = np.argsort(scores)[::-1]
+
+        results = dict()
+        results.setdefault('scores', list())
+        results.setdefault('sel_ind', list())
+        for ind in selection_indices:
+            results['scores'].append(scores[ind])
+            results['sel_ind'].append(ind)
+
+        return results
 
 
 def compute_bg(train_images):
