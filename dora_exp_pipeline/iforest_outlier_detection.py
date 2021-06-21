@@ -8,7 +8,17 @@ class IForestOutlierDetection(OutlierDetection):
         super(IForestOutlierDetection, self).__init__('iforest')
 
     def _rank_internal(self, data_to_fit, data_to_score, seed):
-        return train_and_run_ISO(data_to_fit, data_to_score, seed)
+        scores = train_and_run_ISO(data_to_fit, data_to_score, seed)
+        selection_indices = np.argsort(scores)
+
+        results = dict()
+        results.setdefault('scores', list())
+        results.setdefault('sel_ind', list())
+        for ind in selection_indices:
+            results['scores'].append(scores[ind])
+            results['sel_ind'].append(ind)
+
+        return results
 
 
 def train_and_run_ISO(train, test, seed):
