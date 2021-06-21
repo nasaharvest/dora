@@ -18,4 +18,4 @@ jobs:
           pip install flake8
       - name: Lint with flake8
         run: | 
-          flake8 --max-line-length 80 dora_exp_pipeline
+          flake8 --max-line-length 80 --per-file-ignores="__init__.py:F401" dora_exp_pipeline

@@ -173,7 +173,7 @@ class TimeSeriesLoader(DataLoader):
         data_dict.setdefault('id', [])
         data_dict.setdefault('data', [])
 
-        # TODO: add support for other data types 
+        # TODO: add support for other data types
         # (e.g., .h5 dataframes, .npy)
         if dir_path.endswith('.csv'):
             # Load the csv data
@@ -181,14 +181,14 @@ class TimeSeriesLoader(DataLoader):
                 csv_reader = csv.reader(csv_file, quoting=csv.QUOTE_NONNUMERIC)
                 # Read each row into the data_dict
                 for row in csv_reader:
-                    # Assumes the first column is the ID 
+                    # Assumes the first column is the ID
                     # and all other columns are time steps
                     data_dict['id'].append(row[0])
                     data_dict['data'].append(np.array(row[1:]))
         else:
             raise RuntimeError(f'File extension not supported. '
                                f'Valid file extensions: '
-                               f'{file_types}') 
+                               f'{file_types}')
 
         return data_dict
 
