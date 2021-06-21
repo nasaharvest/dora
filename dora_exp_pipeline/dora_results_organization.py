@@ -48,11 +48,14 @@ class ResultsOrganization(object):
         else:
             return True
 
-    def run(self, data_ids, dts_scores, logger, **params):
-        self._run(data_ids, dts_scores, logger, **params)
+    def run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, logger,
+            **params):
+        self._run(data_ids, dts_scores, dts_sels, outlier_alg_name, logger,
+                  **params)
 
     @abstractmethod
-    def _run(self, data_ids, dts_scores, logger, **params):
+    def _run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, logger,
+             **params):
         raise RuntimeError('This function must be implemented in a child class')
 
 
@@ -60,17 +63,17 @@ class SaveScoresCSV(ResultsOrganization):
     def __init__(self):
         super(SaveScoresCSV, self).__init__('save_scores')
 
-    def _run(self, data_ids, dts_scores, logger, out_dir):
+    def _run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, logger,
+             out_dir):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             logger.text(f'Created output directory: {out_dir}')
 
-        out_file = open(f'{out_dir}/selections.csv', 'w')
-        scores = np.argsort(dts_scores)[::-1]
+        out_file = open(f'{out_dir}/selections-{outlier_alg_name}.csv', 'w')
 
-        for ind, s_ind in enumerate(scores):
-            out_file.write(f'{ind}, {s_ind}, {data_ids[s_ind]}, '
-                           f'{dts_scores[s_ind]}\n')
+        for ind, s_ind, dts_id, score in enumerate(zip(dts_sels, data_ids,
+                                                       dts_scores)):
+            out_file.write(f'{ind}, {s_ind}, {dts_id}, {score}\n')
 
         out_file.close()
 

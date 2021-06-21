@@ -61,7 +61,8 @@ class OutlierDetection(object):
         for res_org_name, res_org_params in results_org_dict.items():
             res_org_method = get_res_org_method(res_org_name)
             res_org_method.run(results['dts_ids'], results['scores'],
-                               results['sel_ind'], logger, **res_org_params)
+                               results['sel_ind'], self._ranking_alg_name,
+                               logger, **res_org_params)
 
     @abstractmethod
     def _rank_internal(self, data_to_fit, data_to_score, seed, **kwargs):
