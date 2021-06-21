@@ -71,8 +71,8 @@ class SaveScoresCSV(ResultsOrganization):
 
         out_file = open(f'{out_dir}/selections-{outlier_alg_name}.csv', 'w')
 
-        for ind, s_ind, dts_id, score in enumerate(zip(dts_sels, data_ids,
-                                                       dts_scores)):
+        for ind, (s_ind, dts_id, score) in enumerate(zip(dts_sels, data_ids,
+                                                         dts_scores)):
             out_file.write(f'{ind}, {s_ind}, {dts_id}, {score}\n')
 
         out_file.close()
