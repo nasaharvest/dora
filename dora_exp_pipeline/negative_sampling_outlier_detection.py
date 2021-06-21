@@ -28,7 +28,18 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
             raise RuntimeError('percent_increase parameter must be a number '
                                'between 0 and 100.')
 
-        return self._rank_targets(data_to_fit, data_to_score, percent_increase)
+        scores = self._rank_targets(data_to_fit, data_to_score,
+                                    percent_increase)
+        selection_indices = np.argsort(scores)[::-1]
+
+        results = dict()
+        results.setdefault('scores', list())
+        results.setdefault('sel_ind', list())
+        for ind in selection_indices:
+            results['scores'].append(scores[ind])
+            results['sel_ind'].append(ind)
+
+        return results
 
     def _rank_targets(self, positive_train, data_test, percent_increase):
         # Create negative examples from positive examples
