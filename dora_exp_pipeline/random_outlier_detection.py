@@ -9,9 +9,9 @@
 # Steven Lu, May 13, 2020, refactored the code to extract common functionalities
 #                          out to util.py.
 
-import sys
 import numpy as np
 from dora_exp_pipeline.outlier_detection import OutlierDetection
+
 
 class RandomOutlierDetection(OutlierDetection):
     def __init__(self):
@@ -23,8 +23,8 @@ class RandomOutlierDetection(OutlierDetection):
         random_state = np.random.RandomState(seed)
         random_state.shuffle(indices)
 
-        # This interprets the indices as the scores so when 
-        # the scores are sorted later they will have the 
+        # This interprets the indices as the scores so when
+        # the scores are sorted later they will have the
         # random order.
         return indices
 

@@ -67,11 +67,11 @@ class DoraConfig(object):
     def verify_config_parameters(self):
         # Verify `data_type` field
         if not isinstance(self.data_type, str):
-            raise RuntimeError(f'data_type field must be a string')
+            raise RuntimeError('data_type field must be a string')
 
         # Verify `data_to_fit`
         if not isinstance(self.data_to_fit, str):
-            raise RuntimeError(f'data_to_fit field must be a string')
+            raise RuntimeError('data_to_fit field must be a string')
 
         if not os.path.exists(self.data_to_fit):
             raise RuntimeError(f'data_to_fit not found: '
@@ -79,7 +79,7 @@ class DoraConfig(object):
 
         # Verify `data_to_score`
         if not isinstance(self.data_to_score, str):
-            raise RuntimeError(f'data_to_score field must be a string')
+            raise RuntimeError('data_to_score field must be a string')
 
         if (len(self.data_to_score) != 0 and
                 not os.path.exists(self.data_to_score)):
@@ -88,15 +88,15 @@ class DoraConfig(object):
 
         # Verify `features`
         if not isinstance(self.features, dict):
-            raise RuntimeError(f'features field must be a dictionary')
+            raise RuntimeError('features field must be a dictionary')
 
         # Verify `outlier_detection`
         if not isinstance(self.outlier_detection, dict):
-            raise RuntimeError(f'outlier_detection field must be a dictionary')
+            raise RuntimeError('outlier_detection field must be a dictionary')
 
         # Verify `results`
         if not isinstance(self.results, dict):
-            raise RuntimeError(f'results field must be a dictionary')
+            raise RuntimeError('results field must be a dictionary')
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").

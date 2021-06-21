@@ -12,7 +12,6 @@ import os
 import sys
 from dora_exp_pipeline.dora_config import DoraConfig
 from dora_exp_pipeline.dora_data_loader import get_data_loader_by_name
-from dora_exp_pipeline.dora_feature import z_score_normalize
 from dora_exp_pipeline.outlier_detection import register_od_alg
 from dora_exp_pipeline.demud_outlier_detection import DEMUDOutlierDetection
 from dora_exp_pipeline.iforest_outlier_detection import IForestOutlierDetection
