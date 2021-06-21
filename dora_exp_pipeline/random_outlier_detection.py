@@ -26,7 +26,10 @@ class RandomOutlierDetection(OutlierDetection):
         # This interprets the indices as the scores so when
         # the scores are sorted later they will have the
         # random order.
-        return indices
+        return {
+            'scores': list(np.zeros(test.shape[0], dtype=float)),
+            'sel_ind': indices
+        }
 
     def _rank_internal(self, data_to_fit, data_to_score, seed):
         return self._random(data_to_fit, data_to_score, seed)
