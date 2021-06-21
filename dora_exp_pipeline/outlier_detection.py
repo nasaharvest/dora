@@ -55,27 +55,13 @@ class OutlierDetection(object):
         dts = dts.astype(np.float32)
 
         # Run outlier detection algorithm
-        outlier_scores = self._rank_internal(dtf, dts, seed, **kwargs)
+        scores, sel_ind = self._rank_internal(dtf, dts, seed, **kwargs)
 
         # Run results organization methods
         for res_org_name, res_org_params in results_org_dict.items():
             res_org_method = get_res_org_method(res_org_name)
-            res_org_method.run(dts_ids, outlier_scores, logger,
+            res_org_method.run(dts_ids, scores, sel_ind, logger,
                                **res_org_params)
-
-        # # Save results in a csv file.
-        # if len(fn_suffix) == 0:
-        #     alg_subdir_name = self._ranking_alg_name
-        #     results_fn = 'selections.csv'
-        # else:
-        #     alg_subdir_name = '%s-%s' % (self._ranking_alg_name, fn_suffix)
-        #     results_fn = 'selections-%s.csv' % fn_suffix
-        #
-        # save_results(
-        #     results, os.path.join(config.out_dir, alg_subdir_name),
-        #     file_name=results_fn, logger=logger,
-        #     enable_explanation=config.enable_explanation
-        # )
 
     @abstractmethod
     def _rank_internal(self, data_to_fit, data_to_score, seed, **kwargs):
