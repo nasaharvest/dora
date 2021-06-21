@@ -22,7 +22,10 @@ outlier_detection: {
     # negative_sampling: {
     #     percent_increase: 20
     # },
-    random: {}
+    # random: {},
+    pae: {
+        latent_dim: 3
+    }
 }
 
 # Results organization module
