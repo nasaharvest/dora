@@ -22,9 +22,14 @@ class DEMUDOutlierDetection(OutlierDetection):
         # nsel=-1 means to rank all items;
         # in a future update, the caller may want to limit this
         # Note: DEMUD expects data in d x n order
-        return DEMUDOutlierDetection.demud(data=data_to_score.T,
-                                           initdata=data_to_fit.T,
-                                           k=k, nsel=-1)
+        scores, sel_ind = DEMUDOutlierDetection.demud(data=data_to_score.T,
+                                                      initdata=data_to_fit.T,
+                                                      k=k, nsel=-1)
+
+        return {
+            'scores': scores,
+            'sel_ind': sel_ind
+        }
 
     # Simplified DEMUD algorithm:
     # Specify data as numpy array (d x n), initdata (d x n2) can be [],
@@ -107,7 +112,7 @@ class DEMUDOutlierDetection(OutlierDetection):
             orig_ind = orig_ind[keep]
 
         # return res
-        return np.array(res['scores']), np.array(res['sels'])
+        return res['scores'], res['sels']
 
     @classmethod
     def update_model(cls, X, U, S, k, n, mu):
