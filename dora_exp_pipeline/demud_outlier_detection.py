@@ -106,7 +106,7 @@ class DEMUDOutlierDetection(OutlierDetection):
             X = X[:, keep]
             orig_ind = orig_ind[keep]
 
-        #return res
+        # return res
         # TODO: DORA currently only accepts scores;
         # need to return sels as well
         return np.array(res['scores'])
