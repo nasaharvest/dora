@@ -19,7 +19,17 @@ class PCAOutlierDetection(OutlierDetection):
                                f'({data_to_fit.shape[1]})')
 
         # Rank targets
-        return train_and_run_PCA(data_to_fit, data_to_score, k, seed)
+        scores = train_and_run_PCA(data_to_fit, data_to_score, k, seed)
+        selection_indices = np.argsort(scores)[::-1]
+
+        results = dict()
+        results.setdefault('scores', list())
+        results.setdefault('sel_ind', list())
+        for ind in selection_indices:
+            results['scores'].append(scores[ind])
+            results['sel_ind'].append(ind)
+
+        return results
 
 
 def train_and_run_PCA(train, test, k, seed):
