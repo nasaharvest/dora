@@ -107,9 +107,7 @@ class DEMUDOutlierDetection(OutlierDetection):
             orig_ind = orig_ind[keep]
 
         # return res
-        # TODO: DORA currently only accepts scores;
-        # need to return sels as well
-        return np.array(res['scores'])
+        return np.array(res['scores']), np.array(res['sels'])
 
     @classmethod
     def update_model(cls, X, U, S, k, n, mu):
