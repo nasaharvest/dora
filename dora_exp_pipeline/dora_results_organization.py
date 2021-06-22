@@ -48,10 +48,10 @@ class ResultsOrganization(object):
         else:
             return True
 
-    def run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, logger,
-            **params):
-        self._run(data_ids, dts_scores, dts_sels, outlier_alg_name, logger,
-                  **params)
+    def run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, out_dir,
+            logger, **params):
+        self._run(data_ids, dts_scores, dts_sels, outlier_alg_name, out_dir,
+                  logger, **params)
 
     @abstractmethod
     def _run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, logger,
@@ -63,8 +63,8 @@ class SaveScoresCSV(ResultsOrganization):
     def __init__(self):
         super(SaveScoresCSV, self).__init__('save_scores')
 
-    def _run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, logger,
-             out_dir):
+    def _run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, out_dir,
+             logger):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             logger.text(f'Created output directory: {out_dir}')

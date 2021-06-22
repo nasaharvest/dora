@@ -3,6 +3,7 @@ data_type: 'grayscale image'
 data_to_fit: '/PATH/TO/DIR/'
 data_to_score: '/PATH/TO/DIR/'
 zscore_normalization: False
+out_dir: 'PATH/TO/OUTPUT/DIR'
 
 # Feature extraction module
 features: {
@@ -25,7 +26,5 @@ outlier_detection: {
 
 # Results organization module
 results: {
-    save_scores: {
-        'out_dir': 'PATH/TO/OUTPUT/DIR/'
-    }
+    save_scores: {}
 }

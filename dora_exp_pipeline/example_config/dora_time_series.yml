@@ -3,6 +3,7 @@ data_type: 'Time series'
 data_to_fit: 'sample_data/earth_fieldsamples/landsat8_ndvi_2020_sample-2k.csv'
 data_to_score: 'sample_data/earth_fieldsamples/landsat8_ndvi_2020_sample-2k.csv'
 zscore_normalization: False
+out_dir: 'PATH/TO/OUTPUT/DIR'
 
 # Feature extraction module
 features: {
@@ -26,7 +27,5 @@ outlier_detection: {
 
 # Results organization module
 results: {
-    save_scores: {
-        'out_dir': 'results'
-    }
+    save_scores: {}
 }

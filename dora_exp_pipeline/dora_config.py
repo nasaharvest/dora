@@ -9,8 +9,8 @@ import yaml
 
 
 CONFIG_KEYWORDS = ['data_type', 'data_to_fit', 'data_to_score',
-                   'zscore_normalization', 'features', 'outlier_detection',
-                   'results']
+                   'zscore_normalization', 'out_dir', 'features',
+                   'outlier_detection', 'results']
 
 
 class DoraConfig(object):
@@ -38,6 +38,7 @@ class DoraConfig(object):
         self.data_to_fit = config['data_to_fit']
         self.data_to_score = config['data_to_score']
         self.zscore_normalization = config['zscore_normalization']
+        self.out_dir = config['out_dir']
         self.features = config['features']
         self.outlier_detection = config['outlier_detection']
         self.results = config['results']

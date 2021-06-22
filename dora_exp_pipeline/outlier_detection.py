@@ -3,6 +3,7 @@
 # Steven Lu
 # May 21, 2021
 
+import os
 import numpy as np
 from six import add_metaclass
 from abc import ABCMeta
@@ -48,7 +49,7 @@ class OutlierDetection(object):
         else:
             return False
 
-    def run(self, dtf: np.ndarray, dts: np.ndarray, dts_ids: list,
+    def run(self, dtf: np.ndarray, dts: np.ndarray, dts_ids: list, out_dir: str,
             results_org_dict: dict, logger: LogUtil, seed: int,
             **kwargs) -> None:
         dtf = dtf.astype(np.float32)
@@ -57,12 +58,34 @@ class OutlierDetection(object):
         # Run outlier detection algorithm
         results = self._rank_internal(dtf, dts, dts_ids, seed, **kwargs)
 
+        # Create algorithm specific sub directory
+        kwargs_string = OutlierDetection.dict_to_str(kwargs)
+        sub_dir = os.path.join(out_dir, self._ranking_alg_name + kwargs_string)
+        if not os.path.exists(sub_dir):
+            os.mkdir(sub_dir)
+            if logger:
+                logger.text(f'Created sub directory for outlier detection '
+                            f'algorithm {self._ranking_alg_name} at '
+                            f'{os.path.abspath(sub_dir)}')
+
         # Run results organization methods
         for res_org_name, res_org_params in results_org_dict.items():
             res_org_method = get_res_org_method(res_org_name)
             res_org_method.run(results['dts_ids'], results['scores'],
                                results['sel_ind'], self._ranking_alg_name,
-                               logger, **res_org_params)
+                               sub_dir, logger, **res_org_params)
+
+    @staticmethod
+    def dict_to_str(params_dict: dict()) -> str:
+        """ Convert a dictionary of parameters to a string representation. Note
+        that if the input dictionary contains nested data structures (e.g.,
+        list, dict), this method will fail.
+        """
+        ret_string = ''
+        for k, v in params_dict.items():
+            ret_string += '-%s=%s' % (k, v)
+
+        return ret_string
 
     @abstractmethod
     def _rank_internal(self, data_to_fit, data_to_score, seed, **kwargs):

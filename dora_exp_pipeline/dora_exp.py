@@ -56,8 +56,7 @@ def register_od_algs():
     register_od_alg(negative_sampling_outlier_detection)
 
 
-def start(config_file: str, log_file=None, seed=1234):
-
+def start(config_file: str, out_dir: str, log_file=None, seed=1234):
     if not os.path.exists(config_file):
         print('[ERROR] Configuration file not found: %s' %
               os.path.abspath(config_file))
@@ -68,6 +67,19 @@ def start(config_file: str, log_file=None, seed=1234):
         logger = LogUtil('dora_exp', log_file)
 
     config = DoraConfig(config_file, logger)
+    if out_dir is not None:
+        config.out_dir = out_dir
+        if logger:
+            logger.text('Argument out_dir is specified in the command line '
+                        'interface, and it will overwrite the out_dir in the '
+                        'config file.')
+            logger.text(f'out_dir used is {os.path.abspath(config.out_dir)}')
+
+        if not os.path.exists(config.out_dir):
+            os.mkdir(config.out_dir)
+            if logger:
+                logger.text(f'Created out_dir: '
+                            f'{os.path.abspath(config.out_dir)}')
 
     # Register all ranking algorithms supported
     register_od_algs()
@@ -91,7 +103,8 @@ def start(config_file: str, log_file=None, seed=1234):
     for alg_name, alg_params in config.outlier_detection.items():
         outlier_alg = get_alg_by_name(alg_name)
         outlier_alg.run(dtf_features, dts_features, dts_dict['id'],
-                        config.results, logger, seed, **alg_params)
+                        config.out_dir, config.results, logger, seed,
+                        **alg_params)
 
 
 def main():
@@ -100,6 +113,9 @@ def main():
 
     parser.add_argument('config_file', type=str,
                         help='Path to the configuration file')
+    parser.add_argument('-o', '--out_dir', type=str,
+                        help='Output directory. If specified, it will overwrite'
+                             ' the out_dir option in the config file.')
     parser.add_argument('-l', '--log_file', type=str,
                         help='Log file. This is optional. If enabled, a log '
                              'file will be saved. ')
