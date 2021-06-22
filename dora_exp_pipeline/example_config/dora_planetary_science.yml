@@ -1,5 +1,5 @@
 # Data loading module parameters
-data_type: 'grayscale image'
+data_type: 'image'
 data_to_fit: '/PATH/TO/DIR/'
 data_to_score: '/PATH/TO/DIR/'
 zscore_normalization: False

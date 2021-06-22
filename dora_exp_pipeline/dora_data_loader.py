@@ -71,9 +71,9 @@ class DataLoader(object):
                            'called directly.')
 
 
-class GrayscaleImageLoader(DataLoader):
+class ImageLoader(DataLoader):
     def __init__(self):
-        super(GrayscaleImageLoader, self).__init__('grayscale image')
+        super(ImageLoader, self).__init__('image')
 
     def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):
@@ -100,61 +100,14 @@ class GrayscaleImageLoader(DataLoader):
                 raise RuntimeError(f'The format of the input is not '
                                    f'recognized: {os.path.abspath(f)}')
 
-            if len(im_data.shape) >= 3:
-                raise RuntimeError(f'The input is not a grayscale image: '
-                                   f'{os.path.abspath(f)}')
-
             data_dict['id'].append(file_id)
             data_dict['data'].append(im_data)
 
         return data_dict
 
 
-grayscale_image_loader = GrayscaleImageLoader()
-register_data_loader(grayscale_image_loader)
-
-
-class RGBImageLoader(DataLoader):
-    def __init__(self):
-        super(RGBImageLoader, self).__init__('RGB image')
-
-    def _load(self, dir_path: str) -> dict:
-        if not os.path.exists(dir_path):
-            raise RuntimeError(f'Directory not found: '
-                               f'{os.path.abspath(dir_path)}')
-
-        data_dict = dict()
-        data_dict.setdefault('id', [])
-        data_dict.setdefault('data', [])
-        file_list = glob.glob('%s/*' % dir_path)
-
-        for f in file_list:
-            file_id = os.path.basename(f)
-            file_ext = os.path.splitext(file_id)[1]
-
-            if file_ext == 'jpg' or file_ext == 'png':
-                im_pil = Image.open(f)
-                im_data = np.array(im_pil)
-                im_pil.close()
-            elif file_ext == '.img':
-                im = PDS3Image.open(f)
-                im_data = im.image
-            else:
-                raise RuntimeError(f'The format of the input is not '
-                                   f'recognized: {os.path.abspath(f)}')
-
-            if len(im_data.shape) != 3:
-                raise RuntimeError(f'The input is not a RGB image: '
-                                   f'{os.path.abspath(f)}')
-
-            data_dict['id'].append(file_id)
-            data_dict['data'].append(im_data)
-
-        return data_dict
-
-
-rgb_image_loader = RGBImageLoader()
-register_data_loader(rgb_image_loader)
+image_loader = ImageLoader()
+register_data_loader(image_loader)
 
 
 class TimeSeriesLoader(DataLoader):
