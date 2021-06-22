@@ -4,7 +4,6 @@
 # June 3, 2021
 
 import os
-import numpy as np
 from six import add_metaclass
 from abc import ABCMeta, abstractmethod
 
