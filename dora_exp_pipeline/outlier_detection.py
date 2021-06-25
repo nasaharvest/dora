@@ -61,7 +61,7 @@ class OutlierDetection(object):
         for res_org_name, res_org_params in results_org_dict.items():
             res_org_method = get_res_org_method(res_org_name)
             res_org_method.run(dts_ids, outlier_scores, logger,
-                               **res_org_params)
+                               self._ranking_alg_name, **res_org_params)
 
         # # Save results in a csv file.
         # if len(fn_suffix) == 0:
