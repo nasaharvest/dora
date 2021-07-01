@@ -86,7 +86,7 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
 
     # Get data loader
     data_loader = get_data_loader_by_name(config.data_type)
-    if logger is not None:
+    if logger:
         logger.text(f'Use data loader: {config.data_type}')
 
     # Read data_to_fit (dtf)
