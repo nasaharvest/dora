@@ -66,7 +66,8 @@ class SaveScoresCSV(ResultsOrganization):
              logger):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
-            logger.text(f'Created output directory: {out_dir}')
+            if logger:
+                logger.text(f'Created output directory: {out_dir}')
 
         out_file = open(f'{out_dir}/selections-{outlier_alg_name}.csv', 'w')
 
