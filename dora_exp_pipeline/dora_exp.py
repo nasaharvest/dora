@@ -75,11 +75,11 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
                         'config file.')
             logger.text(f'out_dir used is {os.path.abspath(config.out_dir)}')
 
-        if not os.path.exists(config.out_dir):
-            os.mkdir(config.out_dir)
-            if logger:
-                logger.text(f'Created out_dir: '
-                            f'{os.path.abspath(config.out_dir)}')
+    if not os.path.exists(config.out_dir):
+        os.mkdir(config.out_dir)
+        if logger:
+            logger.text(f'Created out_dir: '
+                        f'{os.path.abspath(config.out_dir)}')
 
     # Register all ranking algorithms supported
     register_od_algs()
