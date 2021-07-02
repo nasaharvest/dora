@@ -7,6 +7,7 @@ import os
 import glob
 import csv
 import numpy as np
+import pandas as pd
 from PIL import Image
 from six import add_metaclass
 from planetaryimage import PDS3Image
@@ -108,6 +109,40 @@ class ImageLoader(DataLoader):
 
 image_loader = ImageLoader()
 register_data_loader(image_loader)
+
+class CatalogLoader(DataLoader):
+    def __init__(self):
+        super(CatalogLoader, self).__init__('Catalog')
+
+    def _load(self, dir_path: str) -> dict:
+        if not os.path.exists(dir_path):
+            raise RuntimeError(f'Directory not found: '
+                               f'{os.path.abspath(dir_path)}')
+
+        # List of supported file types
+        file_types = ['.h5']
+
+        data_dict = dict()
+        data_dict.setdefault('id', [])
+        data_dict.setdefault('data', [])
+
+        # (e.g., .h5 dataframes, .npy)
+        if dir_path.endswith('.h5'):
+            # Load the .h5
+            df = pd.read_hdf(dir_path)
+            data_dict['id'] = df.index
+            data_dict['data'] = df.values
+
+        else:
+            raise RuntimeError(f'File extension not supported. '
+                               f'Valid file extensions: '
+                               f'{file_types}')
+
+        return data_dict
+
+
+catalog_loader = CatalogLoader()
+register_data_loader(catalog_loader)
 
 
 class TimeSeriesLoader(DataLoader):
