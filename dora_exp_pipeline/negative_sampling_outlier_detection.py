@@ -64,8 +64,7 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
 
         kfold = KFold(n_splits=5, shuffle=True)
         clf = GridSearchCV(RandomForestClassifier(), params, cv=kfold,
-                           scoring='accuracy', n_jobs=1, iid=True,
-                           error_score='raise')
+                           scoring='accuracy', n_jobs=1, error_score='raise')
         clf.fit(x, y)
         n_estimators = clf.best_params_['n_estimators']
         max_depth = clf.best_params_['max_depth']

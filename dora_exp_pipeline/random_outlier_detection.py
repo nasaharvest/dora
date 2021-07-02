@@ -36,8 +36,9 @@ class RandomOutlierDetection(OutlierDetection):
             'dts_ids': dts_ids
         }
 
-    def _rank_internal(self, data_to_fit, data_to_score, seed):
-        return self._random(data_to_fit, data_to_score, seed)
+    def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
+                       seed):
+        return self._random(data_to_fit, data_to_score, data_to_score_ids, seed)
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").

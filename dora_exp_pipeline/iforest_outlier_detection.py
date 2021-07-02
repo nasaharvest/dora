@@ -29,7 +29,7 @@ def train_and_run_ISO(train, test, seed):
 
     # initialize isolation forest
     clf_iso = IsolationForest(max_samples=train.shape[0], contamination=0.1,
-                              random_state=random_state, behaviour='new')
+                              random_state=random_state)
 
     # train isolation forest
     clf_iso.fit(train)
