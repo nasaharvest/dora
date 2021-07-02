@@ -18,7 +18,8 @@ setup(
         'scikit-learn==0.24.2',
         'Pillow==8.2.0',
         'planetaryimage==0.5.0',
-        'PyYAML==5.4.1'
+        'PyYAML==5.4.1',
+        'pandas==1.1.5'
     ],
     provide=[
         'dora_exp_pipeline'
