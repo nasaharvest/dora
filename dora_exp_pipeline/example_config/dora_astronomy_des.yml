@@ -1,0 +1,31 @@
+# Data loading module parameters
+data_type: 'Catalog'
+data_to_fit: '/Users/Urebbapr/research/dora/sample_data/astronomy_des/Y3_mastercat_12_3_19_SOMv0.21_indexselect_p0.0001_lups_colors.h5'
+data_to_score: '/Users/Urebbapr/research/dora/sample_data/astronomy_des/Y3_mastercat_12_3_19_SOMv0.21_indexselect_p0.0001_lups_colors.h5'
+zscore_normalization: False
+out_dir: '/Users/Urebbapr/research/dora/local/runs/dataloader'
+
+# Feature extraction module
+features: {
+    raw_values: {
+        # no args
+    }
+}
+
+# Outlier detection module
+outlier_detection: {
+    # iforest: {},
+    # pca: {
+    #     k: 3
+    # },
+    # rx: {},
+    # negative_sampling: {
+    #     percent_increase: 20
+    # },
+    random: {}
+}
+
+# Results organization module
+results: {
+    save_scores: {}
+}
