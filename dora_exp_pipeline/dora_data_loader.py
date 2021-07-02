@@ -110,6 +110,7 @@ class ImageLoader(DataLoader):
 image_loader = ImageLoader()
 register_data_loader(image_loader)
 
+
 class CatalogLoader(DataLoader):
     def __init__(self):
         super(CatalogLoader, self).__init__('Catalog')
