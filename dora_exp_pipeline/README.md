@@ -93,6 +93,9 @@ Use the following command to invoke the `dora_exp` program:
 dora_exp config.yml
 ```
 
+NOTE: dora_exp may not be fully up to date with the latest dev changes.  In order to run dora_exp locally, please run: `python dora_exp_pipeline/dora_exp.py -h`.  Running dora_exp.py below the dora_exp_pipeline directory will break the package structure.
+
+
 (TODO: Add a section in the README for config file. For now, please see the 
 example config files in `dora_exp_pipeline/example_config/`.)
 
