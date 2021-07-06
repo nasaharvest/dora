@@ -94,8 +94,11 @@ class SaveComparisonPlot(ResultsOrganization):
             y.append(numOutliers)
 
         fig, axes = plt.subplots()
+        index = x.index(y[-1])
+        area = np.trapz(y[:index+1], x[:index+1])
         
         plt.plot(x, y, label=alg_name)
+        plt.plot([], [], ' ', label=f'Area: {area}')
         plt.title('Correct Outliers vs Selected Outliers')
         plt.xlabel('Number of Outliers Selected')
         plt.ylabel('Number of True Outliers')
