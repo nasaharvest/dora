@@ -1,8 +1,9 @@
 # Data loading module parameters
 data_type: 'Time series'
-data_to_fit: 'sample_data/earth_fieldsamples/points_to_fit.csv'
-data_to_score: 'sample_data/earth_fieldsamples/kenya_points_to_predict.csv'
+data_to_fit: 'sample_data/earth_fieldsamples/sentinel1_ndvi_fit.csv'
+data_to_score: 'sample_data/earth_fieldsamples/sentinel1_ndvi_predict.csv'
 zscore_normalization: False
+'out_dir': 'results'
 
 # Feature extraction module
 features: {
@@ -23,7 +24,6 @@ outlier_detection: {
 # Results organization module
 results: {
     comparison_plot: {
-        'out_dir': 'results/comparison-plots',
-        'validation_dir': 'sample_data/earth_fieldsamples/kenya_labels.csv'
+        'validation_dir': 'sample_data/earth_fieldsamples/sentinel1_ndvi_labels.csv'
     }
 }
