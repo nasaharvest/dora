@@ -1,0 +1,29 @@
+# Data loading module parameters
+data_type: 'Time series'
+data_to_fit: 'sample_data/earth_fieldsamples/points_to_fit.csv'
+data_to_score: 'sample_data/earth_fieldsamples/kenya_points_to_predict.csv'
+zscore_normalization: False
+
+# Feature extraction module
+features: {
+    raw_values: {
+        # no args
+    }
+}
+
+# Outlier detection module
+# Outlier detection module
+outlier_detection: {
+    pca: {
+        k: 3
+    },
+    iforest: {}
+}
+
+# Results organization module
+results: {
+    comparison_plot: {
+        'out_dir': 'results/comparison-plots',
+        'validation_dir': 'sample_data/earth_fieldsamples/kenya_labels.csv'
+    }
+}
