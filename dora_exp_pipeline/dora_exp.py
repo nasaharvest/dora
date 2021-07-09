@@ -10,7 +10,6 @@
 
 import os
 import sys
-sys.path.append('.') # TODO: remove this line after package installation
 from dora_exp_pipeline.dora_config import DoraConfig
 from dora_exp_pipeline.dora_data_loader import get_data_loader_by_name
 from dora_exp_pipeline.outlier_detection import register_od_alg
