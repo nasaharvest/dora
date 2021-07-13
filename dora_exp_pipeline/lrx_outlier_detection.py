@@ -7,7 +7,6 @@
 # Modification history:
 # Steven Lu, July 13, 2021, updated to be compatible with DORA pipeline.
 
-import sys
 import numpy as np
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
@@ -23,7 +22,7 @@ class LocalRXOutlierDetection(OutlierDetection):
                                ' for %s method.' % self._ranking_alg_name)
 
         scores, vis = get_LRX_scores(data_to_score, inner_window, outer_window,
-                                         bands)
+                                     bands)
 
         selection_indices = np.argsort(scores)[::-1]
 
@@ -96,55 +95,6 @@ def lrx(patch, w_in):
     sub = patch[c, c] - mu
     rx_score = np.dot(np.dot(sub, cov), sub.T)
     return rx_score
-
-
-def start(start_sol, end_sol, data_dir, out_dir, inner_window, outer_window,
-          bands, seed):
-    lrx_params = {
-        'inner_window': inner_window,
-        'outer_window': outer_window,
-        'bands': bands
-    }
-
-    lrx_outlier_detection = LocalRXOutlierDetection()
-
-    try:
-        lrx_outlier_detection.run(data_dir, start_sol, end_sol, out_dir, seed,
-                                  **lrx_params)
-    except RuntimeError as e:
-        print(e)
-        sys.exit(1)
-
-
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description='Local RX ranking algorithm')
-    parser.add_argument('-s', '--start_sol', type=int, default=1343,
-                        help='minimum (starting) sol (default 1343)')
-    parser.add_argument('-e', '--end_sol', type=int, default=1343,
-                        help='maximum (ending) sol (default 1343)')
-    parser.add_argument('-d', '--data_dir', default=DEFAULT_DATA_DIR,
-                        help='target image data directory '
-                             '(default: %(default)s)')
-    parser.add_argument('-o', '--out_dir', default='.',
-                        help='output directory (default: .)')
-    parser.add_argument('-i', '--inner_window', type=int, default=3,
-                        help='size of inner window (default 3)')
-    parser.add_argument('-u', '--outer_window', type=int, default=5,
-                        help='size of outer window (default 5)')
-    parser.add_argument('-b', '--bands', type=int, default=1,
-                        help='number of bands in input images (default 1)')
-    parser.add_argument('--seed', type=int, default=1234,
-                        help='Integer used to seed the random generator. This '
-                             'argument is not used in this script.')
-    args = parser.parse_args()
-    start(**vars(args))
-
-
-if __name__ == '__main__':
-    main()
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").
