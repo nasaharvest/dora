@@ -79,6 +79,7 @@ class SaveScoresCSV(ResultsOrganization):
 
         out_file.close()
 
+
 class SaveComparisonPlot(ResultsOrganization):
     def __init__(self):
         super(SaveComparisonPlot, self).__init__('comparison_plot')
@@ -87,15 +88,15 @@ class SaveComparisonPlot(ResultsOrganization):
              validation_dir):
         if(not(os.path.exists(out_dir))):
             os.makedirs(out_dir)
-            
-        # Outliers will be 1s and inliers will be 0s. 
+
+        # Outliers will be 1s and inliers will be 0s.
         labels = self._get_validation_labels(validation_dir)
         scores = np.argsort(dts_scores)[::-1]
 
         x = list(range(1, len(scores)+1))
         y = []
         numOutliers = 0
-        
+
         for i in range(len(scores)):
             if(labels[scores[i]] == 1):
                 numOutliers += 1
@@ -104,7 +105,7 @@ class SaveComparisonPlot(ResultsOrganization):
         fig, axes = plt.subplots()
         index = x.index(y[-1])
         area = np.trapz(y[:index+1], x[:index+1])
-        
+
         plt.plot(x, y, label=alg_name)
         plt.plot([], [], ' ', label=f'Area: {area}')
         plt.title('Correct Outliers vs Selected Outliers')
@@ -118,14 +119,13 @@ class SaveComparisonPlot(ResultsOrganization):
     def _get_validation_labels(self, validation_dir):
         with open(validation_dir, 'r') as f:
             text = f.read().split("\n")[:-1]
-            
+
         labels = {}
         for i in text:
             line = i.split(",")
             labels[int(line[0])] = int(line[1])
 
         return labels
-        
 
 
 save_scores_csv = SaveScoresCSV()

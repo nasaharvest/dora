@@ -104,18 +104,18 @@ class FlattenedPixelValuesExtractor(FeatureExtractor):
             do_resizing = True
 
         # Get data dimension from the first item in the data cube
-        if len(data_cube[0].shape) == 2: # grayscale
+        if len(data_cube[0].shape) == 2:  # grayscale
             rows, cols = data_cube[0].shape
             channels = 1
-        elif len(data_cube[0].shape) == 3: # color
+        elif len(data_cube[0].shape) == 3:  # color
             rows, cols, channels = data_cube[0].shape
-        
+
         if do_resizing:
-            ret_features = np.zeros((len(data_cube), 
+            ret_features = np.zeros((len(data_cube),
                                     height * width * channels),
                                     dtype=np.uint8)
         else:
-            ret_features = np.zeros((len(data_cube), 
+            ret_features = np.zeros((len(data_cube),
                                     rows * cols * channels),
                                     dtype=np.uint8)
 
