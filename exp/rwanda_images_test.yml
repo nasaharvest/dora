@@ -19,9 +19,15 @@ features: {
 
 # Outlier detection module
 outlier_detection: {
+    lrx: {
+        inner_window: 4,
+        outer_window: 10,
+        bands: 3
+    },
     pca: {
         k: 10
-    }
+    },
+    iforest: {}
 }
 
 # Results organization module
