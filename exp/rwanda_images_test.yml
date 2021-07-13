@@ -1,0 +1,30 @@
+# Data loading module parameters
+data_type: 'image'
+data_to_fit: 'sample_data/earth_rwanda_drone'
+data_to_score: 'sample_data/earth_rwanda_drone'
+zscore_normalization: False
+out_dir: 'results/rwanda_test'
+
+# Feature extraction module
+features: {
+    flattened_pixel_values: {
+        # optional parameter; if defined, the width of the image will be
+        # resized to the value of `width`
+        width: 64,
+        # optional parameter; if defined, the height of the image will be
+        # resized to the value of `height`
+        height: 64
+    }
+}
+
+# Outlier detection module
+outlier_detection: {
+    pca: {
+        k: 10
+    }
+}
+
+# Results organization module
+results: {
+    save_scores: {}
+}
