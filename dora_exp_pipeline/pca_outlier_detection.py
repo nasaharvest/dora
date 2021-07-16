@@ -1,4 +1,5 @@
 import numpy as np
+from copy import deepcopy
 from sklearn.decomposition import PCA
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
@@ -9,6 +10,9 @@ class PCAOutlierDetection(OutlierDetection):
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        seed, k):
+        if data_to_fit is None:
+            data_to_fit = deepcopy(data_to_score)
+
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')

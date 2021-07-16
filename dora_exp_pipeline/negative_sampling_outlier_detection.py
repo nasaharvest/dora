@@ -11,6 +11,7 @@
 #
 
 import numpy as np
+from copy import deepcopy
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
@@ -44,6 +45,9 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
         return results
 
     def _rank_targets(self, positive_train, data_test, percent_increase):
+        if positive_train is None:
+            positive_train = deepcopy(data_test)
+
         # Create negative examples from positive examples
         negative_train = generate_negative_example(positive_train,
                                                    percent_increase)
