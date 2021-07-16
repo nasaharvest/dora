@@ -1,4 +1,5 @@
 import numpy as np
+from copy import deepcopy
 from sklearn.ensemble import IsolationForest
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
@@ -9,6 +10,9 @@ class IForestOutlierDetection(OutlierDetection):
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        seed):
+        if data_to_fit is None:
+            data_to_fit = deepcopy(data_to_score)
+
         scores = train_and_run_ISO(data_to_fit, data_to_score, seed)
         selection_indices = np.argsort(scores)
 
