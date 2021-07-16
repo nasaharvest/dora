@@ -44,6 +44,9 @@ def compute_bg(train_images):
         warnings.warn('There are fewer image samples than features. '
                       'Covariance matrix may be singular.')
     cov = np.cov(np.transpose(train_images))
+    # If covariance matrix is 1 x 1, reshape to a 2-d array
+    if len(cov.shape) == 0:
+        cov = np.array([[cov]])
     cov = np.linalg.inv(cov)
 
     return mu, cov
