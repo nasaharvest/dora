@@ -58,7 +58,10 @@ class DataLoader(object):
         else:
             return False
 
-    def load(self, path: str) -> dict:
+    def load(self, path: str):
+        if path is None:
+            return None
+
         data_dict = self._load(path)
 
         if not isinstance(data_dict, dict):

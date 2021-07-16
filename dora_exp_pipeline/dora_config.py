@@ -74,9 +74,12 @@ class DoraConfig(object):
         if not isinstance(self.data_to_fit, str):
             raise RuntimeError('data_to_fit field must be a string')
 
-        if not os.path.exists(self.data_to_fit):
-            raise RuntimeError(f'data_to_fit not found: '
-                               f'{os.path.abspath(self.data_to_fit)}')
+        if self.data_to_fit.lower() == 'none':
+            self.data_to_fit = None
+        else:
+            if not os.path.exists(self.data_to_fit):
+                raise RuntimeError(f'data_to_fit not found: '
+                                   f'{os.path.abspath(self.data_to_fit)}')
 
         # Verify `data_to_score`
         if not isinstance(self.data_to_score, str):

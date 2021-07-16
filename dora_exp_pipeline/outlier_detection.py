@@ -52,7 +52,8 @@ class OutlierDetection(object):
     def run(self, dtf: np.ndarray, dts: np.ndarray, dts_ids: list, out_dir: str,
             results_org_dict: dict, logger: LogUtil, seed: int,
             **kwargs) -> None:
-        dtf = dtf.astype(np.float32)
+        if dtf is not None:
+            dtf = dtf.astype(np.float32)
         dts = dts.astype(np.float32)
 
         # Run outlier detection algorithm

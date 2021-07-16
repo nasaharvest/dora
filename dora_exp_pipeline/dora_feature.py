@@ -57,6 +57,9 @@ def get_feature_extractor_by_name(feature_name):
 
 
 def extract_feature(data_dict, features_dict):
+    if data_dict is None:
+        return None
+
     ret_features = np.empty((len(data_dict['data']), 0))
 
     for method_name, method_params in features_dict.items():
