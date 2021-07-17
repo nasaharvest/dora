@@ -50,14 +50,18 @@ class OutlierDetection(object):
             return False
 
     def run(self, dtf: np.ndarray, dts: np.ndarray, dts_ids: list, out_dir: str,
-            results_org_dict: dict, logger: LogUtil, seed: int,
+            results_org_dict: dict, top_n: int, logger: LogUtil, seed: int,
             **kwargs) -> None:
         if dtf is not None:
             dtf = dtf.astype(np.float32)
         dts = dts.astype(np.float32)
 
+        if top_n > len(dts):
+            raise RuntimeError('top_n must be greater than or equal to the '
+                               'number of items in data_to_score')
+
         # Run outlier detection algorithm
-        results = self._rank_internal(dtf, dts, dts_ids, seed, **kwargs)
+        results = self._rank_internal(dtf, dts, dts_ids, top_n, seed, **kwargs)
 
         # Create algorithm specific sub directory
         kwargs_string = OutlierDetection.dict_to_str(kwargs)
@@ -89,7 +93,8 @@ class OutlierDetection(object):
         return ret_string
 
     @abstractmethod
-    def _rank_internal(self, data_to_fit, data_to_score, seed, **kwargs):
+    def _rank_internal(self, data_to_fit, data_to_score, data_ids, top_n, seed,
+                       **kwargs):
         raise RuntimeError('This function must be implemented in the child '
                            'class.')
 

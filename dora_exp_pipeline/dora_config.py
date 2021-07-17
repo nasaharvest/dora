@@ -10,7 +10,7 @@ import yaml
 
 CONFIG_KEYWORDS = ['data_type', 'data_to_fit', 'data_to_score',
                    'zscore_normalization', 'out_dir', 'features',
-                   'outlier_detection', 'results']
+                   'top_n', 'outlier_detection', 'results']
 
 
 class DoraConfig(object):
@@ -40,6 +40,7 @@ class DoraConfig(object):
         self.zscore_normalization = config['zscore_normalization']
         self.out_dir = config['out_dir']
         self.features = config['features']
+        self.top_n = config['top_n']
         self.outlier_detection = config['outlier_detection']
         self.results = config['results']
         self.logger = logger
@@ -62,6 +63,7 @@ class DoraConfig(object):
         self.logger.text(f'zscore_normalization: '
                          f'{self.zscore_normalization:<20}')
         self.logger.text(f'features: {self.features}')
+        self.logger.text(f'top_n: {self.top_n}')
         self.logger.text(f'outlier_detection: {self.outlier_detection}')
         self.logger.text(f'results: {self.results}')
 
@@ -95,6 +97,9 @@ class DoraConfig(object):
             raise RuntimeError('features field must be a dictionary')
 
         # Verify `outlier_detection`
+        if not isinstance(self.top_n, int):
+            raise RuntimeError('top_n field must be a integer')
+
         if not isinstance(self.outlier_detection, dict):
             raise RuntimeError('outlier_detection field must be a dictionary')
 

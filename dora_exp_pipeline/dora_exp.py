@@ -103,8 +103,8 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
     for alg_name, alg_params in config.outlier_detection.items():
         outlier_alg = get_alg_by_name(alg_name)
         outlier_alg.run(dtf_features, dts_features, dts_dict['id'],
-                        config.out_dir, config.results, logger, seed,
-                        **alg_params)
+                        config.out_dir, config.results, config.top_n, logger,
+                        seed, **alg_params)
 
 
 def main():
