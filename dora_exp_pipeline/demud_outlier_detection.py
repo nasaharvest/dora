@@ -20,8 +20,6 @@ class DEMUDOutlierDetection(OutlierDetection):
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
 
-        # nsel=-1 means to rank all items;
-        # in a future update, the caller may want to limit this
         # Note: DEMUD expects data in d x n order
         scores, sel_ind = DEMUDOutlierDetection.demud(data=data_to_score.T,
                                                       initdata=data_to_fit.T,
@@ -67,9 +65,6 @@ class DEMUDOutlierDetection(OutlierDetection):
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
-        if nsel == -1:
-            # Select all items
-            nsel = data.shape[1]
 
         res = {}
         res['sels'] = []
