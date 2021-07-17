@@ -17,14 +17,15 @@ class RandomOutlierDetection(OutlierDetection):
     def __init__(self):
         super(RandomOutlierDetection, self).__init__('random')
 
-    def _random(self, data_to_fit, data_to_score, data_to_score_ids, seed):
+    def _random(self, data_to_fit, data_to_score, data_to_score_ids, top_n,
+                seed):
         # Random ranking
         indices = list(range(0, data_to_score.shape[0]))
         random_state = np.random.RandomState(seed)
         random_state.shuffle(indices)
 
         dts_ids = []
-        for ind in indices:
+        for ind in indices[:top_n]:
             dts_ids.append(data_to_score_ids[ind])
 
         # This interprets the indices as the scores so when
@@ -37,8 +38,9 @@ class RandomOutlierDetection(OutlierDetection):
         }
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
-                       seed):
-        return self._random(data_to_fit, data_to_score, data_to_score_ids, seed)
+                       top_n, seed):
+        return self._random(data_to_fit, data_to_score, data_to_score_ids,
+                            top_n, seed)
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").

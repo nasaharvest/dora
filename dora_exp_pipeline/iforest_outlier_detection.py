@@ -9,7 +9,7 @@ class IForestOutlierDetection(OutlierDetection):
         super(IForestOutlierDetection, self).__init__('iforest')
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
-                       seed):
+                       top_n, seed):
         if data_to_fit is None:
             data_to_fit = deepcopy(data_to_score)
 
@@ -20,7 +20,7 @@ class IForestOutlierDetection(OutlierDetection):
         results.setdefault('scores', list())
         results.setdefault('sel_ind', list())
         results.setdefault('dts_ids', list())
-        for ind in selection_indices:
+        for ind in selection_indices[:top_n]:
             results['scores'].append(scores[ind])
             results['sel_ind'].append(ind)
             results['dts_ids'].append(data_to_score_ids[ind])

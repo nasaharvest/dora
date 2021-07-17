@@ -24,7 +24,7 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
             'negative_sampling')
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
-                       seed, percent_increase):
+                       top_n, seed, percent_increase):
         if percent_increase < 0 or percent_increase > 100:
             raise RuntimeError('percent_increase parameter must be a number '
                                'between 0 and 100.')
@@ -37,7 +37,7 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
         results.setdefault('scores', list())
         results.setdefault('sel_ind', list())
         results.setdefault('dts_ids', list())
-        for ind in selection_indices:
+        for ind in selection_indices[:top_n]:
             results['scores'].append(scores[ind])
             results['sel_ind'].append(ind)
             results['dts_ids'].append(data_to_score_ids[ind])

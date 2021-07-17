@@ -16,7 +16,7 @@ class LocalRXOutlierDetection(OutlierDetection):
         super(LocalRXOutlierDetection, self).__init__('lrx')
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
-                       seed, inner_window, outer_window, bands=1):
+                       top_n, seed, inner_window, outer_window, bands=1):
         if inner_window > outer_window:
             raise RuntimeError('inner_window cannot be bigger than outer_window'
                                ' for %s method.' % self._ranking_alg_name)
@@ -30,7 +30,7 @@ class LocalRXOutlierDetection(OutlierDetection):
         results.setdefault('scores', list())
         results.setdefault('sel_ind', list())
         results.setdefault('dts_ids', list())
-        for ind in selection_indices:
+        for ind in selection_indices[:top_n]:
             results['scores'].append(scores[ind])
             results['sel_ind'].append(ind)
             results['dts_ids'].append(data_to_score_ids[ind])
