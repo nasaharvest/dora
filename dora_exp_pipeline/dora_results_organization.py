@@ -49,14 +49,14 @@ class ResultsOrganization(object):
         else:
             return False
 
-    def run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, out_dir,
-            logger, **params):
-        self._run(data_ids, dts_scores, dts_sels, outlier_alg_name, out_dir,
-                  logger, **params)
+    def run(self, data_ids, dts_scores, dts_sels, data_to_score,
+            outlier_alg_name, out_dir, logger, **params):
+        self._run(data_ids, dts_scores, dts_sels, data_to_score,
+                  outlier_alg_name, out_dir, logger, **params)
 
     @abstractmethod
-    def _run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, logger,
-             **params):
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, logger, **params):
         raise RuntimeError('This function must be implemented in a child class')
 
 
@@ -64,8 +64,8 @@ class SaveScoresCSV(ResultsOrganization):
     def __init__(self):
         super(SaveScoresCSV, self).__init__('save_scores')
 
-    def _run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, out_dir,
-             logger):
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             if logger:
@@ -84,8 +84,8 @@ class SaveComparisonPlot(ResultsOrganization):
     def __init__(self):
         super(SaveComparisonPlot, self).__init__('comparison_plot')
 
-    def _run(self, data_ids, dts_scores, dts_sels, alg_name, out_dir, logger,
-             validation_dir):
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score, alg_name,
+             out_dir, logger, validation_dir):
         if(not(os.path.exists(out_dir))):
             os.makedirs(out_dir)
 

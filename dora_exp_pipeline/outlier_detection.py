@@ -80,7 +80,7 @@ class OutlierDetection(object):
         for res_org_name, res_org_params in results_org_dict.items():
             res_org_method = get_res_org_method(res_org_name)
             res_org_method.run(results['dts_ids'], results['scores'],
-                               results['sel_ind'], self._ranking_alg_name,
+                               results['sel_ind'], dts, self._ranking_alg_name,
                                sub_dir, logger, **res_org_params)
 
     @staticmethod
