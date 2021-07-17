@@ -18,6 +18,7 @@ features: {
 }
 
 # Outlier detection module
+top_n: 10
 outlier_detection: {
     pca: {
         k: 5
