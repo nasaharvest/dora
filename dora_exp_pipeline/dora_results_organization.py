@@ -8,6 +8,7 @@ from six import add_metaclass
 from abc import ABCMeta, abstractmethod
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.cluster import KMeans
 
 
 METHOD_POOL = []
@@ -50,13 +51,13 @@ class ResultsOrganization(object):
             return False
 
     def run(self, data_ids, dts_scores, dts_sels, data_to_score,
-            outlier_alg_name, out_dir, logger, **params):
+            outlier_alg_name, out_dir, logger, seed, **params):
         self._run(data_ids, dts_scores, dts_sels, data_to_score,
-                  outlier_alg_name, out_dir, logger, **params)
+                  outlier_alg_name, out_dir, logger, seed, **params)
 
     @abstractmethod
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
-             outlier_alg_name, logger, **params):
+             outlier_alg_name, logger, seed, **params):
         raise RuntimeError('This function must be implemented in a child class')
 
 
@@ -65,7 +66,7 @@ class SaveScoresCSV(ResultsOrganization):
         super(SaveScoresCSV, self).__init__('save_scores')
 
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
-             outlier_alg_name, out_dir, logger):
+             outlier_alg_name, out_dir, logger, seed):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             if logger:
@@ -80,12 +81,16 @@ class SaveScoresCSV(ResultsOrganization):
         out_file.close()
 
 
+save_scores_csv = SaveScoresCSV()
+register_org_method(save_scores_csv)
+
+
 class SaveComparisonPlot(ResultsOrganization):
     def __init__(self):
         super(SaveComparisonPlot, self).__init__('comparison_plot')
 
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score, alg_name,
-             out_dir, logger, validation_dir):
+             out_dir, logger, seed, validation_dir):
         if(not(os.path.exists(out_dir))):
             os.makedirs(out_dir)
 
@@ -128,11 +133,44 @@ class SaveComparisonPlot(ResultsOrganization):
         return labels
 
 
-save_scores_csv = SaveScoresCSV()
-register_org_method(save_scores_csv)
-
 save_comparison_plot = SaveComparisonPlot()
 register_org_method(save_comparison_plot)
+
+
+class KmeansCluster(ResultsOrganization):
+    def __init__(self):
+        super(KmeansCluster, self).__init__('kmeans')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, n_clusters):
+        if not os.path.exists(out_dir):
+            os.mkdir(out_dir)
+            if logger:
+                logger.text(f'Created output directory: {out_dir}')
+
+        out_file = open(f'{out_dir}/kmeans-{outlier_alg_name}.csv', 'w')
+
+        data_to_cluster = []
+        for dts_ind in dts_sels:
+            data_to_cluster.append(data_to_score[dts_ind])
+        data_to_cluster = np.array(data_to_cluster, dtype=float)
+
+        if n_clusters > len(data_to_cluster):
+            raise RuntimeError('Kmeans n_clusters is greater than the number '
+                               'of items to cluster')
+
+        kmeans = KMeans(n_clusters=n_clusters, random_state=seed)
+        groups = kmeans.fit_predict(data_to_cluster)
+
+        for ind, (s_ind, dts_id, group) in enumerate(zip(dts_sels, data_ids,
+                                                         groups)):
+            out_file.write(f'{ind}, {s_ind}, {dts_id}, {group}\n')
+
+        out_file.close()
+
+
+kmeans_cluster = KmeansCluster()
+register_org_method(kmeans_cluster)
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").
