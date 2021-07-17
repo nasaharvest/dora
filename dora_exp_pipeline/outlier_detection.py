@@ -56,6 +56,9 @@ class OutlierDetection(object):
             dtf = dtf.astype(np.float32)
         dts = dts.astype(np.float32)
 
+        if top_n is None:
+            top_n = len(dts)
+
         if top_n > len(dts):
             raise RuntimeError('top_n must be greater than or equal to the '
                                'number of items in data_to_score')

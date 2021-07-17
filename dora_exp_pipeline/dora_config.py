@@ -97,8 +97,14 @@ class DoraConfig(object):
             raise RuntimeError('features field must be a dictionary')
 
         # Verify `outlier_detection`
-        if not isinstance(self.top_n, int):
-            raise RuntimeError('top_n field must be a integer')
+        if self.top_n == 'None' or self.top_n == 'none':
+            self.top_n = None
+        else:
+            if not isinstance(self.top_n, int):
+                raise RuntimeError('top_n field must be a integer')
+            elif self.top_n < 0:
+                raise RuntimeError('top_n must be greater than or equal to '
+                                   'zero.')
 
         if not isinstance(self.outlier_detection, dict):
             raise RuntimeError('outlier_detection field must be a dictionary')
