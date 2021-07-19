@@ -47,6 +47,9 @@ def get_LRX_scores(images, w_inner, w_outer, bands):
     rows, cols = images.shape
     im_height, im_width = int(np.sqrt(cols/bands)), int(np.sqrt(cols/bands))
 
+    if outer_window > im_height:
+        raise RuntimeError('outer_window cannot be bigger than im_height')
+
     # Read in image data from BSQ format (bands, rows, cols),
     # then reshape to (rows, cols, bands)
     images = np.reshape(images, [rows, bands, im_height, im_width])
