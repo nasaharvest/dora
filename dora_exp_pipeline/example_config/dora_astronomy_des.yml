@@ -13,6 +13,7 @@ features: {
 }
 
 # Outlier detection module
+top_n: 10
 outlier_detection: {
     iforest: {},
     # pca: {
@@ -27,5 +28,7 @@ outlier_detection: {
 
 # Results organization module
 results: {
-    save_scores: {}
+    kmeans: {
+        n_clusters: 5
+    }
 }

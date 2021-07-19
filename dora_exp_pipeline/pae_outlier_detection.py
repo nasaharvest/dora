@@ -1,16 +1,12 @@
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 import numpy as np
-import os
-import math
-from itertools import accumulate
+from copy import deepcopy
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, losses
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.preprocessing import image_dataset_from_directory
 from tensorflow_probability import distributions, bijectors, layers as tfpl
-from sklearn.model_selection import train_test_split
 
 
 class PAEOutlierDetection(OutlierDetection):
@@ -18,15 +14,14 @@ class PAEOutlierDetection(OutlierDetection):
         super(PAEOutlierDetection, self).__init__('pae')
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
-                       seed, latent_dim):
+                       top_n, seed, latent_dim):
+        if data_to_fit is None:
+            data_to_fit = deepcopy(data_to_score)
+
         if latent_dim < 1:
             raise RuntimeError('The dimensionality of the latent space must be '
                                '>= 1')
 
-        # If there is no test data specified, we evaluate on train data
-        if data_to_score is None:
-            data_to_score = data_to_fit
-        
         # Check that the number of hidden layers <= number of features
         num_features = data_to_fit.shape[1]
         if latent_dim > num_features:
@@ -36,7 +31,7 @@ class PAEOutlierDetection(OutlierDetection):
                                f'({num_features})')
 
         # Rank targets
-        scores = train_and_run_PAE(data_to_fit, data_to_score, latent_dim, 
+        scores = train_and_run_PAE(data_to_fit, data_to_score, latent_dim,
                                    num_features)
         selection_indices = np.argsort(scores)[::-1]
 
@@ -44,11 +39,11 @@ class PAEOutlierDetection(OutlierDetection):
         results.setdefault('scores', list())
         results.setdefault('sel_ind', list())
         results.setdefault('dts_ids', list())
-        for ind in selection_indices:
+        for ind in selection_indices[:top_n]:
             results['scores'].append(scores[ind])
             results['sel_ind'].append(ind)
             results['dts_ids'].append(data_to_score_ids[ind])
-        
+
         return results
 
 
@@ -56,15 +51,15 @@ def train_and_run_PAE(train, test, latent_dim, num_features):
     # Train autoencoder
     autoencoder = Autoencoder(latent_dim, num_features)
     autoencoder.compile(optimizer='adam', loss=losses.MeanSquaredError())
-    callback = EarlyStopping(monitor='val_loss', patience=3) 
-    autoencoder.fit(train, train, epochs=500, callbacks=[callback], 
+    callback = EarlyStopping(monitor='val_loss', patience=3)
+    autoencoder.fit(train, train, epochs=500, callbacks=[callback],
                     validation_split=0.25)
 
     # Train flow
     encoded_train = autoencoder.encoder(train).numpy()
     flow = NormalizingFlow(latent_dim)
     flow.compile(optimizer='adam', loss=lambda y, rv_y: -rv_y.log_prob(y))
-    callback = EarlyStopping(monitor='val_loss', patience=3) 
+    callback = EarlyStopping(monitor='val_loss', patience=3)
     flow.fit(np.zeros((len(encoded_train), 0)), encoded_train, epochs=500,
              callbacks=[callback], validation_split=0.25)
 
@@ -84,11 +79,11 @@ class Autoencoder(Model):
         self.encoder = keras.Sequential([
             layers.InputLayer(input_shape=(num_features,)),
             layers.Dense(latent_dim, activation='relu')
-        ]) 
+        ])
 
         self.decoder = keras.Sequential([
             layers.InputLayer(input_shape=(latent_dim,)),
-                layers.Dense(num_features, activation='sigmoid')
+            layers.Dense(num_features, activation='sigmoid')
         ])
 
     def call(self, x):
@@ -101,17 +96,17 @@ class NormalizingFlow(Model):
     def __init__(self, latent_dim):
         super(NormalizingFlow, self).__init__()
 
-        self._latent_dim = latent_dim
         self.dist = keras.Sequential([
             layers.InputLayer(input_shape=(0,), dtype=tf.float32),
-            tfpl.DistributionLambda(lambda t: 
-                distributions.MultivariateNormalDiag(
-                    loc=tf.zeros(tf.concat(
-                        [tf.shape(t)[:-1], [latent_dim]], axis=0)))),
+            tfpl.DistributionLambda(
+                lambda t: distributions.MultivariateNormalDiag(
+                    loc=tf.zeros(tf.concat([tf.shape(t)[:-1],
+                                           [latent_dim]],
+                                           axis=0)))),
             tfpl.AutoregressiveTransform(bijectors.AutoregressiveNetwork(
-                params=2, hidden_units=[10, 10], activation='relu')), 
+                params=2, hidden_units=[10, 10], activation='relu')),
         ])
-    
+
     def call(self, x):
         return self.dist(x)
 

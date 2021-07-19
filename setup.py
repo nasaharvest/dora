@@ -20,6 +20,7 @@ setup(
         'planetaryimage==0.5.0',
         'PyYAML==5.4.1',
         'pandas==1.1.5',
+        'rasterio==1.2.6',
         'tensorflow==2.4.2',
         'tensorflow-probability==0.12.2'
     ],

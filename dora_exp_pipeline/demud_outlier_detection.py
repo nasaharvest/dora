@@ -15,17 +15,15 @@ class DEMUDOutlierDetection(OutlierDetection):
         super(DEMUDOutlierDetection, self).__init__('demud')
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
-                       seed, k):
+                       top_n, seed, k):
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
 
-        # nsel=-1 means to rank all items;
-        # in a future update, the caller may want to limit this
         # Note: DEMUD expects data in d x n order
         scores, sel_ind = DEMUDOutlierDetection.demud(data=data_to_score.T,
                                                       initdata=data_to_fit.T,
-                                                      k=k, nsel=-1)
+                                                      k=k, nsel=top_n)
         dts_ids = list()
         for ind in sel_ind:
             dts_ids.append(data_to_score_ids[ind])
@@ -67,9 +65,6 @@ class DEMUDOutlierDetection(OutlierDetection):
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
-        if nsel == -1:
-            # Select all items
-            nsel = data.shape[1]
 
         res = {}
         res['sels'] = []

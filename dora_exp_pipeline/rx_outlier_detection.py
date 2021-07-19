@@ -12,6 +12,7 @@
 
 import warnings
 import numpy as np
+from copy import deepcopy
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
 
@@ -20,7 +21,10 @@ class RXOutlierDetection(OutlierDetection):
         super(RXOutlierDetection, self).__init__('rx')
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
-                       seed):
+                       top_n, seed):
+        if data_to_fit is None:
+            data_to_fit = deepcopy(data_to_score)
+
         scores = get_RX_scores(data_to_fit, data_to_score)
         selection_indices = np.argsort(scores)[::-1]
 
@@ -28,7 +32,7 @@ class RXOutlierDetection(OutlierDetection):
         results.setdefault('scores', list())
         results.setdefault('sel_ind', list())
         results.setdefault('dts_ids', list())
-        for ind in selection_indices:
+        for ind in selection_indices[:top_n]:
             results['scores'].append(scores[ind])
             results['sel_ind'].append(ind)
             results['dts_ids'].append(data_to_score_ids[ind])
@@ -44,6 +48,9 @@ def compute_bg(train_images):
         warnings.warn('There are fewer image samples than features. '
                       'Covariance matrix may be singular.')
     cov = np.cov(np.transpose(train_images))
+    # If covariance matrix is 1 x 1, reshape to a 2-d array
+    if len(cov.shape) == 0:
+        cov = np.array([[cov]])
     cov = np.linalg.inv(cov)
 
     return mu, cov

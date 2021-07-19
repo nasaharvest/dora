@@ -16,7 +16,7 @@ from dora_exp_pipeline.outlier_detection import register_od_alg
 from dora_exp_pipeline.demud_outlier_detection import DEMUDOutlierDetection
 from dora_exp_pipeline.iforest_outlier_detection import IForestOutlierDetection
 from dora_exp_pipeline.pca_outlier_detection import PCAOutlierDetection
-# from dora_exp_pipeline.lrx_outlier_detection import LocalRXOutlierDetection
+from dora_exp_pipeline.lrx_outlier_detection import LocalRXOutlierDetection
 from dora_exp_pipeline.rx_outlier_detection import RXOutlierDetection
 from dora_exp_pipeline.random_outlier_detection import RandomOutlierDetection
 from dora_exp_pipeline.negative_sampling_outlier_detection import \
@@ -40,9 +40,9 @@ def register_od_algs():
     pca_outlier_detection = PCAOutlierDetection()
     register_od_alg(pca_outlier_detection)
 
-    # # Register LRX outlier detection algorithm in the pool
-    # lrx_outlier_detection = LocalRXOutlierDetection()
-    # register_od_alg(lrx_outlier_detection)
+    # Register LRX outlier detection algorithm in the pool
+    lrx_outlier_detection = LocalRXOutlierDetection()
+    register_od_alg(lrx_outlier_detection)
 
     # Register RX outlier detection algorithm in the pool
     rx_outlier_detection = RXOutlierDetection()
@@ -108,8 +108,8 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
     for alg_name, alg_params in config.outlier_detection.items():
         outlier_alg = get_alg_by_name(alg_name)
         outlier_alg.run(dtf_features, dts_features, dts_dict['id'],
-                        config.out_dir, config.results, logger, seed,
-                        **alg_params)
+                        config.out_dir, config.results, config.top_n, logger,
+                        seed, **alg_params)
 
 
 def main():

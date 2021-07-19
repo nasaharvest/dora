@@ -1,4 +1,10 @@
-results
+# Don't ignore this globally because we are storing correct results
+# under this directory name and want to know if they change.
+#results
+# Instead, ignore temporary output directories
+sample_data/planetary_rover/pds/exp/results
+sample_data/planetary_rover/pds/exp/sol01371
+sample_data/planetary_rover/png/exp/results
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

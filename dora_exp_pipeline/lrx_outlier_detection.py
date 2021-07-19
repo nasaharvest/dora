@@ -1,94 +1,46 @@
 #!/usr/bin/env python
 # See copyright notice at the end.
 #
-# Author (TODO)
-# Date created (TODO)
+# Author: Hannah Kerner
+# Date created: July 13, 2021
 #
 # Modification history:
-# Steven Lu, May 28, 2020, refactored the code to extract common functionalities
-#                          out to util.py.
+# Steven Lu, July 13, 2021, updated to be compatible with DORA pipeline.
 
-import sys
 import numpy as np
 from dora_exp_pipeline.outlier_detection import OutlierDetection
-from dora_exp_pipeline.util import DEFAULT_DATA_DIR
 
 
 class LocalRXOutlierDetection(OutlierDetection):
     def __init__(self):
         super(LocalRXOutlierDetection, self).__init__('lrx')
 
-    def _rank_internal(self, files, rank_data, prior_data, config, seed,
-                       inner_window, outer_window, bands=1):
+    def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
+                       top_n, seed, inner_window, outer_window, bands=1):
         if inner_window > outer_window:
             raise RuntimeError('inner_window cannot be bigger than outer_window'
                                ' for %s method.' % self._ranking_alg_name)
 
-        # LRX can only be used with `flattened_pixel_values` feature. In
-        # addition, `width` and `height` parameters must be supplied and their
-        # values must be the same.
-        if 'one_dimensional' not in config.features.keys():
-            raise RuntimeError(
-                'Invalid feature dimensionality for LRX. LRX is currently '
-                'implemented only for `one_dimensional` feature')
-        features_1d = config.features['one_dimensional']
-        features_keys = features_1d.keys()
-        if 'flattened_pixel_values' not in features_keys or \
-                len(features_keys) > 1:
-            raise RuntimeError(
-                'LRX must be used with `flattened_pixel_values` feature alone.'
-            )
-        alg_params = features_1d['flattened_pixel_values'].keys()
-        if 'width' not in alg_params:
-            raise RuntimeError(
-                'width parameter in flattened_pixel_values group must be '
-                'supplied for LRX ranking method'
-            )
-        if 'height' not in alg_params:
-            raise RuntimeError(
-                'height parameter in flattened_pixel_values group must be '
-                'supplied for LRX ranking method'
-            )
-        resize_width = features_1d['flattened_pixel_values']['width']
-        resize_height = features_1d['flattened_pixel_values']['height']
-        if resize_width != resize_height:
-            raise RuntimeError(
-                'width and height must be the same. LRX works only with square '
-                'images'
-            )
+        scores, vis = get_LRX_scores(data_to_score, inner_window, outer_window,
+                                     bands)
 
-        # Rank targets
-        return self._rank_targets(rank_data, files, inner_window, outer_window,
-                                  bands, config.enable_explanation)
+        selection_indices = np.argsort(scores)[::-1]
 
-    def _rank_targets(self, data_test, files, inner_window, outer_window, bands,
-                      enable_explanation=False):
-        # get LRX scores and visualization (pixel-wise scores), then sort in
-        # descending order
-        scores_tst, vis = get_LRX_scores(data_test, inner_window, outer_window,
-                                         bands)
-        indices_srt_by_score = np.argsort(scores_tst)[::-1]
-
-        # prepare results to return
         results = dict()
-        results.setdefault('ind', range(indices_srt_by_score.shape[0]))
-        results.setdefault('sel_ind', [])
-        results.setdefault('img_id', [])
-        results.setdefault('scores', [])
-        results.setdefault('explanations', [])
-        for i, idx in enumerate(indices_srt_by_score):
-            results['sel_ind'].append(idx)
-            results['img_id'].append(files[idx])
-            results['scores'].append(scores_tst[idx])
+        results.setdefault('scores', list())
+        results.setdefault('sel_ind', list())
+        results.setdefault('dts_ids', list())
+        for ind in selection_indices[:top_n]:
+            results['scores'].append(scores[ind])
+            results['sel_ind'].append(ind)
+            results['dts_ids'].append(data_to_score_ids[ind])
 
-        results_file_suffix = 'i%d-o%d-b%d' % (inner_window, outer_window,
-                                               bands)
-
-        return results, results_file_suffix
+        return results
 
 
 # Local RX (LRX)
 def get_LRX_scores(images, w_inner, w_outer, bands):
+    # LRX can only be used with `flattened_pixel_values` feature.
     # Images has shape N x M where N is number of images and
     # M is flattened image dimension. Divide by bands to get
     # image dimensions.
@@ -143,55 +95,6 @@ def lrx(patch, w_in):
     sub = patch[c, c] - mu
     rx_score = np.dot(np.dot(sub, cov), sub.T)
     return rx_score
-
-
-def start(start_sol, end_sol, data_dir, out_dir, inner_window, outer_window,
-          bands, seed):
-    lrx_params = {
-        'inner_window': inner_window,
-        'outer_window': outer_window,
-        'bands': bands
-    }
-
-    lrx_outlier_detection = LocalRXOutlierDetection()
-
-    try:
-        lrx_outlier_detection.run(data_dir, start_sol, end_sol, out_dir, seed,
-                                  **lrx_params)
-    except RuntimeError as e:
-        print(e)
-        sys.exit(1)
-
-
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description='Local RX ranking algorithm')
-    parser.add_argument('-s', '--start_sol', type=int, default=1343,
-                        help='minimum (starting) sol (default 1343)')
-    parser.add_argument('-e', '--end_sol', type=int, default=1343,
-                        help='maximum (ending) sol (default 1343)')
-    parser.add_argument('-d', '--data_dir', default=DEFAULT_DATA_DIR,
-                        help='target image data directory '
-                             '(default: %(default)s)')
-    parser.add_argument('-o', '--out_dir', default='.',
-                        help='output directory (default: .)')
-    parser.add_argument('-i', '--inner_window', type=int, default=3,
-                        help='size of inner window (default 3)')
-    parser.add_argument('-u', '--outer_window', type=int, default=5,
-                        help='size of outer window (default 5)')
-    parser.add_argument('-b', '--bands', type=int, default=1,
-                        help='number of bands in input images (default 1)')
-    parser.add_argument('--seed', type=int, default=1234,
-                        help='Integer used to seed the random generator. This '
-                             'argument is not used in this script.')
-    args = parser.parse_args()
-    start(**vars(args))
-
-
-if __name__ == '__main__':
-    main()
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").

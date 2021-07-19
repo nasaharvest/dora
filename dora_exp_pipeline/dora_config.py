@@ -10,7 +10,7 @@ import yaml
 
 CONFIG_KEYWORDS = ['data_type', 'data_to_fit', 'data_to_score',
                    'zscore_normalization', 'out_dir', 'features',
-                   'outlier_detection', 'results']
+                   'top_n', 'outlier_detection', 'results']
 
 
 class DoraConfig(object):
@@ -40,6 +40,7 @@ class DoraConfig(object):
         self.zscore_normalization = config['zscore_normalization']
         self.out_dir = config['out_dir']
         self.features = config['features']
+        self.top_n = config['top_n']
         self.outlier_detection = config['outlier_detection']
         self.results = config['results']
         self.logger = logger
@@ -62,6 +63,7 @@ class DoraConfig(object):
         self.logger.text(f'zscore_normalization: '
                          f'{self.zscore_normalization:<20}')
         self.logger.text(f'features: {self.features}')
+        self.logger.text(f'top_n: {self.top_n}')
         self.logger.text(f'outlier_detection: {self.outlier_detection}')
         self.logger.text(f'results: {self.results}')
 
@@ -74,9 +76,12 @@ class DoraConfig(object):
         if not isinstance(self.data_to_fit, str):
             raise RuntimeError('data_to_fit field must be a string')
 
-        if not os.path.exists(self.data_to_fit):
-            raise RuntimeError(f'data_to_fit not found: '
-                               f'{os.path.abspath(self.data_to_fit)}')
+        if self.data_to_fit.lower() == 'none':
+            self.data_to_fit = None
+        else:
+            if not os.path.exists(self.data_to_fit):
+                raise RuntimeError(f'data_to_fit not found: '
+                                   f'{os.path.abspath(self.data_to_fit)}')
 
         # Verify `data_to_score`
         if not isinstance(self.data_to_score, str):
@@ -92,6 +97,15 @@ class DoraConfig(object):
             raise RuntimeError('features field must be a dictionary')
 
         # Verify `outlier_detection`
+        if self.top_n == 'None' or self.top_n == 'none':
+            self.top_n = None
+        else:
+            if not isinstance(self.top_n, int):
+                raise RuntimeError('top_n field must be a integer')
+            elif self.top_n < 0:
+                raise RuntimeError('top_n must be greater than or equal to '
+                                   'zero.')
+
         if not isinstance(self.outlier_detection, dict):
             raise RuntimeError('outlier_detection field must be a dictionary')
 
