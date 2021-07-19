@@ -71,6 +71,9 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
     if log_file is not None:
         logger = LogUtil('dora_exp', log_file)
 
+    # Supress Tensorflow progress output
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
     config = DoraConfig(config_file, logger)
     if out_dir is not None:
         config.out_dir = out_dir

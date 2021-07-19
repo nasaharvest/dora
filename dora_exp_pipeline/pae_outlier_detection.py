@@ -52,7 +52,7 @@ def train_and_run_PAE(train, test, latent_dim, num_features):
     autoencoder = Autoencoder(latent_dim, num_features)
     autoencoder.compile(optimizer='adam', loss=losses.MeanSquaredError())
     callback = EarlyStopping(monitor='val_loss', patience=3)
-    autoencoder.fit(train, train, epochs=500, callbacks=[callback],
+    autoencoder.fit(train, train, epochs=500, verbose=0, callbacks=[callback],
                     validation_split=0.25)
 
     # Train flow
@@ -61,7 +61,7 @@ def train_and_run_PAE(train, test, latent_dim, num_features):
     flow.compile(optimizer='adam', loss=lambda y, rv_y: -rv_y.log_prob(y))
     callback = EarlyStopping(monitor='val_loss', patience=3)
     flow.fit(np.zeros((len(encoded_train), 0)), encoded_train, epochs=500,
-             callbacks=[callback], validation_split=0.25)
+             verbose=0, callbacks=[callback], validation_split=0.25)
 
     # Calculate scores
     trained_dist = flow.dist(np.zeros(0,))
@@ -109,6 +109,7 @@ class NormalizingFlow(Model):
 
     def call(self, x):
         return self.dist(x)
+
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").
 # U.S. Government sponsorship acknowledged.
