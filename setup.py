@@ -19,9 +19,9 @@ setup(
         'Pillow==8.2.0',
         'planetaryimage==0.5.0',
         'PyYAML==5.4.1',
-        'pandas==1.1.5'
-        'tensorflow==2.5.0',
-        'tensorflow-probability==0.13.0rc0'
+        'pandas==1.1.5',
+        'tensorflow==2.4.2',
+        'tensorflow-probability==0.12.2'
     ],
     provide=[
         'dora_exp_pipeline'

@@ -52,8 +52,10 @@ class OutlierDetection(object):
     def run(self, dtf: np.ndarray, dts: np.ndarray, dts_ids: list, out_dir: str,
             results_org_dict: dict, logger: LogUtil, seed: int,
             **kwargs) -> None:
-        dtf = dtf.astype(np.float32)
-        dts = dts.astype(np.float32)
+        # Don't try to convert strings (i.e. filenames) to float32
+        if dtf.dtype.type is not np.str_:
+            dtf = dtf.astype(np.float32)
+            dts = dts.astype(np.float32)
 
         # Run outlier detection algorithm
         results = self._rank_internal(dtf, dts, dts_ids, seed, **kwargs)
