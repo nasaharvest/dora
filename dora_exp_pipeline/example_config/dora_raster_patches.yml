@@ -1,9 +1,9 @@
 # Data loading module parameters
-data_type: 'raster'
+data_type: 'raster_patches'
 data_to_fit: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
 data_to_score: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
 zscore_normalization: False
-out_dir: 'results/raster_test'
+out_dir: 'results/raster_patch_test'
 
 # Feature extraction module
 features: {
@@ -19,7 +19,12 @@ outlier_detection: {
     # pca: {
     #     k: 3
     # },
-    rx: {},
+    # rx: {},
+    lrx: {
+        inner_window: 5,
+        outer_window: 11,
+        bands: 1
+    },
     # negative_sampling: {
     #     percent_increase: 20
     # },

@@ -18,6 +18,7 @@ features: {
 }
 
 # Outlier detection module
+top_n: 10
 outlier_detection: {
     lrx: {
         inner_window: 4,

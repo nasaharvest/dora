@@ -59,11 +59,11 @@ class DataLoader(object):
         else:
             return False
 
-    def load(self, path: str):
+    def load(self, path: str, alg_dict: dict):
         if path is None:
             return None
 
-        data_dict = self._load(path)
+        data_dict = self._load(path, alg_dict)
 
         if not isinstance(data_dict, dict):
             raise RuntimeError(f'Unexpected return type: {type(data_dict)}')
@@ -71,7 +71,7 @@ class DataLoader(object):
         return data_dict
 
     @abstractmethod
-    def _load(self, file_path: str) -> dict:
+    def _load(self, file_path: str, alg_dict: dict) -> dict:
         raise RuntimeError('Development error. This function should never be '
                            'called directly.')
 
@@ -80,7 +80,7 @@ class ImageLoader(DataLoader):
     def __init__(self):
         super(ImageLoader, self).__init__('image')
 
-    def _load(self, dir_path: str) -> dict:
+    def _load(self, dir_path: str, alg_dict: dict) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
@@ -115,11 +115,11 @@ image_loader = ImageLoader()
 register_data_loader(image_loader)
 
 
-class RasterLoader(DataLoader):
+class RasterPixelLoader(DataLoader):
     def __init__(self):
-        super(RasterLoader, self).__init__('raster')
+        super(RasterPixelLoader, self).__init__('raster_pixels')
 
-    def _load(self, dir_path: str) -> dict:
+    def _load(self, dir_path: str, alg_dict: dict) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
@@ -142,7 +142,6 @@ class RasterLoader(DataLoader):
                 # vectors where each pixel is a feature vector
                 img = np.reshape(img, [img.shape[0]*img.shape[1],
                                        img.shape[2]])
-                print(img.shape)
                 # set the ID to the index of the pixel
                 data_dict['id'] = range(img.shape[0])
                 data_dict['data'] = list(img)
@@ -154,15 +153,66 @@ class RasterLoader(DataLoader):
         return data_dict
 
 
-raster_loader = RasterLoader()
-register_data_loader(raster_loader)
+raster_pixel_loader = RasterPixelLoader()
+register_data_loader(raster_pixel_loader)
+
+
+class RasterPatchLoader(DataLoader):
+    def __init__(self):
+        super(RasterPatchLoader, self).__init__('raster_patches')
+
+    def _load(self, dir_path: str, alg_dict: dict) -> dict:
+        if not os.path.exists(dir_path):
+            raise RuntimeError(f'Directory not found: '
+                               f'{os.path.abspath(dir_path)}')
+
+        if 'lrx' not in alg_dict.keys():
+            raise RuntimeError(f'LRX outer window must be specified'
+                               f' to use this data loader.')
+
+        # List of supported file types
+        file_types = ['.tif']
+
+        data_dict = dict()
+        data_dict.setdefault('id', [])
+        data_dict.setdefault('data', [])
+
+        if dir_path.endswith('.tif'):
+            # Load the raster
+            with rio.open(dir_path) as src:
+                img = src.read()
+                # rasterio reads images in channels-first order
+                # we want to put it in channels-last order
+                img = np.moveaxis(img, 0, -1)
+                # get patch size based on LRX with buffer
+                # so that LRX will be computed once per patch
+                window_size = alg_dict['lrx']['outer_window']
+                # extract patches from raster image
+                # i, j are top left corner coordinate
+                for i in range(img.shape[0]-window_size):
+                    for j in range(img.shape[1]-window_size):
+                        patch = img[i:i+window_size, j:j+window_size]
+                        # append the patch coordinate as the id
+                        data_dict['id'].append('%d-%d' % (i, j))
+                        # append the patch data
+                        data_dict['data'].append(patch.flatten())
+        else:
+            raise RuntimeError(f'File extension not supported. '
+                               f'Valid file extensions: '
+                               f'{file_types}')
+
+        return data_dict
+
+
+raster_patch_loader = RasterPatchLoader()
+register_data_loader(raster_patch_loader)
 
 
 class CatalogLoader(DataLoader):
     def __init__(self):
         super(CatalogLoader, self).__init__('Catalog')
 
-    def _load(self, dir_path: str) -> dict:
+    def _load(self, dir_path: str, alg_dict: dict) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
@@ -197,7 +247,7 @@ class TimeSeriesLoader(DataLoader):
     def __init__(self):
         super(TimeSeriesLoader, self).__init__('Time series')
 
-    def _load(self, dir_path: str) -> dict:
+    def _load(self, dir_path: str, alg_dict: dict) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
@@ -209,8 +259,6 @@ class TimeSeriesLoader(DataLoader):
         data_dict.setdefault('id', [])
         data_dict.setdefault('data', [])
 
-        # TODO: add support for other data types
-        # (e.g., .h5 dataframes, .npy)
         if dir_path.endswith('.csv'):
             # Load the csv data
             with open(dir_path, 'r') as csv_file:

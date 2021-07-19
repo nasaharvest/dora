@@ -90,10 +90,10 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
         logger.text(f'Use data loader: {config.data_type}')
 
     # Read data_to_fit (dtf)
-    dtf_dict = data_loader.load(config.data_to_fit)
+    dtf_dict = data_loader.load(config.data_to_fit, config.outlier_detection)
 
     # Read data_to_score (dts)
-    dts_dict = data_loader.load(config.data_to_score)
+    dts_dict = data_loader.load(config.data_to_score, config.outlier_detection)
 
     # Feature extraction
     dtf_features = extract_feature(dtf_dict, config.features)
