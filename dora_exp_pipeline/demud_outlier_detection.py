@@ -20,6 +20,9 @@ class DEMUDOutlierDetection(OutlierDetection):
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
 
+        if data_to_fit is None:
+            data_to_fit = np.array(())
+
         # Note: DEMUD expects data in d x n order
         scores, sel_ind = DEMUDOutlierDetection.demud(data=data_to_score.T,
                                                       initdata=data_to_fit.T,
