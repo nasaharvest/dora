@@ -9,13 +9,60 @@
 import numpy as np
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
-
 class DEMUDOutlierDetection(OutlierDetection):
     def __init__(self):
         super(DEMUDOutlierDetection, self).__init__('demud')
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        top_n, seed, k):
+        """
+        >>> data_to_score = np.array([[1,2,3],[4,5,6],[7,8,9]])
+        >>> data_to_fit = np.array([[0,7,2],[3,9,3],[4,7,4]])
+        >>> #data_to_fit = np.array(())
+        >>> k = 2
+        >>> top_n = 2
+
+        # --- Run local DEMUD
+        >>> scores, sel_ind = DEMUDOutlierDetection.demud(data=data_to_score.T,\
+                                                      initdata=data_to_fit.T,\
+                                                      k=k, nsel=top_n)
+        >>> import sys
+        >>> sys.path.append('/home/wkiri/Research/COSMIC/COSMIC_DEMUD/cosmic_demud')
+        >>> from demud import demud as cosmic_demud
+        --- Loaded package version information ---
+        >>> from dataset import Dataset
+
+        # --- compare to COSMIC DEMUD ---
+        # Create a DEMUD data set
+        >>> ds = Dataset('', name='novelty')
+        >>> ds.data = data_to_score.T
+        >>> n_items = data_to_score.shape[0]
+        >>> for i in range(n_items): ds.labels.append(str(i))
+
+        >>> if data_to_fit is not None: \
+               ds.initdata = np.array(data_to_fit).T
+
+        # Suppress stdout for DEMUD calls
+        >>> stdout_ = sys.stdout
+        >>> sys.stdout = open('/dev/null', 'w')
+
+        # Run DEMUD and get selections back
+        # 'sels': list of item indices, in order of selection
+        >>> demud_results = cosmic_demud(\
+            ds, k=k, nsel=top_n, inititem=-1, plotresults=False\
+        )
+        >>> sys.stdout = stdout_
+
+        >>> print(sel_ind == demud_results['sels'])
+        True
+        >>> print(scores == demud_results['scores'])
+        True
+
+        # print(sel_ind == demud_results['sels'], sel_ind, demud_results['sels'])
+        # print(scores == demud_results['scores'], scores, demud_results['scores'])
+        # input()
+        """
+
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
@@ -27,6 +74,7 @@ class DEMUDOutlierDetection(OutlierDetection):
         scores, sel_ind = DEMUDOutlierDetection.demud(data=data_to_score.T,
                                                       initdata=data_to_fit.T,
                                                       k=k, nsel=top_n)
+
         dts_ids = list()
         for ind in sel_ind:
             dts_ids.append(data_to_score_ids[ind])
