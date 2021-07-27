@@ -50,17 +50,17 @@ class DEMUDOutlierDetection(OutlierDetection):
         >>> data = np.array([[0, 0], [-1, 1]]).T
         >>> demud_res = DEMUDOutlierDetection.demud(data, np.array([]), \
                                                     k=1, nsel=2)
-        >>> demud_res['sels']
+        >>> demud_res[1]  # selections
         [1, 0]
-        >>> demud_res['scores']
+        >>> demud_res[0]  # scores
         [1.6023737137301802e-31, 1.0]
 
         Example from CIF benchmarking tests - with prior data
         >>> initdata = np.array([[1, 1], [-1, -1]]).T
         >>> demud_res = DEMUDOutlierDetection.demud(data, initdata, k=1, nsel=2)
-        >>> demud_res['sels']
+        >>> demud_res[1]
         [1, 0]
-        >>> demud_res['scores']
+        >>> demud_res[0]
         [2.0, 0.2222222222222222]
         """
 
