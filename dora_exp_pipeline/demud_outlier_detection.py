@@ -9,6 +9,7 @@
 import numpy as np
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
+
 class DEMUDOutlierDetection(OutlierDetection):
     def __init__(self):
         super(DEMUDOutlierDetection, self).__init__('demud')
@@ -26,13 +27,14 @@ class DEMUDOutlierDetection(OutlierDetection):
         >>> scores, sel_ind = DEMUDOutlierDetection.demud(data=data_to_score.T,\
                                                       initdata=data_to_fit.T,\
                                                       k=k, nsel=top_n)
-        
+
         # If cosmic_demud is not installed, point to a checkout:
         >>> #import sys
-        >>> #sys.path.append('/home/wkiri/Research/COSMIC/COSMIC_DEMUD/cosmic_demud')
+        >>> #sys.path.append('/home/wkiri/Research/COSMIC/'\
+                             'COSMIC_DEMUD/cosmic_demud')
         >>> #from demud import demud as cosmic_demud
         >>> #from dataset import Dataset
-        
+
         # if cosmic_demud is installed in your environment:
         >>> import cosmic_demud
         >>> from cosmic_demud.demud import demud as cosmic_demud
@@ -65,8 +67,10 @@ class DEMUDOutlierDetection(OutlierDetection):
         >>> print(scores == demud_results['scores'])
         True
 
-        # print(sel_ind == demud_results['sels'], sel_ind, demud_results['sels'])
-        # print(scores == demud_results['scores'], scores, demud_results['scores'])
+        # print(sel_ind == demud_results['sels'], \
+                sel_ind, demud_results['sels'])
+        # print(scores == demud_results['scores'], \
+                scores, demud_results['scores'])
         """
 
         if k < 1:
