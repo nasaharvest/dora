@@ -26,11 +26,18 @@ class DEMUDOutlierDetection(OutlierDetection):
         >>> scores, sel_ind = DEMUDOutlierDetection.demud(data=data_to_score.T,\
                                                       initdata=data_to_fit.T,\
                                                       k=k, nsel=top_n)
-        >>> import sys
-        >>> sys.path.append('/home/wkiri/Research/COSMIC/COSMIC_DEMUD/cosmic_demud')
-        >>> from demud import demud as cosmic_demud
+        
+        # If cosmic_demud is not installed, point to a checkout:
+        >>> #import sys
+        >>> #sys.path.append('/home/wkiri/Research/COSMIC/COSMIC_DEMUD/cosmic_demud')
+        >>> #from demud import demud as cosmic_demud
+        >>> #from dataset import Dataset
+        
+        # if cosmic_demud is installed in your environment:
+        >>> import cosmic_demud
+        >>> from cosmic_demud.demud import demud as cosmic_demud
         --- Loaded package version information ---
-        >>> from dataset import Dataset
+        >>> from cosmic_demud.dataset import Dataset
 
         # --- compare to COSMIC DEMUD ---
         # Create a DEMUD data set
@@ -60,7 +67,6 @@ class DEMUDOutlierDetection(OutlierDetection):
 
         # print(sel_ind == demud_results['sels'], sel_ind, demud_results['sels'])
         # print(scores == demud_results['scores'], scores, demud_results['scores'])
-        # input()
         """
 
         if k < 1:
