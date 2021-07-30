@@ -16,14 +16,75 @@ class DEMUDOutlierDetection(OutlierDetection):
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        top_n, seed, k):
+        """
+        >>> data_to_score = np.array([[1,2,3],[4,5,6],[7,8,9]])
+        >>> data_to_fit = np.array([[0,7,2],[3,9,3],[4,7,4]])
+        >>> #data_to_fit = np.array(())
+        >>> k = 2
+        >>> top_n = 2
+
+        # --- Run local DEMUD
+        >>> scores, sel_ind = DEMUDOutlierDetection.demud(data=data_to_score.T,\
+                                                      initdata=data_to_fit.T,\
+                                                      k=k, nsel=top_n)
+
+        # If cosmic_demud is not installed, point to a checkout:
+        >>> #import sys
+        >>> #sys.path.append('/home/wkiri/Research/COSMIC/'\
+                             'COSMIC_DEMUD/cosmic_demud')
+        >>> #from demud import demud as cosmic_demud
+        >>> #from dataset import Dataset
+
+        # if cosmic_demud is installed in your environment:
+        >>> import cosmic_demud
+        >>> from cosmic_demud.demud import demud as cosmic_demud
+        --- Loaded package version information ---
+        >>> from cosmic_demud.dataset import Dataset
+
+        # --- compare to COSMIC DEMUD ---
+        # Create a DEMUD data set
+        >>> ds = Dataset('', name='novelty')
+        >>> ds.data = data_to_score.T
+        >>> n_items = data_to_score.shape[0]
+        >>> for i in range(n_items): ds.labels.append(str(i))
+
+        >>> if data_to_fit is not None: \
+               ds.initdata = np.array(data_to_fit).T
+
+        # Suppress stdout for DEMUD calls
+        >>> stdout_ = sys.stdout
+        >>> sys.stdout = open('/dev/null', 'w')
+
+        # Run DEMUD and get selections back
+        # 'sels': list of item indices, in order of selection
+        >>> demud_results = cosmic_demud(\
+            ds, k=k, nsel=top_n, inititem=-1, plotresults=False\
+        )
+        >>> sys.stdout = stdout_
+
+        >>> print(sel_ind == demud_results['sels'])
+        True
+        >>> print(scores == demud_results['scores'])
+        True
+
+        # print(sel_ind == demud_results['sels'], \
+                sel_ind, demud_results['sels'])
+        # print(scores == demud_results['scores'], \
+                scores, demud_results['scores'])
+        """
+
         if k < 1:
             raise RuntimeError('The number of principal components (k) must '
                                'be >= 1')
+
+        if data_to_fit is None:
+            data_to_fit = np.array(())
 
         # Note: DEMUD expects data in d x n order
         scores, sel_ind = DEMUDOutlierDetection.demud(data=data_to_score.T,
                                                       initdata=data_to_fit.T,
                                                       k=k, nsel=top_n)
+
         dts_ids = list()
         for ind in sel_ind:
             dts_ids.append(data_to_score_ids[ind])
@@ -47,17 +108,17 @@ class DEMUDOutlierDetection(OutlierDetection):
         >>> data = np.array([[0, 0], [-1, 1]]).T
         >>> demud_res = DEMUDOutlierDetection.demud(data, np.array([]), \
                                                     k=1, nsel=2)
-        >>> demud_res['sels']
+        >>> demud_res[1]  # selections
         [1, 0]
-        >>> demud_res['scores']
+        >>> demud_res[0]  # scores
         [1.6023737137301802e-31, 1.0]
 
         Example from CIF benchmarking tests - with prior data
         >>> initdata = np.array([[1, 1], [-1, -1]]).T
         >>> demud_res = DEMUDOutlierDetection.demud(data, initdata, k=1, nsel=2)
-        >>> demud_res['sels']
+        >>> demud_res[1]
         [1, 0]
-        >>> demud_res['scores']
+        >>> demud_res[0]
         [2.0, 0.2222222222222222]
         """
 
