@@ -117,7 +117,7 @@ class SaveComparisonPlot(ResultsOrganization):
         plt.xlabel('Number of Outliers Selected')
         plt.ylabel('Number of True Outliers')
         plt.legend()
-        axes.set_xlim(1, y[-1])
+        axes.set_xlim(1, x[-1])
         axes.set_ylim(1, y[-1])
         plt.savefig(f'{out_dir}/comparison_plot_{alg_name}.png')
 
