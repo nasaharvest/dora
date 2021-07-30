@@ -24,18 +24,22 @@ class RandomOutlierDetection(OutlierDetection):
         random_state = np.random.RandomState(seed)
         random_state.shuffle(indices)
 
-        dts_ids = []
-        for ind in indices[:top_n]:
-            dts_ids.append(data_to_score_ids[ind])
-
         # This interprets the indices as the scores so when
         # the scores are sorted later they will have the
         # random order.
-        return {
-            'scores': list(np.zeros(data_to_score.shape[0], dtype=float)),
-            'sel_ind': indices,
-            'dts_ids': dts_ids
-        }
+        scores = list(np.zeros(data_to_score.shape[0], dtype=float))
+        
+        results = dict()
+        results.setdefault('scores', list())
+        results.setdefault('sel_ind', list())
+        results.setdefault('dts_ids', list())
+        for ind in indices[:top_n]:
+            results['scores'].append(scores[ind])
+            results['sel_ind'].append(ind)
+            results['dts_ids'].append(data_to_score_ids[ind])
+
+        return results
+    
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        top_n, seed):
