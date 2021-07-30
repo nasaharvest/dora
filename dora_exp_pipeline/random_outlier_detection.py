@@ -28,7 +28,7 @@ class RandomOutlierDetection(OutlierDetection):
         # the scores are sorted later they will have the
         # random order.
         scores = list(np.zeros(data_to_score.shape[0], dtype=float))
-        
+
         results = dict()
         results.setdefault('scores', list())
         results.setdefault('sel_ind', list())
@@ -39,7 +39,6 @@ class RandomOutlierDetection(OutlierDetection):
             results['dts_ids'].append(data_to_score_ids[ind])
 
         return results
-    
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        top_n, seed):
