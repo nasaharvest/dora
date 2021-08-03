@@ -10,6 +10,7 @@
 
 import os
 import sys
+from tqdm import tqdm
 from dora_exp_pipeline.dora_config import DoraConfig
 from dora_exp_pipeline.dora_data_loader import get_data_loader_by_name
 from dora_exp_pipeline.outlier_detection import register_od_alg
@@ -90,10 +91,12 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
         logger.text(f'Use data loader: {config.data_loader["name"]}')
 
     # Read data_to_fit (dtf)
+    print('Loading data_to_fit')
     dtf_dict = data_loader.load(config.data_to_fit,
                                 **config.data_loader['params'])
 
     # Read data_to_score (dts)
+    print('Loading data_to_score')
     dts_dict = data_loader.load(config.data_to_score,
                                 **config.data_loader['params'])
 
@@ -102,7 +105,8 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
     dts_features = extract_feature(dts_dict, config.features)
 
     # Outlier detection
-    for alg_name, alg_params in config.outlier_detection.items():
+    for alg_name, alg_params in tqdm(config.outlier_detection.items(),
+                                     desc='Outlier detection'):
         outlier_alg = get_alg_by_name(alg_name)
         outlier_alg.run(dtf_features, dts_features, dts_dict['id'],
                         config.out_dir, config.results, config.top_n, logger,

@@ -4,6 +4,7 @@
 # Steven Lu, June 29, 2020
 
 import numpy as np
+from tqdm import tqdm
 from skimage import transform
 from six import add_metaclass
 from abc import ABCMeta, abstractmethod
@@ -62,7 +63,8 @@ def extract_feature(data_dict, features_dict):
 
     ret_features = np.empty((len(data_dict['data']), 0))
 
-    for method_name, method_params in features_dict.items():
+    for method_name, method_params in tqdm(features_dict.items(),
+                                           desc='Feature extraction'):
         extractor = get_feature_extractor_by_name(method_name)
         features = extractor.extract(data_dict['data'], **method_params)
 
