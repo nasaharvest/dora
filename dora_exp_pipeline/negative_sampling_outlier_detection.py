@@ -30,7 +30,7 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
                                'between 0 and 100.')
 
         scores = self._rank_targets(data_to_fit, data_to_score,
-                                    percent_increase)
+                                    percent_increase, seed)
         selection_indices = np.argsort(scores)[::-1]
 
         results = dict()
@@ -44,13 +44,16 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
 
         return results
 
-    def _rank_targets(self, positive_train, data_test, percent_increase):
+    def _rank_targets(self, positive_train, data_test, percent_increase, seed):
         if positive_train is None:
             positive_train = deepcopy(data_test)
 
+        random_state = np.random.RandomState(seed)
+
         # Create negative examples from positive examples
         negative_train = generate_negative_example(positive_train,
-                                                   percent_increase)
+                                                   percent_increase,
+                                                   random_state)
 
         # Create labels
         positive_label = np.ones(len(positive_train))
@@ -66,21 +69,28 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
             'max_depth': list(range(2, 7, 1))
         }]
 
-        kfold = KFold(n_splits=5, shuffle=True)
-        clf = GridSearchCV(RandomForestClassifier(), params, cv=kfold,
-                           scoring='accuracy', n_jobs=1, error_score='raise')
+        kfold = KFold(n_splits=5, shuffle=True, random_state=random_state)
+        clf = GridSearchCV(RandomForestClassifier(random_state=random_state),
+                           params, cv=kfold, scoring='accuracy', n_jobs=1,
+                           error_score='raise')
         clf.fit(x, y)
         n_estimators = clf.best_params_['n_estimators']
         max_depth = clf.best_params_['max_depth']
+        print(n_estimators)
+        print(max_depth)
 
         # Train a random forest classifier with the best parameters found in
         # grid search
         rf_clf = RandomForestClassifier(n_estimators=n_estimators,
-                                        max_depth=max_depth)
+                                        max_depth=max_depth,
+                                        random_state=random_state)
         rf_clf.fit(x, y)
+        print(x)
+        print(y)
 
         # Make predictions for test data
         probs = rf_clf.predict_proba(data_test)
+        print(probs)
 
         # Keeping only the probabilities for negative (novel) class, and use
         # them as novelty scores to rank selections
@@ -89,7 +99,7 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
         return scores
 
 
-def generate_negative_example(data_train, percent_increase):
+def generate_negative_example(data_train, percent_increase, random_state):
     rows, cols = data_train.shape
     negative_train = np.zeros((rows, cols), dtype=np.float32)
 
@@ -97,7 +107,8 @@ def generate_negative_example(data_train, percent_increase):
         min_value = np.min(data_train[:, dim]) * (1 - percent_increase / 100.0)
         max_value = np.max(data_train[:, dim]) * (1 + percent_increase / 100.0)
 
-        negative_train[:, dim] = np.random.uniform(min_value, max_value, rows)
+        negative_train[:, dim] = random_state.uniform(min_value, max_value,
+                                                      rows)
 
     return negative_train
 
