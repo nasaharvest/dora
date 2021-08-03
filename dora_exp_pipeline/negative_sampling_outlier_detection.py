@@ -76,8 +76,6 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
         clf.fit(x, y)
         n_estimators = clf.best_params_['n_estimators']
         max_depth = clf.best_params_['max_depth']
-        print(n_estimators)
-        print(max_depth)
 
         # Train a random forest classifier with the best parameters found in
         # grid search
@@ -85,12 +83,9 @@ class NegativeSamplingOutlierDetection(OutlierDetection):
                                         max_depth=max_depth,
                                         random_state=random_state)
         rf_clf.fit(x, y)
-        print(x)
-        print(y)
 
         # Make predictions for test data
         probs = rf_clf.predict_proba(data_test)
-        print(probs)
 
         # Keeping only the probabilities for negative (novel) class, and use
         # them as novelty scores to rank selections
