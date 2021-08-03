@@ -1,5 +1,8 @@
 # Data loading module parameters
-data_type: 'Time series'
+data_type: {
+    name: 'Time series',
+    params: {}
+}
 data_to_fit: 'sample_data/earth_fieldsamples/points_to_fit.csv'
 data_to_score: 'sample_data/earth_fieldsamples/kenya_points_to_predict.csv'
 zscore_normalization: False

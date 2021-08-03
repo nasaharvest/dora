@@ -1,5 +1,8 @@
 # Data loading module parameters
-data_type: 'raster'
+data_type: {
+    name: 'raster',
+    params: {}
+}
 data_to_fit: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
 data_to_score: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
 zscore_normalization: False
