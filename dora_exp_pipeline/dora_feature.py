@@ -26,20 +26,19 @@ def register_extractor(extractor_obj):
 
 
 # z-score normalization
-def z_score_normalize(prior_data, rank_data):
-    if len(prior_data) == 0:
-        raise RuntimeError('The prior data used to calculate mean and standard '
-                           'deviation cannot be empty.')
-
-    if len(rank_data) == 0:
-        raise RuntimeError('The rank data to be normalized cannot be empty.')
-
+def z_score_normalize(dtf, dts):
     scaler = StandardScaler()
-    scaler.fit(prior_data)
-    ret_prior_data = scaler.transform(prior_data)
-    ret_rank_data = scaler.transform(rank_data)
 
-    return ret_prior_data, ret_rank_data
+    if dtf is None:
+        scaler.fit(dts)
+        ret_dtf = None
+    else:
+        scaler.fit(dtf)
+        ret_dtf = scaler.transform(dtf)
+
+    ret_dts = scaler.transform(dts)
+
+    return ret_dtf, ret_dts
 
 
 # Function to get the feature extractor by name

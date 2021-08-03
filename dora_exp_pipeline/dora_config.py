@@ -110,6 +110,10 @@ class DoraConfig(object):
         if not isinstance(self.features, dict):
             raise RuntimeError('features field must be a dictionary')
 
+        # Verify zscore normalization
+        if not isinstance(self.zscore_normalization, bool):
+            raise RuntimeError('zscore_normalization field must be a boolean')
+
         # Verify `outlier_detection`
         if self.top_n == 'None' or self.top_n == 'none':
             self.top_n = None

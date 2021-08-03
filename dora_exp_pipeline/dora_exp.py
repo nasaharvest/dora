@@ -24,6 +24,7 @@ from dora_exp_pipeline.negative_sampling_outlier_detection import \
     NegativeSamplingOutlierDetection
 from dora_exp_pipeline.util import LogUtil
 from dora_exp_pipeline.dora_feature import extract_feature
+from dora_exp_pipeline.dora_feature import z_score_normalize
 from dora_exp_pipeline.outlier_detection import get_alg_by_name
 
 
@@ -103,6 +104,11 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
     # Feature extraction
     dtf_features = extract_feature(dtf_dict, config.features)
     dts_features = extract_feature(dts_dict, config.features)
+
+    # zscore normalization
+    if config.zscore_normalization:
+        dtf_features, dts_features = z_score_normalize(dtf_features,
+                                                       dts_features)
 
     # Outlier detection
     for alg_name, alg_params in tqdm(config.outlier_detection.items(),
