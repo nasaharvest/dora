@@ -80,7 +80,7 @@ class ImageLoader(DataLoader):
     def __init__(self):
         super(ImageLoader, self).__init__('image')
 
-    def _load(self, dir_path: str, a, b, c) -> dict:
+    def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
