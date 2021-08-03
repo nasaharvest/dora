@@ -85,15 +85,17 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
     register_od_algs()
 
     # Get data loader
-    data_loader = get_data_loader_by_name(config.data_type)
+    data_loader = get_data_loader_by_name(config.data_loader['name'])
     if logger:
-        logger.text(f'Use data loader: {config.data_type}')
+        logger.text(f'Use data loader: {config.data_loader["name"]}')
 
     # Read data_to_fit (dtf)
-    dtf_dict = data_loader.load(config.data_to_fit)
+    dtf_dict = data_loader.load(config.data_to_fit,
+                                **config.data_loader['params'])
 
     # Read data_to_score (dts)
-    dts_dict = data_loader.load(config.data_to_score)
+    dts_dict = data_loader.load(config.data_to_score,
+                                **config.data_loader['params'])
 
     # Feature extraction
     dtf_features = extract_feature(dtf_dict, config.features)
