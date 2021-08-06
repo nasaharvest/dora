@@ -15,14 +15,14 @@ features: {
 # Outlier detection module
 outlier_detection: {
     iforest: {},
-    # pca: {
-    #     k: 3
-    # },
-    # rx: {},
-    # negative_sampling: {
-    #    percent_increase: 20
-    # },
-    # random: {}
+    pca: {
+        k: 3
+    },
+    rx: {},
+    negative_sampling: {
+       percent_increase: 20
+    },
+    random: {}
 }
 
 # Results organization module
