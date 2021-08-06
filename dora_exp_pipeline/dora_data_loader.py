@@ -158,9 +158,9 @@ raster_loader = RasterLoader()
 register_data_loader(raster_loader)
 
 
-class CatalogLoader(DataLoader):
+class FeatureVectorLoader(DataLoader):
     def __init__(self):
-        super(CatalogLoader, self).__init__('Catalog')
+        super(FeatureVectorLoader, self).__init__('FeatureVector')
 
     def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):
@@ -189,7 +189,7 @@ class CatalogLoader(DataLoader):
         return data_dict
 
 
-catalog_loader = CatalogLoader()
+catalog_loader = FeatureVectorLoader()
 register_data_loader(catalog_loader)
 
 
