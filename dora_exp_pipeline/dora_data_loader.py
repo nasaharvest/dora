@@ -8,6 +8,7 @@ import glob
 import csv
 import numpy as np
 import pandas as pd
+import rasterio as rio
 from PIL import Image
 from six import add_metaclass
 from planetaryimage import PDS3Image
@@ -58,8 +59,11 @@ class DataLoader(object):
         else:
             return False
 
-    def load(self, path: str) -> dict:
-        data_dict = self._load(path)
+    def load(self, path: str, **kwargs):
+        if path is None:
+            return None
+
+        data_dict = self._load(path, **kwargs)
 
         if not isinstance(data_dict, dict):
             raise RuntimeError(f'Unexpected return type: {type(data_dict)}')
@@ -67,7 +71,7 @@ class DataLoader(object):
         return data_dict
 
     @abstractmethod
-    def _load(self, file_path: str) -> dict:
+    def _load(self, file_path: str, **kwargs) -> dict:
         raise RuntimeError('Development error. This function should never be '
                            'called directly.')
 
@@ -84,7 +88,7 @@ class ImageLoader(DataLoader):
         data_dict = dict()
         data_dict.setdefault('id', [])
         data_dict.setdefault('data', [])
-        file_list = glob.glob('%s/*' % dir_path)
+        file_list = glob.glob(os.path.join(dir_path, '*'))
 
         for f in file_list:
             file_id = os.path.basename(f)
@@ -109,6 +113,49 @@ class ImageLoader(DataLoader):
 
 image_loader = ImageLoader()
 register_data_loader(image_loader)
+
+
+class RasterLoader(DataLoader):
+    def __init__(self):
+        super(RasterLoader, self).__init__('raster')
+
+    def _load(self, dir_path: str) -> dict:
+        if not os.path.exists(dir_path):
+            raise RuntimeError(f'Directory not found: '
+                               f'{os.path.abspath(dir_path)}')
+
+        # List of supported file types
+        file_types = ['.tif']
+
+        data_dict = dict()
+        data_dict.setdefault('id', [])
+        data_dict.setdefault('data', [])
+
+        if dir_path.endswith('.tif'):
+            # Load the raster
+            with rio.open(dir_path) as src:
+                img = src.read()
+                # rasterio reads images in channels-first order
+                # we want to put it in channels-last order
+                img = np.moveaxis(img, 0, -1)
+                # flatten the raster so we have an array of feature
+                # vectors where each pixel is a feature vector
+                img = np.reshape(img, [img.shape[0]*img.shape[1],
+                                       img.shape[2]])
+                print(img.shape)
+                # set the ID to the index of the pixel
+                data_dict['id'] = range(img.shape[0])
+                data_dict['data'] = list(img)
+        else:
+            raise RuntimeError(f'File extension not supported. '
+                               f'Valid file extensions: '
+                               f'{file_types}')
+
+        return data_dict
+
+
+raster_loader = RasterLoader()
+register_data_loader(raster_loader)
 
 
 class CatalogLoader(DataLoader):

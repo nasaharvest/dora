@@ -4,6 +4,7 @@
 # Steven Lu, June 29, 2020
 
 import numpy as np
+from tqdm import tqdm
 from skimage import transform
 from six import add_metaclass
 from abc import ABCMeta, abstractmethod
@@ -25,20 +26,19 @@ def register_extractor(extractor_obj):
 
 
 # z-score normalization
-def z_score_normalize(prior_data, rank_data):
-    if len(prior_data) == 0:
-        raise RuntimeError('The prior data used to calculate mean and standard '
-                           'deviation cannot be empty.')
-
-    if len(rank_data) == 0:
-        raise RuntimeError('The rank data to be normalized cannot be empty.')
-
+def z_score_normalize(dtf, dts):
     scaler = StandardScaler()
-    scaler.fit(prior_data)
-    ret_prior_data = scaler.transform(prior_data)
-    ret_rank_data = scaler.transform(rank_data)
 
-    return ret_prior_data, ret_rank_data
+    if dtf is None:
+        scaler.fit(dts)
+        ret_dtf = None
+    else:
+        scaler.fit(dtf)
+        ret_dtf = scaler.transform(dtf)
+
+    ret_dts = scaler.transform(dts)
+
+    return ret_dtf, ret_dts
 
 
 # Function to get the feature extractor by name
@@ -57,9 +57,13 @@ def get_feature_extractor_by_name(feature_name):
 
 
 def extract_feature(data_dict, features_dict):
+    if data_dict is None:
+        return None
+
     ret_features = np.empty((len(data_dict['data']), 0))
 
-    for method_name, method_params in features_dict.items():
+    for method_name, method_params in tqdm(features_dict.items(),
+                                           desc='Feature extraction'):
         extractor = get_feature_extractor_by_name(method_name)
         features = extractor.extract(data_dict['data'], **method_params)
 
@@ -104,8 +108,20 @@ class FlattenedPixelValuesExtractor(FeatureExtractor):
             do_resizing = True
 
         # Get data dimension from the first item in the data cube
-        rows, cols = data_cube[0].shape
-        ret_features = np.zeros((len(data_cube), rows * cols), dtype=np.uint8)
+        if len(data_cube[0].shape) == 2:  # grayscale
+            rows, cols = data_cube[0].shape
+            channels = 1
+        elif len(data_cube[0].shape) == 3:  # color
+            rows, cols, channels = data_cube[0].shape
+
+        if do_resizing:
+            ret_features = np.zeros((len(data_cube),
+                                    height * width * channels),
+                                    dtype=np.uint8)
+        else:
+            ret_features = np.zeros((len(data_cube),
+                                    rows * cols * channels),
+                                    dtype=np.uint8)
 
         for ind, data in enumerate(data_cube):
             if do_resizing:

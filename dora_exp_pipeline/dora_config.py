@@ -8,9 +8,9 @@ import os
 import yaml
 
 
-CONFIG_KEYWORDS = ['data_type', 'data_to_fit', 'data_to_score',
+CONFIG_KEYWORDS = ['data_loader', 'data_to_fit', 'data_to_score',
                    'zscore_normalization', 'out_dir', 'features',
-                   'outlier_detection', 'results']
+                   'top_n', 'outlier_detection', 'results']
 
 
 class DoraConfig(object):
@@ -34,12 +34,13 @@ class DoraConfig(object):
                 raise RuntimeError('Required keyword %s is not provided in the '
                                    'config file' % r_key)
 
-        self.data_type = config['data_type']
+        self.data_loader = config['data_loader']
         self.data_to_fit = config['data_to_fit']
         self.data_to_score = config['data_to_score']
         self.zscore_normalization = config['zscore_normalization']
         self.out_dir = config['out_dir']
         self.features = config['features']
+        self.top_n = config['top_n']
         self.outlier_detection = config['outlier_detection']
         self.results = config['results']
         self.logger = logger
@@ -56,27 +57,45 @@ class DoraConfig(object):
 
         self.logger.text(f'Configuration file: '
                          f'{os.path.abspath(config_file):<20}')
-        self.logger.text(f'data_type: {self.data_type:<20}')
+        self.logger.text(f'data_loader: {self.data_loader}')
         self.logger.text(f'data_to_fit: {self.data_to_fit:<20}')
         self.logger.text(f'data_to_score: {self.data_to_score:<20}')
         self.logger.text(f'zscore_normalization: '
                          f'{self.zscore_normalization:<20}')
         self.logger.text(f'features: {self.features}')
+        self.logger.text(f'top_n: {self.top_n}')
         self.logger.text(f'outlier_detection: {self.outlier_detection}')
         self.logger.text(f'results: {self.results}')
 
     def verify_config_parameters(self):
         # Verify `data_type` field
-        if not isinstance(self.data_type, str):
-            raise RuntimeError('data_type field must be a string')
+        if not isinstance(self.data_loader, dict):
+            raise RuntimeError('data_loader field must be a dictionary')
+
+        if 'name' not in self.data_loader.keys():
+            raise RuntimeError('data_loader must have a name field')
+
+        if 'params' not in self.data_loader.keys():
+            raise RuntimeError('data_loader must have a params field')
+
+        if not isinstance(self.data_loader['name'], str):
+            raise RuntimeError('The name field in data_loader must be a string'
+                               ' type')
+
+        if not isinstance(self.data_loader['params'], dict):
+            raise RuntimeError('The params field in data_loader must be a '
+                               'dictionary type')
 
         # Verify `data_to_fit`
         if not isinstance(self.data_to_fit, str):
             raise RuntimeError('data_to_fit field must be a string')
 
-        if not os.path.exists(self.data_to_fit):
-            raise RuntimeError(f'data_to_fit not found: '
-                               f'{os.path.abspath(self.data_to_fit)}')
+        if self.data_to_fit.lower() == 'none':
+            self.data_to_fit = None
+        else:
+            if not os.path.exists(self.data_to_fit):
+                raise RuntimeError(f'data_to_fit not found: '
+                                   f'{os.path.abspath(self.data_to_fit)}')
 
         # Verify `data_to_score`
         if not isinstance(self.data_to_score, str):
@@ -91,7 +110,20 @@ class DoraConfig(object):
         if not isinstance(self.features, dict):
             raise RuntimeError('features field must be a dictionary')
 
+        # Verify zscore normalization
+        if not isinstance(self.zscore_normalization, bool):
+            raise RuntimeError('zscore_normalization field must be a boolean')
+
         # Verify `outlier_detection`
+        if self.top_n == 'None' or self.top_n == 'none':
+            self.top_n = None
+        else:
+            if not isinstance(self.top_n, int):
+                raise RuntimeError('top_n field must be a integer')
+            elif self.top_n < 0:
+                raise RuntimeError('top_n must be greater than or equal to '
+                                   'zero.')
+
         if not isinstance(self.outlier_detection, dict):
             raise RuntimeError('outlier_detection field must be a dictionary')
 

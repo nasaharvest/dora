@@ -6,6 +6,9 @@
 import os
 from six import add_metaclass
 from abc import ABCMeta, abstractmethod
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.cluster import KMeans
 
 
 METHOD_POOL = []
@@ -45,16 +48,16 @@ class ResultsOrganization(object):
         if loader_name.lower() == self.method_name.lower():
             return True
         else:
-            return True
+            return False
 
-    def run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, out_dir,
-            logger, **params):
-        self._run(data_ids, dts_scores, dts_sels, outlier_alg_name, out_dir,
-                  logger, **params)
+    def run(self, data_ids, dts_scores, dts_sels, data_to_score,
+            outlier_alg_name, out_dir, logger, seed, **params):
+        self._run(data_ids, dts_scores, dts_sels, data_to_score,
+                  outlier_alg_name, out_dir, logger, seed, **params)
 
     @abstractmethod
-    def _run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, logger,
-             **params):
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, logger, seed, **params):
         raise RuntimeError('This function must be implemented in a child class')
 
 
@@ -62,8 +65,8 @@ class SaveScoresCSV(ResultsOrganization):
     def __init__(self):
         super(SaveScoresCSV, self).__init__('save_scores')
 
-    def _run(self, data_ids, dts_scores, dts_sels, outlier_alg_name, out_dir,
-             logger):
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             if logger:
@@ -80,6 +83,94 @@ class SaveScoresCSV(ResultsOrganization):
 
 save_scores_csv = SaveScoresCSV()
 register_org_method(save_scores_csv)
+
+
+class SaveComparisonPlot(ResultsOrganization):
+    def __init__(self):
+        super(SaveComparisonPlot, self).__init__('comparison_plot')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score, alg_name,
+             out_dir, logger, seed, validation_dir):
+        if(not(os.path.exists(out_dir))):
+            os.makedirs(out_dir)
+
+        # Outliers will be 1s and inliers will be 0s.
+        labels = self._get_validation_labels(validation_dir)
+        scores = np.argsort(dts_scores)[::-1]
+
+        x = list(range(1, len(scores)+1))
+        y = []
+        numOutliers = 0
+
+        for i in range(len(scores)):
+            if(labels[scores[i]] == 1):
+                numOutliers += 1
+            y.append(numOutliers)
+
+        fig, axes = plt.subplots()
+        index = x.index(y[-1])
+        area = np.trapz(y[:index+1], x[:index+1])
+
+        plt.plot(x, y, label=alg_name)
+        plt.plot([], [], ' ', label=f'Area: {area}')
+        plt.title('Correct Outliers vs Selected Outliers')
+        plt.xlabel('Number of Outliers Selected')
+        plt.ylabel('Number of True Outliers')
+        plt.legend()
+        axes.set_xlim(1, x[-1])
+        axes.set_ylim(1, y[-1])
+        plt.savefig(f'{out_dir}/comparison_plot_{alg_name}.png')
+
+    def _get_validation_labels(self, validation_dir):
+        with open(validation_dir, 'r') as f:
+            text = f.read().split("\n")[:-1]
+
+        labels = {}
+        for i in text:
+            line = i.split(",")
+            labels[int(line[0])] = int(line[1])
+
+        return labels
+
+
+save_comparison_plot = SaveComparisonPlot()
+register_org_method(save_comparison_plot)
+
+
+class KmeansCluster(ResultsOrganization):
+    def __init__(self):
+        super(KmeansCluster, self).__init__('kmeans')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, n_clusters):
+        if not os.path.exists(out_dir):
+            os.mkdir(out_dir)
+            if logger:
+                logger.text(f'Created output directory: {out_dir}')
+
+        out_file = open(f'{out_dir}/kmeans-{outlier_alg_name}.csv', 'w')
+
+        data_to_cluster = []
+        for dts_ind in dts_sels:
+            data_to_cluster.append(data_to_score[dts_ind])
+        data_to_cluster = np.array(data_to_cluster, dtype=float)
+
+        if n_clusters > len(data_to_cluster):
+            raise RuntimeError('Kmeans n_clusters is greater than the number '
+                               'of items to cluster')
+
+        kmeans = KMeans(n_clusters=n_clusters, random_state=seed)
+        groups = kmeans.fit_predict(data_to_cluster)
+
+        for ind, (s_ind, dts_id, group) in enumerate(zip(dts_sels, data_ids,
+                                                         groups)):
+            out_file.write(f'{ind}, {s_ind}, {dts_id}, {group}\n')
+
+        out_file.close()
+
+
+kmeans_cluster = KmeansCluster()
+register_org_method(kmeans_cluster)
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").

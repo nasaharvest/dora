@@ -1,5 +1,8 @@
 # Data loading module parameters
-data_type: 'image'
+data_loader: {
+    name: 'image',
+    params: {}
+}
 data_to_fit: '/PATH/TO/DIR/'
 data_to_score: '/PATH/TO/DIR/'
 zscore_normalization: False
@@ -18,6 +21,7 @@ features: {
 }
 
 # Outlier detection module
+top_n: 10
 outlier_detection: {
     pca: {
         k: 5
