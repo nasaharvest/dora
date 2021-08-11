@@ -80,7 +80,7 @@ class ImageLoader(DataLoader):
     def __init__(self):
         super(ImageLoader, self).__init__('image')
 
-    def _load(self, dir_path: str, alg_dict: dict) -> dict:
+    def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
@@ -119,7 +119,7 @@ class RasterPixelLoader(DataLoader):
     def __init__(self):
         super(RasterPixelLoader, self).__init__('raster_pixels')
 
-    def _load(self, dir_path: str, alg_dict: dict) -> dict:
+    def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
@@ -161,14 +161,10 @@ class RasterPatchLoader(DataLoader):
     def __init__(self):
         super(RasterPatchLoader, self).__init__('raster_patches')
 
-    def _load(self, dir_path: str, alg_dict: dict) -> dict:
+    def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
-
-        if 'lrx' not in alg_dict.keys():
-            raise RuntimeError(f'LRX outer window must be specified'
-                               f' to use this data loader.')
 
         # List of supported file types
         file_types = ['.tif']
@@ -212,7 +208,7 @@ class CatalogLoader(DataLoader):
     def __init__(self):
         super(CatalogLoader, self).__init__('Catalog')
 
-    def _load(self, dir_path: str, alg_dict: dict) -> dict:
+    def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
