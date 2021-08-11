@@ -161,7 +161,7 @@ class RasterPatchLoader(DataLoader):
     def __init__(self):
         super(RasterPatchLoader, self).__init__('raster_patches')
 
-    def _load(self, dir_path: str) -> dict:
+    def _load(self, dir_path: str, patch_size: int) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
@@ -180,14 +180,11 @@ class RasterPatchLoader(DataLoader):
                 # rasterio reads images in channels-first order
                 # we want to put it in channels-last order
                 img = np.moveaxis(img, 0, -1)
-                # get patch size based on LRX with buffer
-                # so that LRX will be computed once per patch
-                window_size = alg_dict['lrx']['outer_window']
                 # extract patches from raster image
                 # i, j are top left corner coordinate
-                for i in range(img.shape[0]-window_size):
-                    for j in range(img.shape[1]-window_size):
-                        patch = img[i:i+window_size, j:j+window_size]
+                for i in range(img.shape[0]-patch_size):
+                    for j in range(img.shape[1]-patch_size):
+                        patch = img[i:i+patch_size, j:j+patch_size]
                         # append the patch coordinate as the id
                         data_dict['id'].append('%d-%d' % (i, j))
                         # append the patch data
@@ -243,7 +240,7 @@ class TimeSeriesLoader(DataLoader):
     def __init__(self):
         super(TimeSeriesLoader, self).__init__('Time series')
 
-    def _load(self, dir_path: str, alg_dict: dict) -> dict:
+    def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):
             raise RuntimeError(f'Directory not found: '
                                f'{os.path.abspath(dir_path)}')
