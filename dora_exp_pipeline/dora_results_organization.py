@@ -196,7 +196,7 @@ class ReshapeRaster(ResultsOrganization):
         if data_format == 'pixels':
             # Check that top_n wasn't specified to be a subset of the pixels
             if top_n != (height*width):
-                raise RuntimeError('top_n cannot be used with ReshapeRaster module')
+                raise RuntimeError('Cannot use top_n with ReshapeRaster')
             # Reorder scores to be in original index order, not sorted by score
             scores = [s for _, s in sorted(zip(data_ids, dts_scores),
                                            key=lambda pair: pair[0])]
@@ -204,7 +204,7 @@ class ReshapeRaster(ResultsOrganization):
         elif data_format == 'patches':
             # Check that top_n wasn't specified to be a subset of the pixels
             if top_n != ((height-(patch_size-1))*(width-(patch_size-1))):
-                raise RuntimeError('top_n cannot be used with ReshapeRaster module')
+                raise RuntimeError('Cannot use top_n with ReshapeRaster')
             scores = np.zeros([height, width])
             for ex, idx in enumerate(data_ids):
                 # get the patch center coordinates
@@ -212,7 +212,7 @@ class ReshapeRaster(ResultsOrganization):
                 i = int(i)
                 j = int(j)
                 # fill in the score for that index
-                scores[i,j] = dts_scores[ex]
+                scores[i, j] = dts_scores[ex]
         else:
             raise RuntimeError("data_format must be 'pixels' or 'patches'")
 
