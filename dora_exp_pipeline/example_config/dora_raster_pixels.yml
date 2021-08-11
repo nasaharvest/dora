@@ -1,6 +1,6 @@
 # Data loading module parameters
-data_type: {
-    name: 'raster',
+data_loader: {
+    name: 'raster_pixels',
     params: {}
 }
 data_to_fit: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
