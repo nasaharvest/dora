@@ -91,8 +91,8 @@ class SaveComparisonPlot(ResultsOrganization):
     def __init__(self):
         super(SaveComparisonPlot, self).__init__('comparison_plot')
 
-    def _run(self, data_ids, dts_scores, dts_sels, data_to_score, alg_name,
-             out_dir, logger, seed, top_n, validation_dir):
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, top_n, validation_dir):
         if(not(os.path.exists(out_dir))):
             os.makedirs(out_dir)
 
@@ -113,7 +113,7 @@ class SaveComparisonPlot(ResultsOrganization):
         index = x.index(y[-1])
         area = np.trapz(y[:index+1], x[:index+1])
 
-        plt.plot(x, y, label=alg_name)
+        plt.plot(x, y, label=outlier_alg_name)
         plt.plot([], [], ' ', label=f'Area: {area}')
         plt.title('Correct Outliers vs Selected Outliers')
         plt.xlabel('Number of Outliers Selected')
@@ -121,7 +121,7 @@ class SaveComparisonPlot(ResultsOrganization):
         plt.legend()
         axes.set_xlim(1, x[-1])
         axes.set_ylim(1, y[-1])
-        plt.savefig(f'{out_dir}/comparison_plot_{alg_name}.png')
+        plt.savefig(f'{out_dir}/comparison_plot_{outlier_alg_name}.png')
 
     def _get_validation_labels(self, validation_dir):
         with open(validation_dir, 'r') as f:
