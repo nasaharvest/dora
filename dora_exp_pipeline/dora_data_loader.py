@@ -59,11 +59,11 @@ class DataLoader(object):
         else:
             return False
 
-    def load(self, path: str, alg_dict: dict):
+    def load(self, path: str, **kwargs):
         if path is None:
             return None
 
-        data_dict = self._load(path, alg_dict)
+        data_dict = self._load(path, **kwargs)
 
         if not isinstance(data_dict, dict):
             raise RuntimeError(f'Unexpected return type: {type(data_dict)}')
@@ -71,7 +71,7 @@ class DataLoader(object):
         return data_dict
 
     @abstractmethod
-    def _load(self, file_path: str, alg_dict: dict) -> dict:
+    def _load(self, file_path: str, **kwargs) -> dict:
         raise RuntimeError('Development error. This function should never be '
                            'called directly.')
 
