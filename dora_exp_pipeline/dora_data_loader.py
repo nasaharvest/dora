@@ -181,10 +181,11 @@ class RasterPatchLoader(DataLoader):
                 # we want to put it in channels-last order
                 img = np.moveaxis(img, 0, -1)
                 # extract patches from raster image
-                # i, j are top left corner coordinate
-                for i in range(img.shape[0]-patch_size):
-                    for j in range(img.shape[1]-patch_size):
-                        patch = img[i:i+patch_size, j:j+patch_size]
+                # i, j are patch center coordinates
+                w = int(patch_size/2)
+                for i in range(w, img.shape[0]-w):
+                    for j in range(w, img.shape[1]-w):
+                        patch = img[i-w:i+(w + 1), j-w:j+(w + 1)]
                         # append the patch coordinate as the id
                         data_dict['id'].append('%d-%d' % (i, j))
                         # append the patch data

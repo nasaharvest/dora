@@ -8,6 +8,7 @@ from six import add_metaclass
 from abc import ABCMeta, abstractmethod
 import matplotlib.pyplot as plt
 import numpy as np
+import rasterio as rio
 from sklearn.cluster import KMeans
 
 
@@ -51,13 +52,14 @@ class ResultsOrganization(object):
             return False
 
     def run(self, data_ids, dts_scores, dts_sels, data_to_score,
-            outlier_alg_name, out_dir, logger, seed, **params):
+            outlier_alg_name, out_dir, logger, seed, top_n, **params):
         self._run(data_ids, dts_scores, dts_sels, data_to_score,
-                  outlier_alg_name, out_dir, logger, seed, **params)
+                  outlier_alg_name, out_dir, logger, seed, top_n,
+                  **params)
 
     @abstractmethod
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
-             outlier_alg_name, logger, seed, **params):
+             outlier_alg_name, logger, seed, top_n, **params):
         raise RuntimeError('This function must be implemented in a child class')
 
 
@@ -66,7 +68,7 @@ class SaveScoresCSV(ResultsOrganization):
         super(SaveScoresCSV, self).__init__('save_scores')
 
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
-             outlier_alg_name, out_dir, logger, seed):
+             outlier_alg_name, out_dir, logger, seed, top_n):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             if logger:
@@ -90,7 +92,7 @@ class SaveComparisonPlot(ResultsOrganization):
         super(SaveComparisonPlot, self).__init__('comparison_plot')
 
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score, alg_name,
-             out_dir, logger, seed, validation_dir):
+             out_dir, logger, seed, top_n, validation_dir):
         if(not(os.path.exists(out_dir))):
             os.makedirs(out_dir)
 
@@ -142,7 +144,7 @@ class KmeansCluster(ResultsOrganization):
         super(KmeansCluster, self).__init__('kmeans')
 
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
-             outlier_alg_name, out_dir, logger, seed, n_clusters):
+             outlier_alg_name, out_dir, logger, seed, top_n, n_clusters):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             if logger:
@@ -171,6 +173,68 @@ class KmeansCluster(ResultsOrganization):
 
 kmeans_cluster = KmeansCluster()
 register_org_method(kmeans_cluster)
+
+
+class ReshapeRaster(ResultsOrganization):
+    def __init__(self):
+        super(ReshapeRaster, self).__init__('reshape_raster')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, top_n,
+             raster_path, data_format, patch_size, colormap):
+        if not os.path.exists(out_dir):
+            os.mkdir(out_dir)
+            if logger:
+                logger.text(f'Created output directory: {out_dir}')
+
+        # Read the raster metadata
+        with rio.open(raster_path) as src:
+            height = src.meta['height']
+            width = src.meta['width']
+
+        # Reshape scores to original raster dimensions
+        if data_format == 'pixels':
+            # Check that top_n wasn't specified to be a subset of the pixels
+            if top_n != (height*width):
+                raise RuntimeError('top_n cannot be used with ReshapeRaster module')
+            # Reorder scores to be in original index order, not sorted by score
+            scores = [s for _, s in sorted(zip(data_ids, dts_scores),
+                                           key=lambda pair: pair[0])]
+            scores = np.reshape(np.array(scores), [height, width])
+        elif data_format == 'patches':
+            # Check that top_n wasn't specified to be a subset of the pixels
+            if top_n != ((height-(patch_size-1))*(width-(patch_size-1))):
+                raise RuntimeError('top_n cannot be used with ReshapeRaster module')
+            scores = np.zeros([height, width])
+            for ex, idx in enumerate(data_ids):
+                # get the patch center coordinates
+                i, j = idx.split('-')
+                i = int(i)
+                j = int(j)
+                # fill in the score for that index
+                scores[i,j] = dts_scores[ex]
+        else:
+            raise RuntimeError("data_format must be 'pixels' or 'patches'")
+
+        # Save as a preview image
+        fig, ax = plt.subplots(1)
+        plt.imshow(scores, cmap=colormap)
+        plt.savefig(f'{out_dir}/scores_image_{outlier_alg_name}.png')
+
+        # Save as raster
+        with rio.open(raster_path) as src:
+            profile = src.profile
+            profile.update(
+                count=1,
+                dtype=scores.dtype)
+            with rio.open(f'{out_dir}/scores_raster_{outlier_alg_name}.tif',
+                          'w',
+                          **profile) as dst:
+                dst.write(scores, 1)
+
+
+reshape_raster = ReshapeRaster()
+register_org_method(reshape_raster)
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").
