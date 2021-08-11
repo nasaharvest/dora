@@ -117,7 +117,7 @@ register_data_loader(image_loader)
 
 class ImageDirectoryLoader(DataLoader):
     def __init__(self):
-        super(ImageDirectoryLoader, self).__init__('Imagedir')
+        super(ImageDirectoryLoader, self).__init__('image_dir')
 
     def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):

@@ -1,0 +1,26 @@
+# Data loading module parameters
+data_type: 'image_dir'
+data_to_fit: '/PATH/TO/DIR/'
+data_to_score: 'PATH/TO/DIR/'
+zscore_normalization: False
+out_dir: 'PATH/TO/OUTPUT/DIR'
+
+# Feature extraction module
+features: {
+    raw_values: {
+        # no args
+    }
+}
+
+# Outlier detection module
+top_n: 10
+outlier_detection: {
+    conv_pae: {
+        latent_dim: 32 
+    }
+}
+
+# Results organization module
+results: {
+    save_scores: {}
+}

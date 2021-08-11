@@ -22,6 +22,7 @@ from dora_exp_pipeline.random_outlier_detection import RandomOutlierDetection
 from dora_exp_pipeline.negative_sampling_outlier_detection import \
     NegativeSamplingOutlierDetection
 from dora_exp_pipeline.pae_outlier_detection import PAEOutlierDetection
+from dora_exp_pipeline.conv_pae_outlier_detection import ConvPAEOutlierDetection
 from dora_exp_pipeline.util import LogUtil
 from dora_exp_pipeline.dora_feature import extract_feature
 from dora_exp_pipeline.outlier_detection import get_alg_by_name
@@ -59,6 +60,10 @@ def register_od_algs():
     # Register PAE outlier detection algorithm in the pool
     pae_outlier_detection = PAEOutlierDetection()
     register_od_alg(pae_outlier_detection)
+
+    # Register Convolutional PAE outlier detection algorithm in the pool
+    conv_pae_outlier_detection = ConvPAEOutlierDetection()
+    register_od_alg(conv_pae_outlier_detection)
 
 
 def start(config_file: str, out_dir: str, log_file=None, seed=1234):
