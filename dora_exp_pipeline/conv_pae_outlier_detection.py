@@ -1,3 +1,16 @@
+# This script implements a convolutional probabilistic autoencoder, drawing on
+# descriptions from the following papers:
+# Böhm, Vanessa, and Uroš Seljak. “Probabilistic Auto-Encoder.”
+# ArXiv:2006.05479 [Cs, Stat], Oct. 2020.
+# Prochaska, J. Xavier, Peter C Cornillon, and David M Reiman. "Deep Learning of
+# Sea Surface Temperature Patterns to Identify Ocean Extremes." Remote Sensing,
+# v. 13,.4 doi: 10.3390/rs13040744
+#
+# See copyright notice at end.
+#
+# Author: Bryce Dubayah
+# Date created: August 16, 2021
+
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 import os
 import math

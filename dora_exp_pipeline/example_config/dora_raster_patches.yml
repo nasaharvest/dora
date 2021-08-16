@@ -1,0 +1,52 @@
+# Data loading module parameters
+data_loader: {
+    name: 'raster_patches',
+    params: {
+        'patch_size': 5
+    }
+}
+data_to_fit: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
+data_to_score: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
+zscore_normalization: False
+out_dir: 'results/raster_patch_test'
+
+# Feature extraction module
+features: {
+    raw_values: {
+        # no args
+    }
+}
+
+# Outlier detection module
+top_n: 'None'
+outlier_detection: {
+    # iforest: {},
+    # pca: {
+    #     k: 3
+    # },
+    # rx: {},
+    lrx: {
+        inner_window: 3,
+        outer_window: 5,
+        bands: 1
+    },
+    # negative_sampling: {
+    #     percent_increase: 20
+    # },
+    # random: {}
+}
+
+# Results organization module
+results: {
+    save_scores: {},
+    reshape_raster: {
+        # the path to the input raster that was scored
+        'raster_path': 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif',
+        # the raster data loader format used: pixels or patches
+        'data_format': 'patches',
+        # must be specified if data_format is patches; if pixels, use 0 for patch_size
+        'patch_size': 5,
+        # colormap to use for preview image; must be supported matplotlib colormap string
+        'colormap': 'magma'
+    }
+}

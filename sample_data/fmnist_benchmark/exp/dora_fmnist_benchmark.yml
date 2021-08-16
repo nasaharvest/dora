@@ -1,9 +1,12 @@
 # Data loading module parameters
-data_type: 'image_dir'
-data_to_fit: '/PATH/TO/DIR/'
-data_to_score: 'PATH/TO/DIR/'
+data_loader: {
+    name: 'image_dir',
+    params: {}
+}
+data_to_fit: 'sample_data/fmnist_benchmark/images_fit'
+data_to_score: 'sample_data/fmnist_benchmark/images_score'
 zscore_normalization: False
-out_dir: 'PATH/TO/OUTPUT/DIR'
+out_dir: 'sample_data/fmnist_benchmark/exp/results'
 
 # Feature extraction module
 features: {

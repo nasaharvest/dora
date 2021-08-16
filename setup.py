@@ -21,6 +21,7 @@ setup(
         'PyYAML==5.4.1',
         'pandas==1.1.5',
         'rasterio==1.2.6',
+        'tqdm==4.62.0',
         'tensorflow==2.4.2',
         'tensorflow-probability==0.12.2'
     ],

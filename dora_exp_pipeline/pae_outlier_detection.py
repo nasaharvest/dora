@@ -1,3 +1,13 @@
+# This script implements a probabilistic autoencoder, as described in the
+# following paper:
+# Böhm, Vanessa, and Uroš Seljak. “Probabilistic Auto-Encoder.”
+# ArXiv:2006.05479 [Cs, Stat], Oct. 2020.
+#
+# See copyright notice at end.
+#
+# Author: Bryce Dubayah
+# Date created: August 16, 2021
+
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 import numpy as np
 from copy import deepcopy
