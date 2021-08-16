@@ -41,9 +41,6 @@ experiment with DORA as well as the expected results for comparison:
   from sol 1371 (in `images-score/`) to be ranked.  It also specifies
   which algorithms to run and the feature representation (raw pixels). 
 
-The `results/` directory contains the expected results of running the
-`run_dora.sh` script.
-
 Expected output at the command line after changing into the `exp/`
 directory and running the Bash script:
 
@@ -57,32 +54,29 @@ Information about the run is available in the generated log file,
 
 ```Console
 > cat dora.log 
-[2021-07-16 11:20:03]: Configuration file: /home/wkiri/Research/DORA/git/sample_data/planetary_rover/png/exp/navcam.config
-[2021-07-16 11:20:03]: data_type: image               
-[2021-07-16 11:20:03]: data_to_fit: ../images-fit       
-[2021-07-16 11:20:03]: data_to_score: ../images-score     
-[2021-07-16 11:20:03]: zscore_normalization: 0                   
-[2021-07-16 11:20:03]: features: {'flattened_pixel_values': {'width': 64, 'height': 64}}
-[2021-07-16 11:20:03]: outlier_detection: {'demud': {'k': 5}, 'iforest': {}, 'negative_sampling': {'percent_increase': 20}, 'pca': {'k': 5}}
-[2021-07-16 11:20:03]: results: {'save_scores': {}}
-[2021-07-16 11:20:03]: Use data loader: image
-[2021-07-16 11:20:04]: Created sub directory for outlier detection algorithm iforest at /home/wkiri/Research/DORA/git/sample_data/planetary_rover/png/exp/results/iforest
-[2021-07-16 11:20:22]: Created sub directory for outlier detection
-algorithm negative_sampling at
-/home/wkiri/Research/DORA/git/sample_data/planetary_rover/png/exp/results/negative_sampling-percent_increase=20
+[2021-08-16 08:38:11]: Configuration file: /home/wkiri/Research/DORA/git/sample_data/planetary_rover/png/exp/navcam.config
+[2021-08-16 08:38:11]: data_loader: {'name': 'image', 'params': {}}
+[2021-08-16 08:38:11]: data_to_fit: sample_data/planetary_rover/png/images-fit
+[2021-08-16 08:38:11]: data_to_score: sample_data/planetary_rover/png/images-score
+[2021-08-16 08:38:11]: zscore_normalization: 0                   
+[2021-08-16 08:38:11]: features: {'flattened_pixel_values': {'width': 64, 'height': 64}}
+[2021-08-16 08:38:11]: top_n: None
+[2021-08-16 08:38:11]: outlier_detection: {'demud': {'k': 5}, 'iforest': {}, 'negative_sampling': {'percent_increase': 20}, 'pca': {'k': 5}}
+[2021-08-16 08:38:11]: results: {'save_scores': {}}
+[2021-08-16 08:38:11]: Argument out_dir is specified in the command line interface, and it will overwrite the out_dir in the config file.
+[2021-08-16 08:38:11]: out_dir used is /home/wkiri/Research/DORA/git/sample_data/planetary_rover/png/exp/results
+[2021-08-16 08:38:11]: Use data loader: image
 ```
 
-You can then compare your new output in `results/` to the output
-in `../results/`.
+You can then compare your new output in `results/` to the expected
+output:
 
 ```Console
-> diff -r ../results/ results
+> diff -r ../../../../test/ref-results/planetary_rover/ results
 ```
 
 Note: git is configured to ignore this new output directory so that it
 will not be accidentally committed back to the repository. 
-
-
 
 ---
 Contact: Kiri Wagstaff, kiri.wagstaff@jpl.nasa.gov
