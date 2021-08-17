@@ -32,7 +32,7 @@ class ConvPAEOutlierDetection(OutlierDetection):
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        top_n, seed, latent_dim, max_epochs=1000, patience=10,
-                       val_split=0.25, verbose=0):
+                       val_split=0.25, verbose=0, optimizer='adam'):
         if data_to_fit is None:
             data_to_fit = deepcopy(data_to_score)
 
@@ -63,7 +63,7 @@ class ConvPAEOutlierDetection(OutlierDetection):
         # Rank targets
         scores = train_and_run_conv_PAE(data_to_fit, data_to_score, latent_dim,
                                         image_shape, seed, max_epochs, patience,
-                                        val_split, verbose)
+                                        val_split, verbose, optimizer)
         selection_indices = np.argsort(scores)[::-1]
 
         results = dict()
@@ -79,7 +79,7 @@ class ConvPAEOutlierDetection(OutlierDetection):
 
 
 def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
-                           max_epochs, patience, val_split, verbose):
+                           max_epochs, patience, val_split, verbose, optimizer):
     # Make tensorflow datasets
     channels = image_shape[2]
     train_ds, val_ds, test_ds = get_train_val_test(train, test, seed, channels,
@@ -87,7 +87,7 @@ def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
 
     # Train autoencoder
     autoencoder = ConvAutoencoder(latent_dim, image_shape)
-    autoencoder.compile(optimizer='adam', loss=losses.MeanSquaredError())
+    autoencoder.compile(optimizer=optimizer, loss=losses.MeanSquaredError())
     callback = EarlyStopping(monitor='val_loss', patience=patience)
     autoencoder.fit(x=train_ds, validation_data=val_ds, verbose=verbose,
                     epochs=max_epochs, callbacks=[callback])
@@ -99,7 +99,7 @@ def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
 
     # Train flow
     flow = NormalizingFlow(latent_dim)
-    flow.compile(optimizer='adam', loss=lambda y, rv_y: -rv_y.log_prob(y))
+    flow.compile(optimizer=optimizer, loss=lambda y, rv_y: -rv_y.log_prob(y))
     callback = EarlyStopping(monitor='val_loss', patience=patience)
     flow.fit(np.zeros((len(encoded_train), 0)), encoded_train,
              verbose=verbose, epochs=max_epochs, callbacks=[callback],

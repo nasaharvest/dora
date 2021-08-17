@@ -26,7 +26,7 @@ class PAEOutlierDetection(OutlierDetection):
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        top_n, seed, latent_dim, max_epochs=500, patience=3,
-                       val_split=0.25, verbose=0):
+                       val_split=0.25, verbose=0, optimizer='adam'):
         if data_to_fit is None:
             data_to_fit = deepcopy(data_to_score)
 
@@ -51,7 +51,7 @@ class PAEOutlierDetection(OutlierDetection):
         # Rank targets
         scores = train_and_run_PAE(data_to_fit, data_to_score, latent_dim,
                                    num_features, seed, max_epochs, patience,
-                                   val_split, verbose)
+                                   val_split, verbose, optimizer)
         selection_indices = np.argsort(scores)[::-1]
 
         results = dict()
@@ -67,10 +67,10 @@ class PAEOutlierDetection(OutlierDetection):
 
 
 def train_and_run_PAE(train, test, latent_dim, num_features, seed, max_epochs,
-                      patience, val_split, verbose):
+                      patience, val_split, verbose, optimizer):
     # Train autoencoder
     autoencoder = Autoencoder(latent_dim, num_features)
-    autoencoder.compile(optimizer='adam', loss=losses.MeanSquaredError())
+    autoencoder.compile(optimizer=optimizer, loss=losses.MeanSquaredError())
     callback = EarlyStopping(monitor='val_loss', patience=patience)
     autoencoder.fit(train, train, epochs=max_epochs, verbose=verbose,
                     callbacks=[callback], validation_split=val_split)
@@ -78,7 +78,7 @@ def train_and_run_PAE(train, test, latent_dim, num_features, seed, max_epochs,
     # Train flow
     encoded_train = autoencoder.encoder(train).numpy()
     flow = NormalizingFlow(latent_dim)
-    flow.compile(optimizer='adam', loss=lambda y, rv_y: -rv_y.log_prob(y))
+    flow.compile(optimizer=optimizer, loss=lambda y, rv_y: -rv_y.log_prob(y))
     callback = EarlyStopping(monitor='val_loss', patience=patience)
     flow.fit(np.zeros((len(encoded_train), 0)), encoded_train,
              epochs=max_epochs, verbose=verbose, callbacks=[callback],

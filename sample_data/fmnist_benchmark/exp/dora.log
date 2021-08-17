@@ -1,14 +1,13 @@
-[2021-08-17 12:47:55]: Configuration file: /Users/bryce/Library/Mobile Documents/com~apple~CloudDocs/harvest/dora/sample_data/fmnist_benchmark/exp/dora_fmnist_benchmark.yml
-[2021-08-17 12:47:55]: data_loader: {'name': 'image_dir', 'params': {}}
-[2021-08-17 12:47:55]: data_to_fit: sample_data/fmnist_benchmark/images_fit
-[2021-08-17 12:47:55]: data_to_score: sample_data/fmnist_benchmark/images_score
-[2021-08-17 12:47:55]: zscore_normalization: 0                   
-[2021-08-17 12:47:55]: features: {'raw_values': {}}
-[2021-08-17 12:47:55]: top_n: 10
-[2021-08-17 12:47:55]: outlier_detection: {'conv_pae': {'latent_dim': 32, 'max_epochs': 1000, 'patience': 10, 'val_split': 0.25, 'verbose': 0}}
-[2021-08-17 12:47:55]: results: {'save_scores': {}}
-[2021-08-17 12:47:55]: Argument out_dir is specified in the command line interface, and it will overwrite the out_dir in the config file.
-[2021-08-17 12:47:55]: out_dir used is /Users/bryce/Library/Mobile Documents/com~apple~CloudDocs/harvest/dora/sample_data/fmnist_benchmark/exp/results
-[2021-08-17 12:47:55]: Created out_dir: /Users/bryce/Library/Mobile Documents/com~apple~CloudDocs/harvest/dora/sample_data/fmnist_benchmark/exp/results
-[2021-08-17 12:47:55]: Use data loader: image_dir
-[2021-08-17 12:48:39]: Created sub directory for outlier detection algorithm conv_pae at /Users/bryce/Library/Mobile Documents/com~apple~CloudDocs/harvest/dora/sample_data/fmnist_benchmark/exp/results/conv_pae-latent_dim=32-max_epochs=1000-patience=10-val_split=0.25-verbose=0
+[2021-08-17 13:00:01]: Configuration file: /Users/bryce/Library/Mobile Documents/com~apple~CloudDocs/harvest/dora/sample_data/fmnist_benchmark/exp/dora_fmnist_benchmark.yml
+[2021-08-17 13:00:01]: data_loader: {'name': 'image_dir', 'params': {}}
+[2021-08-17 13:00:01]: data_to_fit: sample_data/fmnist_benchmark/images_fit
+[2021-08-17 13:00:01]: data_to_score: sample_data/fmnist_benchmark/images_score
+[2021-08-17 13:00:01]: zscore_normalization: 0                   
+[2021-08-17 13:00:01]: features: {'raw_values': {}}
+[2021-08-17 13:00:01]: top_n: 10
+[2021-08-17 13:00:01]: outlier_detection: {'conv_pae': {'latent_dim': 32, 'max_epochs': 1000, 'patience': 10, 'optimizer': 'adam', 'val_split': 0.25, 'verbose': 0}}
+[2021-08-17 13:00:01]: results: {'save_scores': {}}
+[2021-08-17 13:00:01]: Argument out_dir is specified in the command line interface, and it will overwrite the out_dir in the config file.
+[2021-08-17 13:00:01]: out_dir used is /Users/bryce/Library/Mobile Documents/com~apple~CloudDocs/harvest/dora/sample_data/fmnist_benchmark/exp/results
+[2021-08-17 13:00:01]: Use data loader: image_dir
+[2021-08-17 13:00:49]: Created sub directory for outlier detection algorithm conv_pae at /Users/bryce/Library/Mobile Documents/com~apple~CloudDocs/harvest/dora/sample_data/fmnist_benchmark/exp/results/conv_pae-latent_dim=32-max_epochs=1000-patience=10-optimizer=adam-val_split=0.25-verbose=0
