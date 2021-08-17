@@ -19,7 +19,11 @@ features: {
 top_n: 10
 outlier_detection: {
     conv_pae: {
-        latent_dim: 32 
+        latent_dim: 32,
+        max_epochs: 1000,
+        patience: 10,
+        val_split: 0.25,
+        verbose: 0
     }
 }
 

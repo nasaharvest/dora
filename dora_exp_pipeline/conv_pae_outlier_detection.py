@@ -31,7 +31,8 @@ class ConvPAEOutlierDetection(OutlierDetection):
         super(ConvPAEOutlierDetection, self).__init__('conv_pae')
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
-                       top_n, seed, latent_dim):
+                       top_n, seed, latent_dim, max_epochs=1000, patience=10,
+                       val_split=0.25, verbose=0):
         if data_to_fit is None:
             data_to_fit = deepcopy(data_to_score)
 
@@ -53,9 +54,16 @@ class ConvPAEOutlierDetection(OutlierDetection):
                                f'must be <= number of features '
                                f'({num_features})')
 
+        # Set tensorflow logging level
+        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' if verbose == 0 else '0'
+
+        # Set seed
+        tf.random.set_seed(seed)
+
         # Rank targets
         scores = train_and_run_conv_PAE(data_to_fit, data_to_score, latent_dim,
-                                        image_shape, seed)
+                                        image_shape, seed, max_epochs, patience,
+                                        val_split, verbose)
         selection_indices = np.argsort(scores)[::-1]
 
         results = dict()
@@ -70,17 +78,19 @@ class ConvPAEOutlierDetection(OutlierDetection):
         return results
 
 
-def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed):
+def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed, 
+                           max_epochs, patience, val_split, verbose):
     # Make tensorflow datasets
     channels = image_shape[2]
-    train_ds, val_ds, test_ds = get_train_val_test(train, test, seed, channels)
+    train_ds, val_ds, test_ds = get_train_val_test(train, test, seed, channels, 
+                                                   val_split)
 
     # Train autoencoder
     autoencoder = ConvAutoencoder(latent_dim, image_shape)
     autoencoder.compile(optimizer='adam', loss=losses.MeanSquaredError())
-    callback = EarlyStopping(monitor='val_loss', patience=5)
-    autoencoder.fit(x=train_ds, validation_data=val_ds, verbose=0, epochs=1000,
-                    callbacks=[callback])
+    callback = EarlyStopping(monitor='val_loss', patience=patience)
+    autoencoder.fit(x=train_ds, validation_data=val_ds, verbose=verbose, 
+                    epochs=max_epochs, callbacks=[callback])
 
     # Encode datasets
     enc_train = autoencoder.encoder.predict(train_ds)
@@ -90,9 +100,10 @@ def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed):
     # Train flow
     flow = NormalizingFlow(latent_dim)
     flow.compile(optimizer='adam', loss=lambda y, rv_y: -rv_y.log_prob(y))
-    callback = EarlyStopping(monitor='val_loss', patience=5)
-    flow.fit(np.zeros((len(encoded_train), 0)), encoded_train, verbose=0,
-             epochs=1000, callbacks=[callback], validation_split=0.25)
+    callback = EarlyStopping(monitor='val_loss', patience=patience)
+    flow.fit(np.zeros((len(encoded_train), 0)), encoded_train, 
+             verbose=verbose, epochs=max_epochs, callbacks=[callback], 
+             validation_split=val_split)
 
     # Calculate scores
     trained_dist = flow.dist(np.zeros(0,))
@@ -120,13 +131,13 @@ def get_image_dimensions(data):
     return image_shape
 
 
-def get_train_val_test(train_images, test_images, seed, channels):
+def get_train_val_test(train_images, test_images, seed, channels, val_split):
     # Make training and validation sets
     fit_ds = make_tensorlow_dataset(train_images, channels)
     test_ds = make_tensorlow_dataset(test_images, channels)
     fit_ds = fit_ds.shuffle(len(train_images), seed=seed,
                             reshuffle_each_iteration=True)
-    val_size = int(len(train_images) * 0.25)
+    val_size = int(len(train_images) * val_split)
     train_ds = fit_ds.skip(val_size)
     val_ds = fit_ds.take(val_size)
 
@@ -226,12 +237,14 @@ class ConvAutoencoder(Model):
                     activation='relu'))
 
         # Final decoder layer to map back to input channels
-        self._decoder_layers.append(
+        self._decoder_layers.extend([
             layers.Conv2DTranspose(
                 filters=self._channels,
                 kernel_size=3,
                 strides=1,
-                padding='same'))
+                padding='same'),
+            layers.experimental.preprocessing.Rescaling(255) 
+        ])
 
         self.encoder = keras.Sequential(self._encoder_layers)
         self.decoder = keras.Sequential(self._decoder_layers)
