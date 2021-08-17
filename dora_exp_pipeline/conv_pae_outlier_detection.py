@@ -78,18 +78,18 @@ class ConvPAEOutlierDetection(OutlierDetection):
         return results
 
 
-def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed, 
+def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
                            max_epochs, patience, val_split, verbose):
     # Make tensorflow datasets
     channels = image_shape[2]
-    train_ds, val_ds, test_ds = get_train_val_test(train, test, seed, channels, 
+    train_ds, val_ds, test_ds = get_train_val_test(train, test, seed, channels,
                                                    val_split)
 
     # Train autoencoder
     autoencoder = ConvAutoencoder(latent_dim, image_shape)
     autoencoder.compile(optimizer='adam', loss=losses.MeanSquaredError())
     callback = EarlyStopping(monitor='val_loss', patience=patience)
-    autoencoder.fit(x=train_ds, validation_data=val_ds, verbose=verbose, 
+    autoencoder.fit(x=train_ds, validation_data=val_ds, verbose=verbose,
                     epochs=max_epochs, callbacks=[callback])
 
     # Encode datasets
@@ -101,8 +101,8 @@ def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
     flow = NormalizingFlow(latent_dim)
     flow.compile(optimizer='adam', loss=lambda y, rv_y: -rv_y.log_prob(y))
     callback = EarlyStopping(monitor='val_loss', patience=patience)
-    flow.fit(np.zeros((len(encoded_train), 0)), encoded_train, 
-             verbose=verbose, epochs=max_epochs, callbacks=[callback], 
+    flow.fit(np.zeros((len(encoded_train), 0)), encoded_train,
+             verbose=verbose, epochs=max_epochs, callbacks=[callback],
              validation_split=val_split)
 
     # Calculate scores
@@ -243,7 +243,7 @@ class ConvAutoencoder(Model):
                 kernel_size=3,
                 strides=1,
                 padding='same'),
-            layers.experimental.preprocessing.Rescaling(255) 
+            layers.experimental.preprocessing.Rescaling(255)
         ])
 
         self.encoder = keras.Sequential(self._encoder_layers)
