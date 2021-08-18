@@ -19,6 +19,7 @@ from PIL import Image
 from itertools import accumulate
 from copy import deepcopy
 import tensorflow as tf
+import tensorflow_addons as tfa
 from tensorflow import keras
 from tensorflow.keras import layers, losses
 from tensorflow.keras.models import Model
@@ -85,12 +86,17 @@ def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
     train_ds, val_ds, test_ds = get_train_val_test(train, test, seed, channels,
                                                    val_split)
 
+    # Initialize callbacks
+    early_stop_callback = EarlyStopping(monitor='val_loss', patience=patience)
+    tqdm_callback = tfa.callbacks.TQDMProgressBar(leave_overall_progress=False,
+                                                  show_epoch_progress=False)
+    callbacks = [early_stop_callback, tqdm_callback]
+
     # Train autoencoder
     autoencoder = ConvAutoencoder(latent_dim, image_shape)
     autoencoder.compile(optimizer=optimizer, loss=losses.MeanSquaredError())
-    callback = EarlyStopping(monitor='val_loss', patience=patience)
     autoencoder.fit(x=train_ds, validation_data=val_ds, verbose=verbose,
-                    epochs=max_epochs, callbacks=[callback])
+                    epochs=max_epochs, callbacks=callbacks)
 
     # Encode datasets
     enc_train = autoencoder.encoder.predict(train_ds)
@@ -100,9 +106,8 @@ def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
     # Train flow
     flow = NormalizingFlow(latent_dim)
     flow.compile(optimizer=optimizer, loss=lambda y, rv_y: -rv_y.log_prob(y))
-    callback = EarlyStopping(monitor='val_loss', patience=patience)
     flow.fit(np.zeros((len(encoded_train), 0)), encoded_train,
-             verbose=verbose, epochs=max_epochs, callbacks=[callback],
+             verbose=verbose, epochs=max_epochs, callbacks=callbacks,
              validation_split=val_split)
 
     # Calculate scores
