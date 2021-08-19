@@ -24,7 +24,7 @@ class TestPlanetary(TestCase):
 
     def test_run(self):
 
-        config_file = 'sample_data/planetary_rover/png/exp/navcam.config'
+        config_file = 'test/planetary.config'
 
         # Run the experiment; also tests ability to parse config file
         start(config_file, self.outdir)
@@ -32,10 +32,11 @@ class TestPlanetary(TestCase):
         # Check results for each algorithm
         for file_base in ['demud-k=5/selections-demud.csv',
                           'iforest/selections-iforest.csv',
+                          'lrx-inner_window=3-outer_window=9-bands=1/selections-lrx.csv',
                           'negative_sampling-percent_increase=20/selections-negative_sampling.csv',
                           'pca-k=5/selections-pca.csv'
                           ]:
-            correct_file = 'test/ref-results/planetary_rover/%s' % file_base
+            correct_file = 'test/ref-results/planetary_rover/functional/%s' % file_base
             output_file = '%s/%s' % (self.outdir, file_base)
 
             # Check results against correct output
