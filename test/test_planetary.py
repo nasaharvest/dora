@@ -8,10 +8,10 @@
 
 import os
 import shutil
-import pytest
 from unittest import TestCase
-from dora_exp_pipeline.dora_exp import start
+import pytest
 from test_utils import check_results
+from dora_exp_pipeline.dora_exp import start
 
 @pytest.mark.functional
 class TestPlanetary(TestCase):
@@ -39,7 +39,7 @@ class TestPlanetary(TestCase):
             output_file = '%s/%s' % (self.outdir, file_base)
 
             # Check results against correct output
-            assert(check_results(output_file, correct_file))
+            assert check_results(output_file, correct_file)
 
     def tearDown(self):
         # Remove any intermediate files

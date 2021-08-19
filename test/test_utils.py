@@ -42,5 +42,3 @@ def check_results(outfile, correct_file):
 
     # Check the numeric scores
     return np.isclose(scores, correct_scores, atol=1e-6).all()
-
-
