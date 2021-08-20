@@ -13,6 +13,7 @@ import os
 import numpy as np
 from copy import deepcopy
 import tensorflow as tf
+import tensorflow_addons as tfa
 from tensorflow import keras
 from tensorflow.keras import layers, losses
 from tensorflow.keras.models import Model
@@ -68,20 +69,38 @@ class PAEOutlierDetection(OutlierDetection):
 
 def train_and_run_PAE(train, test, latent_dim, num_features, seed, max_epochs,
                       patience, val_split, verbose, optimizer):
+    # Progress bar formatting
+    autoencoder_lbar = 'Autoencoder training: {percentage:3.0f}%|{bar} '
+    flow_lbar = 'Flow training: {percentage:3.0f}%|{bar} '
+    rbar = '{n_fmt}/{total_fmt} ETA: {remaining}s,  {rate_fmt}{postfix}'
+
+    # Initialize callbacks
+    autoencoder_callbacks = [
+        EarlyStopping(monitor='val_loss', patience=patience),
+        tfa.callbacks.TQDMProgressBar(
+            show_epoch_progress=False,
+            overall_bar_format=autoencoder_lbar + rbar
+        )]
+
+    flow_callbacks = [
+        EarlyStopping(monitor='val_loss', patience=patience),
+        tfa.callbacks.TQDMProgressBar(
+            show_epoch_progress=False,
+            overall_bar_format=flow_lbar + rbar
+        )]
+
     # Train autoencoder
     autoencoder = Autoencoder(latent_dim, num_features)
     autoencoder.compile(optimizer=optimizer, loss=losses.MeanSquaredError())
-    callback = EarlyStopping(monitor='val_loss', patience=patience)
     autoencoder.fit(train, train, epochs=max_epochs, verbose=verbose,
-                    callbacks=[callback], validation_split=val_split)
+                    callbacks=autoencoder_callbacks, validation_split=val_split)
 
     # Train flow
     encoded_train = autoencoder.encoder(train).numpy()
     flow = NormalizingFlow(latent_dim)
     flow.compile(optimizer=optimizer, loss=lambda y, rv_y: -rv_y.log_prob(y))
-    callback = EarlyStopping(monitor='val_loss', patience=patience)
     flow.fit(np.zeros((len(encoded_train), 0)), encoded_train,
-             epochs=max_epochs, verbose=verbose, callbacks=[callback],
+             epochs=max_epochs, verbose=verbose, callbacks=flow_callbacks,
              validation_split=val_split)
 
     # Calculate scores

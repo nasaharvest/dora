@@ -86,17 +86,31 @@ def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
     train_ds, val_ds, test_ds = get_train_val_test(train, test, seed, channels,
                                                    val_split)
 
+    # Progress bar formatting
+    autoencoder_lbar = 'Autoencoder training: {percentage:3.0f}%|{bar} '
+    flow_lbar = 'Flow training: {percentage:3.0f}%|{bar} '
+    rbar = '{n_fmt}/{total_fmt} ETA: {remaining}s,  {rate_fmt}{postfix}'
+
     # Initialize callbacks
-    early_stop_callback = EarlyStopping(monitor='val_loss', patience=patience)
-    tqdm_callback = tfa.callbacks.TQDMProgressBar(leave_overall_progress=False,
-                                                  show_epoch_progress=False)
-    callbacks = [early_stop_callback, tqdm_callback]
+    autoencoder_callbacks = [
+        EarlyStopping(monitor='val_loss', patience=patience),
+        tfa.callbacks.TQDMProgressBar(
+            show_epoch_progress=False,
+            overall_bar_format=autoencoder_lbar + rbar
+        )]
+
+    flow_callbacks = [
+        EarlyStopping(monitor='val_loss', patience=patience),
+        tfa.callbacks.TQDMProgressBar(
+            show_epoch_progress=False,
+            overall_bar_format=flow_lbar + rbar
+        )]
 
     # Train autoencoder
     autoencoder = ConvAutoencoder(latent_dim, image_shape)
     autoencoder.compile(optimizer=optimizer, loss=losses.MeanSquaredError())
     autoencoder.fit(x=train_ds, validation_data=val_ds, verbose=verbose,
-                    epochs=max_epochs, callbacks=callbacks)
+                    epochs=max_epochs, callbacks=autoencoder_callbacks)
 
     # Encode datasets
     enc_train = autoencoder.encoder.predict(train_ds)
@@ -107,7 +121,7 @@ def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
     flow = NormalizingFlow(latent_dim)
     flow.compile(optimizer=optimizer, loss=lambda y, rv_y: -rv_y.log_prob(y))
     flow.fit(np.zeros((len(encoded_train), 0)), encoded_train,
-             verbose=verbose, epochs=max_epochs, callbacks=callbacks,
+             verbose=verbose, epochs=max_epochs, callbacks=flow_callbacks,
              validation_split=val_split)
 
     # Calculate scores
