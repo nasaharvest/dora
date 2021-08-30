@@ -1,12 +1,12 @@
 # Data loading module parameters
-data_type: {
-    name: 'raster',
+data_loader: {
+    name: 'raster_pixels',
     params: {}
 }
 data_to_fit: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
 data_to_score: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
 zscore_normalization: False
-out_dir: 'results/raster_test'
+out_dir: 'results/raster_pixel_test'
 
 # Feature extraction module
 features: {
@@ -16,7 +16,7 @@ features: {
 }
 
 # Outlier detection module
-top_n: 10
+top_n: 'None'
 outlier_detection: {
     # iforest: {
     #     n_trees: 100
@@ -33,5 +33,15 @@ outlier_detection: {
 
 # Results organization module
 results: {
-    save_scores: {}
+    save_scores: {},
+    reshape_raster: {
+        # the path to the input raster that was scored
+        'raster_path': 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif',
+        # the raster data loader format used: pixels or patches
+        'data_format': 'pixels',
+        # must be specified if data_format is patches; if pixels, use 0 for patch_size
+        'patch_size': 0,
+        # colormap to use for preview image; must be supported matplotlib colormap string
+        'colormap': 'magma'
+    }
 }
