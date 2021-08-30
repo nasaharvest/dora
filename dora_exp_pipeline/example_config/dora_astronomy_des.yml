@@ -18,7 +18,9 @@ features: {
 # Outlier detection module
 top_n: 10
 outlier_detection: {
-    iforest: {},
+    iforest: {
+        n_trees: 100
+    },
     pca: {
         k: 3
     },
