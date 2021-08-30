@@ -157,68 +157,132 @@
 \maketitle
 
 \begin{abstract}
-AAAI creates proceedings, working notes, and technical reports directly from electronic source furnished by the authors. To ensure that all papers in the publication have a uniform appearance, authors must adhere to the following instructions.
+Automatic detection of out-of-distribution (OOD) samples or features is
+universally needed when working with scientific datasets. For example,
+OOD detection methods can be used for cleaning datasets or flagging
+novel samples in order to guide instrument acquisition or scientific analysis.
+We present Domain-agnostic Outlier Ranking Algorithms (DORA) to provide
+a configurable pipeline that makes it easy for scientists to apply and evaluate
+outlier detection methods in a variety of domains. DORA allows users to 
+configure outlier detection experiments by specifying the location of their 
+dataset(s), the input data type, feature extraction methods, and which 
+algorithms should be applied. DORA supports image, raster, time series, 
+or feature vector input data types and outlier detection methods that include
+ Isolation Forest, Discovery via Eigenbasis Modeling of Uninteresting Data 
+ (DEMUD), principal component analysis (PCA), Reed-Xiaoli (RX) detector, 
+ Local RX, negative sampling, and probabilistic autoencoder. Given a set of
+  data samples, each algorithm assigns an outlier score to each sample. DORA
+   provides results organization and visualization modules to help users 
+   process the results, including sorting samples by outlier score, evaluating 
+   outlier recall for a set of known/labeled outliers, clustering groups of 
+   similar outliers together, and causal graphs. To demonstrate the 
+   cross-domain applicability of DORA, we conducted outlier detection
+    experiments for four use cases: 1) cleaning noisy ground-truth datasets
+     (Earth Science), 2) detecting volcanic thermal anomalies (Earth Science), 
+     3) flagging non-astrophysical objects in the Dark Energy Survey 
+     (astrophysics), and 4) novelty-guided onboard targeting of instruments
+      for Mars rovers (planetary science). [We showed that ...]
 \end{abstract}
 
 \section{Introduction}
 \begin{itemize}
-\item Framing of outlier detection as a domain-agnostic problem that is well-suited to cross-disciplinary applications
-\item Example applications of outlier detection across science application domains
-\item Challenges/barriers to entry for domain scientists who could benefit from outlier detection 
-\item DORA as a solution to lower these barriers to entry and help integrate outlier detection methods into existing scientific workflows across variety of domains
+\item Framing of outlier detection as a domain-agnostic problem that is well-
+suited to cross-disciplinary applications
+\item Example applications of outlier detection across science application 
+domains
+\item Challenges/barriers to entry for domain scientists who could benefit from
+ outlier detection 
+\item DORA as a solution to lower these barriers to entry and help integrate 
+outlier detection methods into existing scientific workflows across variety of 
+domains
 \end{itemize}
 
 \section{Related Work}
 \begin{itemize}
 \item Methods for outlier detection
-\item Applications of outlier detection related to our focus domains (e.g., \citet{kerner2020comparison})
+\item Applications of outlier detection related to our focus domains 
+(e.g., \citet{kerner2020comparison})
 \item Tools for applying outlier detection or other methods across domains?
 
 \end{itemize}
 
 \section{Methods}
 
-\begin{itemize}
-\item DORA configurable pipeline approach 
-\item data types
-\item feature extraction
-\item ranking algorithms
-\item results modules
-\end{itemize}
-
+\subsection{DORA configurable pipeline} Steven please add details about the 
+approach/design choices for this pipeline. Mention that additional data types, 
+feature extraction methods, ranking algorithms, and results organization and 
+visualization modules can easily be added and integrated if they follow the API. 
+Hannah to add architecture figure. Add descriptions of each layer of modules: 
+\paragraph{Data types} Hannah
+\paragraph{Feature extraction} Hannah 
+\paragraph{Ranking algorithms} We implemented 7 algorithms for scoring and 
+ranking samples by outlierness. [Describe each algorithm briefly and how they 
+complement each other.]
+\paragraph{Results organization} Eric, Umaa, Steven, Vinay
+\paragraph{Outlier visualization} Jake?
 
 \section{Experiments}
 
 \subsection{Datasets}
+Describe the datasets overall and our motivation for choosing these. Maybe add
+ a table with number of samples, number of reference known outliers (if 
+ available), etc, if room? 
 
-Four use case datasets; additional benchmark datasets (e.g. FashionMNIST/MNIST)?
+\subsubsection{Astrophysical objects in Dark Energy Survey}
+Umaa
 
-\subsection{Experiment setup}
+\subsubsection{Targets in Mars rover images}
+Kiri
 
-Experiments for each of the use cases; evaluation criteria
+\subsubsection{Satellite time series for ground-truth observations}
+Hannah: Describe the Earth crop field data set and applications
 
-\section{Results}
+\subsubsection{Volcanic thermal anomalies}
 
-Experiment results
+\subsubsection{MNIST and FashionMNIST}
+We added this to have a traditional benchmark and use case demonstration. 
+
+\subsection{Results}
+Discuss the overall approach to the setup of the experiments. In each 
+subsection discuss specific setup details (including evaluation metrics) for 
+each dataset then the results from the experiments.
+
+\subsubsection{Astrophysical objects in Dark Energy Survey}
+Umaa
+
+\subsubsection{Targets in Mars rover images}
+Kiri
+
+\subsubsection{Satellite time series for ground-truth observations}
+Hannah: Describe the Earth crop field data set and applications
+
+\subsubsection{Volcanic thermal anomalies}
+
+\subsubsection{MNIST and FashionMNIST}
+We added this to have a traditional benchmark and use case demonstration. 
+
 
 \section{Discussion}
 \begin{itemize}
 \item Discuss results from experiments
 \item Challenges of evaluating results in outlier detection?
-\item Downstream use of results in science applications
+\item Downstream use of results in science applications/Path to deployment
 \end{itemize}
 
 \section{Conclusions}
-Summarize conclusions and plans for future work
+Summarize conclusions and plans for future work, including public 
+pip-installable package
 
-Path to deployment
+[Note: these datasets could also be used by other researchers as OOD
+ benchmark tasks?]
 
 
 \bibliography{dora_references}
 
 
 \section{ Acknowledgments}
-JPL CIF, SMD etc.
+Funding/support: JPL CIF, SMD etc. Acknowledge people who contributed to 
+datasets e.g. FAO, Matt Pritchard, DES, other CIF team members?
 
 
 
