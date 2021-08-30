@@ -34,7 +34,8 @@ class TestPlanetary(TestCase):
                           'iforest-n_trees=100/selections-iforest.csv',
                           'lrx-inner_window=3-outer_window=9-bands=1/selections-lrx.csv',
                           'negative_sampling-percent_increase=20/selections-negative_sampling.csv',
-                          'pca-k=5/selections-pca.csv'
+                          'pca-k=5/selections-pca.csv',
+                          'random/selections-random.csv'
                           ]:
             correct_file = 'test/ref-results/planetary_rover/functional/%s' % file_base
             output_file = '%s/%s' % (self.outdir, file_base)
