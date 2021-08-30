@@ -36,4 +36,7 @@ results: {
     kmeans: {
         n_clusters: 5
     }
+    som: {
+        n_clusters: 5
+    }
 }
