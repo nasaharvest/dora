@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import rasterio as rio
 from sklearn.cluster import KMeans
+from sklearn_som.som import SOM
 
 
 METHOD_POOL = []
@@ -173,6 +174,39 @@ class KmeansCluster(ResultsOrganization):
 
 kmeans_cluster = KmeansCluster()
 register_org_method(kmeans_cluster)
+
+
+class SOMCluster(ResultsOrganization):
+    def __init__(self):
+        super(SOMCluster, self).__init__('som')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, top_n, n_clusters):
+        if not os.path.exists(out_dir):
+            os.mkdir(out_dir)
+            if logger:
+                logger.text(f'Created output directory: {out_dir}')
+
+        out_file = open(f'{out_dir}/SOM-{outlier_alg_name}.csv', 'w')
+
+        data_to_cluster = []
+        for dts_ind in dts_sels:
+            data_to_cluster.append(data_to_score[dts_ind])
+        data_to_cluster = np.array(data_to_cluster, dtype=float)
+
+        som = SOM(m=n_clusters, n=1, dim=len(data_to_cluster[0]))
+        som.fit(data_to_cluster)
+        groups = som.predict(data_to_cluster)
+
+        for ind, (s_ind, dts_id, group) in enumerate(zip(dts_sels, data_ids,
+                                                         groups)):
+            out_file.write(f'{ind}, {s_ind}, {dts_id}, {group}\n')
+
+        out_file.close()
+
+
+som_cluster = SOMCluster()
+register_org_method(som_cluster)
 
 
 class ReshapeRaster(ResultsOrganization):
