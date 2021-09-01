@@ -17,7 +17,7 @@ import tensorflow_addons as tfa
 from tensorflow import keras
 from tensorflow.keras import layers, losses
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow_probability import distributions, bijectors, layers as tfpl
 
 
@@ -27,7 +27,8 @@ class PAEOutlierDetection(OutlierDetection):
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        top_n, seed, latent_dim, max_epochs=500, patience=3,
-                       val_split=0.25, verbose=0, optimizer='adam'):
+                       val_split=0.25, verbose=0, optimizer='adam', 
+                       log_dir=None):
         if data_to_fit is None:
             data_to_fit = deepcopy(data_to_score)
 
@@ -68,39 +69,21 @@ class PAEOutlierDetection(OutlierDetection):
 
 
 def train_and_run_PAE(train, test, latent_dim, num_features, seed, max_epochs,
-                      patience, val_split, verbose, optimizer):
-    # Progress bar formatting
-    autoencoder_lbar = 'Autoencoder training: {percentage:3.0f}%|{bar} '
-    flow_lbar = 'Flow training: {percentage:3.0f}%|{bar} '
-    rbar = '{n_fmt}/{total_fmt} ETA: {remaining}s,  {rate_fmt}{postfix}'
-
-    # Initialize callbacks
-    autoencoder_callbacks = [
-        EarlyStopping(monitor='val_loss', patience=patience),
-        tfa.callbacks.TQDMProgressBar(
-            show_epoch_progress=False,
-            overall_bar_format=autoencoder_lbar + rbar
-        )]
-
-    flow_callbacks = [
-        EarlyStopping(monitor='val_loss', patience=patience),
-        tfa.callbacks.TQDMProgressBar(
-            show_epoch_progress=False,
-            overall_bar_format=flow_lbar + rbar
-        )]
-
+                      patience, val_split, verbose, optimizer, log_dir):
     # Train autoencoder
     autoencoder = Autoencoder(latent_dim, num_features)
     autoencoder.compile(optimizer=optimizer, loss=losses.MeanSquaredError())
     autoencoder.fit(train, train, epochs=max_epochs, verbose=verbose,
-                    callbacks=autoencoder_callbacks, validation_split=val_split)
+                    callbacks=make_tf_callbacks('Autoencoder training', 
+                    patience, log_dir), validation_split=val_split)
 
     # Train flow
     encoded_train = autoencoder.encoder(train).numpy()
     flow = NormalizingFlow(latent_dim)
     flow.compile(optimizer=optimizer, loss=lambda y, rv_y: -rv_y.log_prob(y))
     flow.fit(np.zeros((len(encoded_train), 0)), encoded_train,
-             epochs=max_epochs, verbose=verbose, callbacks=flow_callbacks,
+             epochs=max_epochs, verbose=verbose, 
+             callbacks=make_tf_callbacks('Flow training', patience, log_dir),
              validation_split=val_split)
 
     # Calculate scores
@@ -111,6 +94,19 @@ def train_and_run_PAE(train, test, latent_dim, num_features, seed, max_epochs,
 
     return scores
 
+def make_tf_callbacks(name, patience, log_dir):
+    lbar = ': {percentage:3.0f}%|{bar} '
+    rbar = '{n_fmt}/{total_fmt} ETA: {remaining}s,  {rate_fmt}{postfix}'
+    callbacks = [
+        EarlyStopping(monitor='val_loss', patience=patience),
+        tfa.callbacks.TQDMProgressBar(
+            show_epoch_progress=False,
+            leave_overall_progress=False,
+            overall_bar_format= name + lbar + rbar
+        )]
+    if log_dir:
+        callbacks.append(TensorBoard(log_dir=log_dir, histogram_freq=1))
+    return callbacks
 
 class Autoencoder(Model):
     def __init__(self, latent_dim, num_features):

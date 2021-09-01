@@ -93,6 +93,10 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
             logger.text(f'Created out_dir: '
                         f'{os.path.abspath(config.out_dir)}')
 
+    # Limit tensorflow to single GPU
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'True'
+
     # Register all ranking algorithms supported
     register_od_algs()
 

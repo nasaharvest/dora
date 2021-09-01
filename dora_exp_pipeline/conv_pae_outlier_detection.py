@@ -12,6 +12,10 @@
 # Date created: August 16, 2021
 
 from dora_exp_pipeline.outlier_detection import OutlierDetection
+from dora_exp_pipeline.pae_outlier_detection import (
+    NormalizingFlow,
+    make_tf_callbacks
+)
 import os
 import math
 import numpy as np
@@ -23,8 +27,7 @@ import tensorflow_addons as tfa
 from tensorflow import keras
 from tensorflow.keras import layers, losses
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow_probability import distributions, bijectors, layers as tfpl
+from tensorflow.keras.callbacks import EarlyStopping 
 
 
 class ConvPAEOutlierDetection(OutlierDetection):
@@ -33,7 +36,8 @@ class ConvPAEOutlierDetection(OutlierDetection):
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        top_n, seed, latent_dim, max_epochs=1000, patience=10,
-                       val_split=0.25, verbose=0, optimizer='adam'):
+                       val_split=0.25, verbose=0, optimizer='adam', 
+                       log_dir=None):
         if data_to_fit is None:
             data_to_fit = deepcopy(data_to_score)
 
@@ -272,25 +276,6 @@ class ConvAutoencoder(Model):
         encoded = self.encoder(x)
         decoded = self.decoder(encoded)
         return decoded
-
-
-class NormalizingFlow(Model):
-    def __init__(self, latent_dim):
-        super(NormalizingFlow, self).__init__()
-
-        self.dist = keras.Sequential([
-            layers.InputLayer(input_shape=(0,), dtype=tf.float32),
-            tfpl.DistributionLambda(
-                lambda t: distributions.MultivariateNormalDiag(
-                    loc=tf.zeros(tf.concat([tf.shape(t)[:-1],
-                                           [latent_dim]],
-                                           axis=0)))),
-            tfpl.AutoregressiveTransform(bijectors.AutoregressiveNetwork(
-                params=2, hidden_units=[10, 10], activation='relu')),
-        ])
-
-    def call(self, x):
-        return self.dist(x)
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").
