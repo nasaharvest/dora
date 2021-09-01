@@ -23,7 +23,6 @@ from dora_exp_pipeline.random_outlier_detection import RandomOutlierDetection
 from dora_exp_pipeline.negative_sampling_outlier_detection import \
     NegativeSamplingOutlierDetection
 from dora_exp_pipeline.pae_outlier_detection import PAEOutlierDetection
-from dora_exp_pipeline.conv_pae_outlier_detection import ConvPAEOutlierDetection
 from dora_exp_pipeline.util import LogUtil
 from dora_exp_pipeline.dora_feature import extract_feature
 from dora_exp_pipeline.dora_feature import z_score_normalize
@@ -63,10 +62,6 @@ def register_od_algs():
     pae_outlier_detection = PAEOutlierDetection()
     register_od_alg(pae_outlier_detection)
 
-    # Register Convolutional PAE outlier detection algorithm in the pool
-    conv_pae_outlier_detection = ConvPAEOutlierDetection()
-    register_od_alg(conv_pae_outlier_detection)
-
 
 def start(config_file: str, out_dir: str, log_file=None, seed=1234):
     if not os.path.exists(config_file):
@@ -93,9 +88,10 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
             logger.text(f'Created out_dir: '
                         f'{os.path.abspath(config.out_dir)}')
 
-    # Limit tensorflow to single GPU
+    # Configure tensorflow
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'True'
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
     # Register all ranking algorithms supported
     register_od_algs()
