@@ -177,25 +177,75 @@ or feature vector input data types and outlier detection methods that include
    outlier recall for a set of known/labeled outliers, clustering groups of 
    similar outliers together, and causal graphs. To demonstrate the 
    cross-domain applicability of DORA, we conducted outlier detection
-    experiments for four use cases: 1) cleaning noisy ground-truth datasets
-     (Earth Science), 2) detecting volcanic thermal anomalies (Earth Science), 
-     3) flagging non-astrophysical objects in the Dark Energy Survey 
-     (astrophysics), and 4) novelty-guided onboard targeting of instruments
+    experiments for three real-world use cases: 1) cleaning noisy ground-truth 
+    datasets (Earth Science), 
+     2) flagging non-astrophysical objects in the Dark Energy Survey 
+     (astrophysics), and 3) novelty-guided onboard targeting of instruments
       for Mars rovers (planetary science). [We showed that ...]
 \end{abstract}
 
 \section{Introduction}
-\begin{itemize}
-\item Framing of outlier detection as a domain-agnostic problem that is well-
-suited to cross-disciplinary applications
-\item Example applications of outlier detection across science application 
-domains
-\item Challenges/barriers to entry for domain scientists who could benefit from
- outlier detection 
-\item DORA as a solution to lower these barriers to entry and help integrate 
-outlier detection methods into existing scientific workflows across variety of 
-domains
-\end{itemize}
+The ability to automatically detect out-of-distribution samples in large data 
+sets is of interest for a wide variety of scientific domains. Depending on the
+ application setting, this capability is also commonly referred to as anomaly
+  detection, outlier detection, or novelty detection. More broadly, this is 
+  referred to as out-of-distribution (OOD) detection. In general, the goal of 
+  OOD detection systems is to identify samples that deviate from the majority
+   of samples in a dataset in an unsupervised manner (Pimentel et al., 2014). 
+   In machine learning, these methods are commonly used for identifying 
+   mislabeled or otherwise invalid samples in a dataset 
+   (e.g., Liang et al., 2018; Böhm et al., 2020). 
+   
+   When working with science datasets, OOD detection can be used for 
+   cleaning datasets, e.g., flagging ground-truth labels with GPS or human
+    entry error or identifying wrongly categorized objects in a catalog. 
+    It could also be used for discovery, e.g., to flag novel samples in order 
+    to guide instrument acquisition or scientific analysis. Another application
+   is the detection of rare objects that are known to exist but the known
+   examples are too few to create a large enough labeled dataset for 
+   supervised classification algorithms. In astrophysics, 
+    outlier detection methods have been employed for identifying astrophysical
+     objects with unique characteristics (Xiong et al., 2010; 
+     Storey-Fisher et al., 2020; Hayat et al., 2020) as well as 
+     data/modeling artifacts (Wagstaff et al., 2020; Lochner et al., 2020) in 
+     astronomical surveys. Examples of outlier detection applications in 
+     Earth science include detecting anomalous objects or materials 
+     (Chang and Chiang, 2002; Zhou et al., 2016), data artifacts/noise 
+     (Liu et al., 2017; Alvera-Azcárate et al., 2012), change (Touati et al.,
+      2020; Zhou et al., 2016),  and ocean extremes (Prochaska et al.). 
+      Planetary science applications of outlier detection have mostly focused 
+      on prioritizing samples with novel geologic or geochemical features for
+       follow-up targeting or analysis (Kerner et al., 2020a; Kerner et al., 
+       2020b; Wagstaff et al., 2013). 
+       
+Despite wide differences in applications, data types, and dimensionality,
+ the same underlying machine learning algorithms can be employed across 
+ all of these domains. A challenge for applying them however is that domain
+ scientists do not always have the programming or machine learning background
+ to apply the algorithms themselves using existing tools. Given the widespread 
+ applicability and transferability of OOD methods, the scientific community 
+ would benefit from a tool that made it easy for them to apply popular outlier
+ detection algorithms to their science datasets. We created DORA (Domain-
+ agnostic Outlier Ranking Algorithms) to provide a tool for applying outlier 
+ detection algorithms to a variety of scientific data sets with minimal coding
+ required. Users need only to specify details for their data/application 
+ including the data type, location, and algorithms to run in an experiment
+ configuration file. DORA supports image, raster, time series, 
+or feature vector input data types and outlier detection methods that include
+ Isolation Forest, Discovery via Eigenbasis Modeling of Uninteresting Data 
+ (DEMUD), principal component analysis (PCA), Reed-Xiaoli (RX) detector, 
+ Local RX, negative sampling, and probabilistic autoencoder. Given a set of
+  data samples, each algorithm assigns an outlier score to each sample. DORA
+   provides results organization and visualization modules to help users 
+   process the results, including sorting samples by outlier score, evaluating 
+   outlier recall for a set of known/labeled outliers, clustering groups of 
+   similar outliers together, and causal graphs. To demonstrate the 
+   cross-domain applicability of DORA, we conducted outlier detection
+    experiments for three real-world use cases: 1) cleaning noisy ground-truth 
+    datasets (Earth Science), 
+     2) flagging non-astrophysical objects in the Dark Energy Survey 
+     (astrophysics), and 3) novelty-guided onboard targeting of instruments
+      for Mars rovers (planetary science). [We showed that ...]
 
 \section{Related Work}
 \begin{itemize}
@@ -203,7 +253,6 @@ domains
 \item Applications of outlier detection related to our focus domains 
 (e.g., \citet{kerner2020comparison})
 \item Tools for applying outlier detection or other methods across domains?
-
 \end{itemize}
 
 \section{Methods}
@@ -237,7 +286,10 @@ Kiri
 \subsubsection{Satellite time series for ground-truth observations}
 Hannah: Describe the Earth crop field data set and applications
 
-\subsubsection{Volcanic thermal anomalies}
+% Decided to cut this use case to make the presentation simpler (only one
+% Earth science use case, and we already have a 1-band image dataset
+% (Navcam). 
+%\subsubsection{Volcanic thermal anomalies}
 
 \subsubsection{MNIST and FashionMNIST}
 We added this to have a traditional benchmark and use case demonstration. 
@@ -256,7 +308,7 @@ Kiri
 \subsubsection{Satellite time series for ground-truth observations}
 Hannah: Describe the Earth crop field data set and applications
 
-\subsubsection{Volcanic thermal anomalies}
+%\subsubsection{Volcanic thermal anomalies}
 
 \subsubsection{MNIST and FashionMNIST}
 We added this to have a traditional benchmark and use case demonstration. 
