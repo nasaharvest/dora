@@ -62,7 +62,7 @@ class PAEOutlierDetection(OutlierDetection):
         # Rank targets
         scores = train_fn(data_to_fit, data_to_score, latent_dim,
                           sample_shape, seed, max_epochs, patience, val_split,
-                          optimizer)
+                          optimizer, log_dir)
         selection_indices = np.argsort(scores)[::-1]
 
         results = dict()
@@ -152,7 +152,8 @@ def make_tf_callbacks(name, patience, log_dir):
             overall_bar_format=name + lbar + rbar
         )]
     if log_dir:
-        callbacks.append(TensorBoard(log_dir=log_dir, histogram_freq=1))
+        logs_path = os.path.join(log_dir, name.replace(' ', '_'))
+        callbacks.append(TensorBoard(log_dir=logs_path, histogram_freq=5))
     return callbacks
 
 

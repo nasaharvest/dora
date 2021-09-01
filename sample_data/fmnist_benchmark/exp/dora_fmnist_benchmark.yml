@@ -24,6 +24,7 @@ outlier_detection: {
         patience: 10,
         optimizer: 'adam',
         val_split: 0.25,
+        log_dir: 'sample_data/fmnist_benchmark/exp/logs'
     }
 }
 

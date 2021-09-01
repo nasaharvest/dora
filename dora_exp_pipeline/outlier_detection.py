@@ -93,7 +93,7 @@ class OutlierDetection(object):
         """
         ret_string = ''
         for k, v in params_dict.items():
-            ret_string += '-%s=%s' % (k, v)
+            ret_string += '-%s=%s' % (k, str(v).replace('/', ''))
 
         return ret_string
 
