@@ -8,6 +8,7 @@
 # Steven Lu, July 13, 2021, updated to be compatible with DORA pipeline.
 
 import numpy as np
+from tqdm import tqdm
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
 
@@ -59,7 +60,8 @@ def get_LRX_scores(images, w_inner, w_outer, bands):
     scores = np.zeros([rows, im_height, im_width])
     s = int(w_outer/2)
     # for each image, compute the LRX score in each pixel
-    for idx in range(images.shape[0]):
+    for idx in tqdm(range(images.shape[0]),
+                    desc='LRX'):
         im = images[idx]
         for i in range(s, im.shape[0]-s):
             for j in range(s, im.shape[1]-s):
