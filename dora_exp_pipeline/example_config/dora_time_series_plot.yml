@@ -6,7 +6,7 @@ data_loader: {
 data_to_fit: 'sample_data/earth_fieldsamples/points_to_fit.csv'
 data_to_score: 'sample_data/earth_fieldsamples/kenya_points_to_predict.csv'
 zscore_normalization: False
-out_dir: 'PATH/TO/OUTPUT/DIR'
+out_dir: 'results'
 
 # Feature extraction module
 features: {
@@ -33,8 +33,12 @@ outlier_detection: {
 
 # Results organization module
 results: {
-    comparison_plot: {
-        'validation_dir': 'sample_data/earth_fieldsamples/kenya_labels.csv'
-    },
-    save_scores: {}
+    #comparison_plot: {
+    #    'validation_dir': 'sample_data/earth_fieldsamples/kenya_labels.csv'
+    #},
+    save_scores: {},
+    histogram: {
+         'bins': 25
+    }
+    
 }

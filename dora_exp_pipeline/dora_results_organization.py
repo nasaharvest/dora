@@ -99,14 +99,13 @@ class SaveComparisonPlot(ResultsOrganization):
 
         # Outliers will be 1s and inliers will be 0s.
         labels = self._get_validation_labels(validation_dir)
-        scores = np.argsort(dts_scores)[::-1]
 
-        x = list(range(1, len(scores)+1))
+        x = list(range(1, len(dts_sels)+1))
         y = []
         numOutliers = 0
 
-        for i in range(len(scores)):
-            if(labels[scores[i]] == 1):
+        for i in range(len(dts_sels)):
+            if(labels[dts_sels[i]] == 1):
                 numOutliers += 1
             y.append(numOutliers)
 
@@ -114,7 +113,8 @@ class SaveComparisonPlot(ResultsOrganization):
         index = x.index(y[-1])
         area = np.trapz(y[:index+1], x[:index+1])
 
-        plt.plot(x, y, label=outlier_alg_name)
+        plt.plot(x, y, label=alg_name)
+        plt.plot(x, x, label='Best Line')
         plt.plot([], [], ' ', label=f'Area: {area}')
         plt.title('Correct Outliers vs Selected Outliers')
         plt.xlabel('Number of Outliers Selected')
@@ -122,7 +122,7 @@ class SaveComparisonPlot(ResultsOrganization):
         plt.legend()
         axes.set_xlim(1, x[-1])
         axes.set_ylim(1, y[-1])
-        plt.savefig(f'{out_dir}/comparison_plot_{outlier_alg_name}.png')
+        plt.savefig(f'{out_dir}/comparison_plot_{alg_name}.png')
 
     def _get_validation_labels(self, validation_dir):
         with open(validation_dir, 'r') as f:
@@ -270,6 +270,30 @@ class ReshapeRaster(ResultsOrganization):
 reshape_raster = ReshapeRaster()
 register_org_method(reshape_raster)
 
+class SaveHistogram(ResultsOrganization):
+    def __init__(self):
+        super(SaveHistogram, self).__init__('histogram')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score, alg_name,
+             out_dir, logger, seed, bins):
+        if(not(os.path.exists(out_dir))):
+            os.makedirs(out_dir)
+
+        scores = sorted(dts_scores)
+        fig, axs = plt.subplots()
+        #numBins = int((scores[-1]-scores[0])/increment)+1
+        #print(scores[0], scores[-1], increment, numBins)
+
+        yVals, bins, patches = axs.hist(scores, bins, density=True,
+                                            alpha=0.5)
+
+        plt.title('Histogram of Anomaly Scores')
+        plt.xlabel('Score')
+        plt.ylabel('Frequency')
+        plt.savefig(f'{out_dir}/histogram_bar_graph-{alg_name}.png')
+
+save_histogram = SaveHistogram()
+register_org_method(save_histogram)
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").
 # U.S. Government sponsorship acknowledged.
