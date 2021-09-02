@@ -317,7 +317,11 @@ centered on each target.
 %
 We collaborated with an MSL science planning team member to
 independently review the targets and identify those that were
-considered novel by the mission ($n_{novel} = 108$).
+considered novel by the mission ($n_{novel} = 108$).  Our goal for
+this application is to assess how well the selections made by each
+algorithm correlate with human novelty judgments to determine which
+methods would be most suitable for informing onboard decisions about
+follow-up observations.
 
 \subsubsection{Satellite time series for ground-truth observations}
 Hannah: Describe the Earth crop field data set and applications
@@ -339,8 +343,19 @@ each dataset then the results from the experiments.
 Umaa
 
 \subsubsection{Targets in Mars rover images.}
-Kiri
-% and organized them chronologically.
+We simulated the operational setting in which the rover has observed
+targets up through mission day (sol) $s$ and the goal is to rank all
+subsequent targets (after sol $s$) to inform which recent targets
+merit further study.  We organized the Mars target images
+chronologically and partitioned them into the corresponding ``prior''
+set $D_s$ and ``assessment'' set $D_{s+}$. We initialized each
+algorithm with $D_s$ and requested a ranking of targets in $D_{s+}$.
+\todo{Add table showing number (or percentage?) of novel targets in
+the top $N$ selections, where $N$ = known number of novel targets in
+$D_{s+}$.  And/or, report average rank of novel targets if alg ranks all
+$|D_{s+}|$ targets. If time/room permits, do this for different values
+of $s$.} 
+
 \subsubsection{Satellite time series for ground-truth observations}
 Hannah: Describe the Earth crop field data set and applications
 
