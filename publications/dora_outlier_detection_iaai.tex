@@ -74,6 +74,10 @@
 
 \setcounter{secnumdepth}{0} %May be changed to 1 or 2 if section numbers are desired.
 
+\usepackage{siunitx}
+\usepackage[dvipsnames]{xcolor}
+\newcommand{\todo}[1]{\textcolor{blue}{#1}}
+
 % The file aaai21.sty is the style file for AAAI Press
 % proceedings, working notes, and technical reports.
 %
@@ -219,7 +223,8 @@ sets is of interest for a wide variety of scientific domains. Depending on the
  configuration file. DORA supports image, raster, time series, 
 or feature vector input data types and outlier detection methods that include
  Isolation Forest, Discovery via Eigenbasis Modeling of Uninteresting Data 
- (DEMUD), principal component analysis (PCA), Reed-Xiaoli (RX) detector, 
+ (DEMUD)~\citep{wagstaff:demud13}, principal component analysis (PCA),
+   Reed-Xiaoli (RX) detector,  
  Local RX, negative sampling, and probabilistic autoencoder. Given a set of
   data samples, each algorithm assigns an outlier score to each sample. DORA
    provides results organization and visualization modules to help users 
@@ -238,7 +243,7 @@ In astrophysics,
     outlier detection methods have been employed for identifying astrophysical
      objects with unique characteristics (Xiong et al., 2010; 
      Storey-Fisher et al., 2020; Hayat et al., 2020) as well as 
-     data/modeling artifacts (Wagstaff et al., 2020; Lochner et al., 2020) in 
+     data/modeling artifacts~\citep{wagstaff:des-anom20} (Lochner et al., 2020) in 
      astronomical surveys. Examples of outlier detection applications in 
      Earth science include detecting anomalous objects or materials 
      (Chang and Chiang, 2002; Zhou et al., 2016), data artifacts/noise 
@@ -247,13 +252,16 @@ In astrophysics,
       Planetary science applications of outlier detection have mostly focused 
       on prioritizing samples with novel geologic or geochemical features for
        follow-up targeting or analysis (Kerner et al., 2020a; Kerner et al., 
-       2020b; Wagstaff et al., 2013). 
+       2020b) \citep{wagstaff:demud13}.
 
 \begin{itemize}
 \item Methods for outlier detection
 \item Applications of outlier detection related to our focus domains 
 (e.g., \citet{kerner2020comparison})
-\item Tools for applying outlier detection or other methods across domains?
+\item Outlier detection toolkits: PyOD Python
+package~\citep{zhao:pyod19}, \url{https://github.com/yzhao062/pyod} 
+\item Tools for applying outlier detection or other methods across
+domains?
 \end{itemize}
 
 \section{Methods}
@@ -265,9 +273,21 @@ visualization modules can easily be added and integrated if they follow the API.
 Hannah to add architecture figure. Add descriptions of each layer of modules: 
 \paragraph{Data types} Hannah
 \paragraph{Feature extraction} Hannah 
-\paragraph{Ranking algorithms} We implemented 7 algorithms for scoring and 
+\paragraph{Ranking algorithms.} We implemented 7 algorithms for scoring and 
 ranking samples by outlierness. [Describe each algorithm briefly and how they 
 complement each other.]
+
+The DEMUD algorithm~\citep{wagstaff:demud13} differs from other
+outlier ranking methods: instead of independently scoring all
+observations, DEMUD incrementally identifies the most unusual
+remaining item, then incorporates it into the model of ``known''
+(non-outlier) observations before selecting the next most unusual
+item.  DEMUD's goal is to identify diverse outliers and avoid
+redundant selections.  Once an outlier is encountered, repeated
+occurrences of that outlier are deprioritized.  Methods that score
+outliers independently maximize coverage of outliers, while DEMUD
+maximizes the fast discovery of distinct outlier types.
+
 \paragraph{Results organization} Eric, Umaa, Steven, Vinay
 \paragraph{Outlier visualization} Jake?
 
@@ -281,8 +301,27 @@ Describe the datasets overall and our motivation for choosing these. Maybe add
 \subsubsection{Astrophysical objects in Dark Energy Survey}
 Umaa
 
-\subsubsection{Targets in Mars rover images}
-Kiri
+\subsubsection{Targets in Mars rover images.}
+Mars exploration is fundamentally an exercise in discovery with the
+goal of increasing our understanding of the history, evolution,
+composition, and currently active processes on Mars.  Outliers
+identified in Mars observations can inspire new discoveries and inform
+the choice of which areas merit follow-up, deeper
+investigation~\cite{kerner2020comparison,wagstaff:rover-novelty20}.
+We collected \todo{XXX} images from the Mars Science Laboratory's
+Navigation camera (Navcam) and employed the Rockster~\cite{burl:rockster16}
+method used by onboard rover software to identify candidate rock
+targets with an area of at least 100 pixels, yielding \num{6005}
+targets.  We cropped out a \num{64}$\times$\num{64} pixel image
+centered on each target.
+%
+We collaborated with an MSL science planning team member to
+independently review the targets and identify those that were
+considered novel by the mission ($n_{novel} = 108$).  Our goal for
+this application is to assess how well the selections made by each
+algorithm correlate with human novelty judgments to determine which
+methods would be most suitable for informing onboard decisions about
+follow-up observations.
 
 \subsubsection{Satellite time series for ground-truth observations}
 Hannah: Describe the Earth crop field data set and applications
@@ -303,8 +342,19 @@ each dataset then the results from the experiments.
 \subsubsection{Astrophysical objects in Dark Energy Survey}
 Umaa
 
-\subsubsection{Targets in Mars rover images}
-Kiri
+\subsubsection{Targets in Mars rover images.}
+We simulated the operational setting in which the rover has observed
+targets up through mission day (sol) $s$ and the goal is to rank all
+subsequent targets (after sol $s$) to inform which recent targets
+merit further study.  We organized the Mars target images
+chronologically and partitioned them into the corresponding ``prior''
+set $D_s$ and ``assessment'' set $D_{s+}$. We initialized each
+algorithm with $D_s$ and requested a ranking of targets in $D_{s+}$.
+\todo{Add table showing number (or percentage?) of novel targets in
+the top $N$ selections, where $N$ = known number of novel targets in
+$D_{s+}$.  And/or, report average rank of novel targets if alg ranks all
+$|D_{s+}|$ targets. If time/room permits, do this for different values
+of $s$.} 
 
 \subsubsection{Satellite time series for ground-truth observations}
 Hannah: Describe the Earth crop field data set and applications
@@ -333,10 +383,26 @@ pip-installable package
 \bibliography{dora_references}
 
 
-\section{ Acknowledgments}
-Funding/support: JPL CIF, SMD etc. Acknowledge people who contributed to 
-datasets e.g. FAO, Matt Pritchard, DES, other CIF team members?
+\section{Acknowledgments}
+\todo{Funding/support: JPL CIF, SMD etc.}
+We thank the NASA Center Innovation Fund for supporting this work.
 
+\todo{Acknowledge people who contributed to 
+datasets e.g. FAO, Matt Pritchard, DES, other CIF team members?}
 
+We thank Raymond Francis for analyzing the Navcam rover images to
+identify targets considered to be ``novel'' for evaluating outlier
+detection in the planetary rover scenario.
+
+Part of this research was carried out at the Jet Propulsion
+Laboratory, California Institute of Technology, under a contract with
+the National Aeronautics and Space Administration.
 
 \end{document}
+
+% LocalWords:  tex OOD Eigenbasis DEMUD PCA Xiaoli RX autoencoder al
+% LocalWords:  Pimentel mislabeled Liang Böhm wagstaff demud Xiong
+% LocalWords:  Storey Hayat des anom Lochner Chiang Zhou Liu Alvera
+% LocalWords:  Azcárate Touati Prochaska Kerner kerner PyOD zhao pyod
+% LocalWords:  API Umaa Vinay Navcam MNIST FashionMNIST installable
+% LocalWords:  dora CIF SMD FAO Pritchard
