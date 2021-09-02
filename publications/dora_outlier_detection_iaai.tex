@@ -219,7 +219,8 @@ sets is of interest for a wide variety of scientific domains. Depending on the
  configuration file. DORA supports image, raster, time series, 
 or feature vector input data types and outlier detection methods that include
  Isolation Forest, Discovery via Eigenbasis Modeling of Uninteresting Data 
- (DEMUD), principal component analysis (PCA), Reed-Xiaoli (RX) detector, 
+ (DEMUD)~\citep{wagstaff:demud13}, principal component analysis (PCA),
+   Reed-Xiaoli (RX) detector,  
  Local RX, negative sampling, and probabilistic autoencoder. Given a set of
   data samples, each algorithm assigns an outlier score to each sample. DORA
    provides results organization and visualization modules to help users 
@@ -271,6 +272,18 @@ Hannah to add architecture figure. Add descriptions of each layer of modules:
 \paragraph{Ranking algorithms} We implemented 7 algorithms for scoring and 
 ranking samples by outlierness. [Describe each algorithm briefly and how they 
 complement each other.]
+
+The DEMUD algorithm~\citep{wagstaff:demud13} differs from other
+outlier ranking methods: instead of independently scoring all
+observations, DEMUD incrementally identifies the most unusual
+remaining item, then incorporates it into the model of ``known''
+(non-outlier) observations before selecting the next most unusual
+item.  DEMUD's goal is to identify diverse outliers and avoid
+redundant selections.  Once an outlier is encountered, repeated
+occurrences of that outlier are deprioritized.  Methods that score
+outliers independently maximize coverage of outliers, while DEMUD
+maximizes the fast discovery of distinct outlier types.
+
 \paragraph{Results organization} Eric, Umaa, Steven, Vinay
 \paragraph{Outlier visualization} Jake?
 
@@ -343,3 +356,10 @@ datasets e.g. FAO, Matt Pritchard, DES, other CIF team members?
 
 
 \end{document}
+
+% LocalWords:  tex OOD Eigenbasis DEMUD PCA Xiaoli RX autoencoder al
+% LocalWords:  Pimentel mislabeled Liang Böhm wagstaff demud Xiong
+% LocalWords:  Storey Hayat des anom Lochner Chiang Zhou Liu Alvera
+% LocalWords:  Azcárate Touati Prochaska Kerner kerner PyOD zhao pyod
+% LocalWords:  API Umaa Vinay Navcam MNIST FashionMNIST installable
+% LocalWords:  dora CIF SMD FAO Pritchard
