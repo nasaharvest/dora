@@ -26,6 +26,6 @@ jobs:
       - name: Lint with flake8
         run: | 
           flake8 --max-line-length 80 --per-file-ignores="__init__.py:F401" dora_exp_pipeline
-      -name: Test with pytest
-      run: |
-        pytest
+      - name: Test with pytest
+        run: |
+          pytest
