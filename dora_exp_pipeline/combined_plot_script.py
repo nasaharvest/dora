@@ -1,17 +1,19 @@
 import os
-import sys
-#sys.path.append('.')
+# import sys
+# sys.path.append('.')
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
+
 def alg_indexes(filename):
     with open(filename, 'r') as f:
         text = f.read().split("\n")[:-1]
-        scores = sorted(text, key=lambda x:float(x.split(", ")[-1]))
+        scores = sorted(text, key=lambda x: float(x.split(", ")[-1]))
         scores = [int(i.split(", ")[1]) for i in scores]
 
     return scores
+
 
 def filenames_and_labels(root):
     filesAndFolders = os.listdir(root)
@@ -29,6 +31,7 @@ def filenames_and_labels(root):
 
     return filenames, labels
 
+
 def validation_labels(filename):
     with open(filename, 'r') as f:
         text = f.read().split("\n")[:-1]
@@ -39,6 +42,7 @@ def validation_labels(filename):
         labels[int(line[0])] = int(line[1])
 
     return labels
+
 
 def get_curve(scores, validationLabels):
     x = list(range(1, len(scores)+1))
@@ -52,6 +56,7 @@ def get_curve(scores, validationLabels):
 
     return x, y
 
+
 def combine_plots(root, validationDir):
     filenames, labels = filenames_and_labels(root)
 
@@ -62,12 +67,12 @@ def combine_plots(root, validationDir):
     for i in range(len(filenames)):
         scores = alg_indexes(filenames[i])
 
-        x,y = get_curve(scores, validationLabels)
+        x, y = get_curve(scores, validationLabels)
         maxX = max(maxX, x[-1])
         maxY = max(maxY, y[-1])
 
         index = x.index(y[-1])
-        #area = np.trapz(y, x)
+        # area = np.trapz(y, x)
         area = np.trapz(y[:index+1], x[:index+1])
 
         plt.plot(x, y, label="{} Area: {}".format(labels[i], area))
@@ -82,6 +87,7 @@ def combine_plots(root, validationDir):
     axes.set_ylim(1, maxY)
     plt.savefig(f'{root}/comparison_plot_combined.png')
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', type=str, help='Path to the results directory')
@@ -90,5 +96,6 @@ def main():
 
     args = parser.parse_args()
     combine_plots(**vars(args))
+
 
 main()
