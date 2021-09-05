@@ -58,6 +58,7 @@ def get_selections_curve(scores, validationLabels):
 
 
 def get_precision_curve(scores, validationLabels):
+    tot_outliers = sum([x for x in validationLabels.values()])
     x = list(range(1, len(scores)+1))
     y = []
     numOutliers = 0
@@ -65,6 +66,9 @@ def get_precision_curve(scores, validationLabels):
         if(validationLabels[scores[i]] == 1):
             numOutliers += 1
         y.append(float(numOutliers)/(i+1))
+        if (i+1) == tot_outliers:
+            print('Precision at N=%d: %f' %
+                  (tot_outliers, float(numOutliers)/(i+1)))
 
     return x, y
 
@@ -94,6 +98,7 @@ def combine_plots(resultsdir, label_path, precision_at_n):
         scores = alg_indexes(filenames[i])
 
         if precision_at_n:
+            print(labels[i])
             x, y = get_precision_curve(scores, validationLabels)
             plt.plot(x, y, label="{}".format(labels[i]))
         else:
