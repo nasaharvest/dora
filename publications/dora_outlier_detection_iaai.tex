@@ -347,15 +347,15 @@ Many Earth science applications using satellite Earth observation (EO) data
  %
  We used a dataset of ground
  observations of fall army worm (FAW) in maize crops collected by the UN Food
- and Agriculture Organization (FAO). This dataset includes \todo{7XXX} samples
- with location (latitude/longitude) metadata covering \todo{a few countries}. 
- Most locations coincide with crop
+ and Agriculture Organization (FAO). This dataset includes 6,757 samples
+ with location (latitude/longitude) metadata primarily in Africa and Southeast
+ Asia. Most locations coincide with crop
  fields but there are many outliers that coincide with other land cover types 
  such as water, buildings, or forests. We constructed an evaluation set 
- consisting of all samples in Kenya ($n=XX$) and manually annotated whether 
+ consisting of all samples in Kenya ($n=113$) and manually annotated whether 
  each sample was considered an inlier (i.e., located in a crop field) or not 
  using high-resolution Planet satellite images in Collect Earth 
- Online~\cite{planetdata} ($n_{inlier}=XX$, $n_{outlier}=XX$). We used Google
+ Online~\cite{planetdata} ($n_{inlier}=76$, $n_{outlier}=37$). We used Google
  Earth Engine to export the Sentinel-1 synthetic aperture radar (SAR) monthly
  time series for each sample location, using data from year each sample was 
  collected. We used SAR data because it is sensitive to ground texture and
@@ -363,9 +363,8 @@ Many Earth science applications using satellite Earth observation (EO) data
   by the dataset. Our goal for this application is to assess how well the 
   selections made by each algorithm correlate with outliers determined by
   visual inspection of the satellite images.
- \todo{If we have time, I want to replace this with a different dataset and 
- experiment that is in progress that evaluates the downstream classifier
- performance before and after applying DORA.}
+ \todo{If we have time, I want to also evaluate the downstream classifier
+ performance before and after removing top N outliers with DORA.}
 
 % Decided to cut this use case to make the presentation simpler (only one
 % Earth science use case, and we already have a 1-band image dataset
