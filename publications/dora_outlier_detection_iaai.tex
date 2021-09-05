@@ -294,9 +294,15 @@ maximizes the fast discovery of distinct outlier types.
 \section{Experiments}
 
 \subsection{Datasets}
-Describe the datasets overall and our motivation for choosing these. Maybe add
+We constructed three datasets to evaluate the utility of DORA and the
+performance of each ranking algorithm for a variety of scientific domains
+ (astrophysics, planetary science, and Earth science). We also included a 
+ benchmark dataset that uses MNIST and FashionMNIST. Here we describe
+ the details of each dataset.
+\todo{Maybe add
  a table with number of samples, number of reference known outliers (if 
- available), etc, if room? 
+ available), etc, if room? }
+ \todo{Can we make any of these datasets publicly available with the paper?}
 
 \subsubsection{Astrophysical objects in Dark Energy Survey}
 Umaa
@@ -306,11 +312,12 @@ Mars exploration is fundamentally an exercise in discovery with the
 goal of increasing our understanding of the history, evolution,
 composition, and currently active processes on Mars.  Outliers
 identified in Mars observations can inspire new discoveries and inform
-the choice of which areas merit follow-up, deeper
+the choice of which areas merit follow-up or deeper
 investigation~\cite{kerner2020comparison,wagstaff:rover-novelty20}.
-We collected \todo{XXX} images from the Mars Science Laboratory's
-Navigation camera (Navcam) and employed the Rockster~\cite{burl:rockster16}
-method used by onboard rover software to identify candidate rock
+We collected \todo{XXX} images from the Navigation camera (Navcam) 
+onboard the Mars Science Laboratory (MSL) rover
+and employed the Rockster~\cite{burl:rockster16}
+method currently used by onboard rover software to identify candidate rock
 targets with an area of at least 100 pixels, yielding \num{6005}
 targets.  We cropped out a \num{64}$\times$\num{64} pixel image
 centered on each target.
@@ -324,7 +331,41 @@ methods would be most suitable for informing onboard decisions about
 follow-up observations.
 
 \subsubsection{Satellite time series for ground-truth observations}
-Hannah: Describe the Earth crop field data set and applications
+Many Earth science applications using satellite Earth observation (EO) data
+ require ground-truth observations for understanding and modeling ground-
+ identified objects in the satellite observations. These ground observations
+ also serve as labels that are paired with satellite data inputs for machine 
+ learning models. For example, a model trained to classify crop types in
+ satellite observations requires geo-referenced labels of crop type annotated
+ in the field~\cite{tseng2021learning}. A widespread challenge of using ground-
+ annotated datasets is that there are often points with erroneous location or 
+ label information (e.g., due to GPS location error or human entry error) that
+ need to be cleaned before the dataset can be used for machine learning or
+ other downstream use cases. Automatically detecting these outliers could save 
+ substantial time required for cleaning datasets and improve the performance of
+ downstream analyses that rely on high-quality datasets. 
+ %
+ We used a dataset of ground
+ observations of fall army worm (FAW) in maize crops collected by the UN Food
+ and Agriculture Organization (FAO). This dataset includes \todo{7XXX} samples
+ with location (latitude/longitude) metadata covering \todo{a few countries}. 
+ Most locations coincide with crop
+ fields but there are many outliers that coincide with other land cover types 
+ such as water, buildings, or forests. We constructed an evaluation set 
+ consisting of all samples in Kenya ($n=XX$) and manually annotated whether 
+ each sample was considered an inlier (i.e., located in a crop field) or not 
+ using high-resolution Planet satellite images in Collect Earth 
+ Online~\cite{planetdata} ($n_{inlier}=XX$, $n_{outlier}=XX$). We used Google
+ Earth Engine to export the Sentinel-1 synthetic aperture radar (SAR) monthly
+ time series for each sample location, using data from year each sample was 
+ collected. We used SAR data because it is sensitive to ground texture and
+  penetrates clouds, which is important for the often-cloudy region covered
+  by the dataset. Our goal for this application is to assess how well the 
+  selections made by each algorithm correlate with outliers determined by
+  visual inspection of the satellite images.
+ \todo{If we have time, I want to replace this with a different dataset and 
+ experiment that is in progress that evaluates the downstream classifier
+ performance before and after applying DORA.}
 
 % Decided to cut this use case to make the presentation simpler (only one
 % Earth science use case, and we already have a 1-band image dataset
@@ -384,11 +425,14 @@ pip-installable package
 
 
 \section{Acknowledgments}
-\todo{Funding/support: JPL CIF, SMD etc.}
-We thank the NASA Center Innovation Fund for supporting this work.
+We thank the NASA Center Innovation Fund and the NASA Science Mission 
+Directorate (under the NASA Cross-Divisional AI Use Case Demonstration grants)
+ for supporting this work.
 
-\todo{Acknowledge people who contributed to 
-datasets e.g. FAO, Matt Pritchard, DES, other CIF team members?}
+\todo{Acknowledge DES?}
+We thank the UN Food and Agriculture Organization (FAO) and Dr. Ritvik Sahajpal
+(University of Maryland) for providing the fall army worm ground observation
+dataset.
 
 We thank Raymond Francis for analyzing the Navcam rover images to
 identify targets considered to be ``novel'' for evaluating outlier
