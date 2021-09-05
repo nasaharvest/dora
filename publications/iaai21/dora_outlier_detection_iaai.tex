@@ -330,7 +330,7 @@ algorithm correlate with human novelty judgments to determine which
 methods would be most suitable for informing onboard decisions about
 follow-up observations.
 
-\subsubsection{Satellite time series for ground-truth observations}
+\subsubsection{Satellite time series for ground-truth observations.}
 Many Earth science applications using satellite Earth observation (EO) data
  require ground-truth observations for understanding and modeling ground-
  identified objects in the satellite observations. These ground observations
@@ -396,8 +396,43 @@ $D_{s+}$.  And/or, report average rank of novel targets if alg ranks all
 $|D_{s+}|$ targets. If time/room permits, do this for different values
 of $s$.} 
 
-\subsubsection{Satellite time series for ground-truth observations}
-Hannah: Describe the Earth crop field data set and applications
+\subsubsection{Satellite time series for ground-truth observations.}
+We used the full dataset of 6,757 samples to fit the ranking algorithms and
+used the independently-labeled set of 113 points in Kenya for evaluation.
+Table \ref{fig:faw_results} compares the performance of each ranking 
+algorithm by plotting the number of true outliers detected out of the top
+$N$ selections. We reported the area under the curve (AUC) in the legend
+for each algorithm to give a quantitative comparison of the curves.
+Table \ref{tab:faw_results} gives the precision at $N$ where
+$N=n_{outlier}=37$. The negative sampling algorithm had the best performance
+in both metrics. RX had the lowest precision at $N=n_{outlier}$ while PCA had
+the lowest AUC of all algorithms except random. 
+
+\begin{table}
+  \caption{Precision at $N=n_{outlier}$ for Earth science dataset. }
+  \label{tab:faw_results}
+  \centering
+  \begin{tabular}{cc}
+    \hline
+    Algorithm & Precision at $N=n_{outlier}$ \\
+    \hline
+    RX & 0.30 \\
+    Random & 0.32 \\
+    DEMUD & 0.32 \\
+    PCA & 0.35 \\
+    Isolation Forest & 0.46 \\
+    \textbf{Negative Sampling} & \textbf{0.54} \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/faw_combined_plot.pdf}
+    \caption{Plot of number of true outliers ranked in top $N$ selections for 
+    Earth science dataset.}
+    \label{fig:faw_results}
+\end{figure}
 
 %\subsubsection{Volcanic thermal anomalies}
 
