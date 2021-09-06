@@ -266,17 +266,46 @@ domains?
 
 \section{Methods}
 
-\subsection{DORA configurable pipeline} Steven please add details about the 
-approach/design choices for this pipeline. Mention that additional data types, 
-feature extraction methods, ranking algorithms, and results organization and 
-visualization modules can easily be added and integrated if they follow the API. 
-Hannah to add architecture figure. Add descriptions of each layer of modules: 
-\paragraph{Data types} Hannah
-\paragraph{Feature extraction} Hannah 
-\paragraph{Ranking algorithms.} We implemented 7 algorithms for scoring and 
-ranking samples by outlierness. [Describe each algorithm briefly and how they 
-complement each other.]
+\subsection{DORA configurable pipeline} 
+Figure \ref{fig:dora} illustrates the architecture of DORA.
+\todo{Steven please add a couple sentences about the
+approach/design choices for this pipeline.} \todo{Describe the configuration
+file setup. Discuss definitions of data to fit and data to score.
+Maybe include example files in the appendix?}
+We designed DORA to be readily extensible to support additional data types or 
+formats, outlier detection algorithms, and results organization or 
+visualization methods by writing new modules that follow the DORA API.
 
+\paragraph{Data types.} We chose to initially implement data loaders for four
+data types that are commonly used by the machine learning and domain science
+communities: time series, feature vectors, images (grayscale or RGB), and 
+$N$-band rasters. $N$-band rasters are essentially images in which every pixel
+is associated with a location defined by a geographic coordinate reference 
+system (e.g., latitude/longitude in degrees). Most satellite data are 
+distributed as rasters; common formats include GeoTIFF, NetCDF, and 
+\todo{HDF}. A data loader for each data type locates the data by the path(s)
+defined in the configuration file and loads samples into a dictionary of numpy
+ arrays indexed by the sample id. This $data_dict$ (\todo{format as 
+ fixed-width}) is then passed to each of the ranking algorithms specified in 
+ the configuration file.
+
+\paragraph{Outlier ranking algorithms.} We implemented 7 algorithms for 
+scoring and 
+ranking samples by outlierness. We chose these algorithms to include a diverse
+set of approaches to scoring outliers since different algorithms may have 
+better performance for different datasets and use cases. 
+%We describe each
+%approach to scoring outliers and the associated methods below.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/dora-system-diagram-v5.pdf}
+    \caption{DORA pipeline architecture.}
+    \label{fig:dora}
+\end{figure}
+
+\subparagraph{Reconstruction error.}
+\todo{Describe PCA: Hannah.}
 The DEMUD algorithm~\citep{wagstaff:demud13} differs from other
 outlier ranking methods: instead of independently scoring all
 observations, DEMUD incrementally identifies the most unusual
@@ -288,8 +317,40 @@ occurrences of that outlier are deprioritized.  Methods that score
 outliers independently maximize coverage of outliers, while DEMUD
 maximizes the fast discovery of distinct outlier types.
 
-\paragraph{Results organization} Eric, Umaa, Steven, Vinay
-\paragraph{Outlier visualization} Jake?
+\subparagraph{Distance.}
+\todo{Describe RX and Local RX: Hannah.}
+
+\subparagraph{Sparsity.}
+\todo{Describe isolation forest: Umaa.}
+
+\subparagraph{Likelihood.}
+\todo{Describe PAE: Hannah or Bryce (if it is ready to be included.)}
+\todo{Describe negative sampling: Steven.}
+
+\paragraph{Results organization.} 
+Each of the outlier ranking algorithms returns an array containing the sample
+index, outlier score, and selection index (index of each sample after sorting
+by outlier score). DORA provides results organization modules intended to help
+ users interpret and make decisions based on these outputs. The simplest 
+ module saves a CSV of the samples sorted by their outlier score 
+ (i.e., selection order). Clustering the top
+  $N$ outlier selections can enable users to investigate the different types of 
+ outliers that might be present in the dataset; this could be especially useful
+ for separating outliers caused by noise or data artifacts vs. scientifically 
+ interesting samples. We implemented the K-means and self-organizing maps 
+ (SOMs) algorithms for clustering the top-N outliers. For use cases in which an
+ evaluation dataset containing known outliers is available, we provide a module
+ to assess how well algorithm selections correlate with known outliers. This is
+ done by plotting the number of true outliers vs. number of selections made. 
+ This can also be represented as the precision at $N$ (\todo{add ref?}), i.e., 
+ the number of true outliers divided by the number of selections $N$. Finally,
+ we provide a module for plotting histograms of outlier scores to visualize the
+ distribution of scores in the dataset (which may be, e.g., multimodal or 
+ long-tailed).
+
+\paragraph{Results visualization.} 
+\todo{Jake: describe website if ready by deadline.}
+\todo{Eric: describe causal graphs if added by deadline.}
 
 \section{Experiments}
 
@@ -304,8 +365,8 @@ performance of each ranking algorithm for a variety of scientific domains
  available), etc, if room? }
  \todo{Can we make any of these datasets publicly available with the paper?}
 
-\subsubsection{Astrophysical objects in Dark Energy Survey}
-Umaa
+\subsubsection{Astrophysical objects in Dark Energy Survey.}
+\todo{Umaa}
 
 \subsubsection{Targets in Mars rover images.}
 Mars exploration is fundamentally an exercise in discovery with the
@@ -371,16 +432,18 @@ Many Earth science applications using satellite Earth observation (EO) data
 % (Navcam). 
 %\subsubsection{Volcanic thermal anomalies}
 
-\subsubsection{MNIST and FashionMNIST}
-We added this to have a traditional benchmark and use case demonstration. 
+\subsubsection{MNIST and FashionMNIST.}
+We added this to demonstrate the capabilities of DORA with a traditional
+benchmark dataset. \todo{Bryce. TBD if we will end up including due to
+space and/or relevance.}
 
 \subsection{Results}
-Discuss the overall approach to the setup of the experiments. In each 
-subsection discuss specific setup details (including evaluation metrics) for 
-each dataset then the results from the experiments.
+In this section we discuss the experimental setup and results for each dataset.
+We designed the experiments to be relevant to the real-world scientific use 
+cases associated with each dataset domain. 
 
-\subsubsection{Astrophysical objects in Dark Energy Survey}
-Umaa
+\subsubsection{Astrophysical objects in Dark Energy Survey.}
+\todo{Umaa}
 
 \subsubsection{Targets in Mars rover images.}
 We simulated the operational setting in which the rover has observed
@@ -429,31 +492,36 @@ the lowest AUC of all algorithms except random.
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/faw_combined_plot.pdf}
-    \caption{Plot of number of true outliers ranked in top $N$ selections for 
+    \caption{Number of true outliers ranked in top $N$ selections for 
     Earth science dataset.}
     \label{fig:faw_results}
 \end{figure}
 
 %\subsubsection{Volcanic thermal anomalies}
 
-\subsubsection{MNIST and FashionMNIST}
-We added this to have a traditional benchmark and use case demonstration. 
+\subsubsection{MNIST and FashionMNIST.}
+\todo{Bryce. TBD if we will end up including due to
+space and/or relevance.}
 
 
 \section{Discussion}
+\todo{ 
+Potential topics TBD based on results:
 \begin{itemize}
 \item Discuss results from experiments
 \item Challenges of evaluating results in outlier detection?
-\item Downstream use of results in science applications/Path to deployment
+\item Downstream use of results in science applications
 \end{itemize}
+}
+\paragraph{Path to deployment.} \todo{Hannah - describe pip-installable
+package, open-source for extension by the wider scientific community, etc.}
 
 \section{Conclusions}
-Summarize conclusions and plans for future work, including public 
-pip-installable package
-
-[Note: these datasets could also be used by other researchers as OOD
+\todo{
+Summarize conclusions and plans for future work
+[Note that these datasets could also be used by other researchers as OOD
  benchmark tasks?]
-
+}
 
 \bibliography{dora_references}
 
@@ -465,8 +533,8 @@ Directorate (under the NASA Cross-Divisional AI Use Case Demonstration grants)
 
 \todo{Acknowledge DES?}
 We thank the UN Food and Agriculture Organization (FAO) and Dr. Ritvik Sahajpal
-(University of Maryland) for providing the fall army worm ground observation
-dataset.
+(University of Maryland/NASA Harvest) for providing the fall army worm ground
+ observation dataset.
 
 We thank Raymond Francis for analyzing the Navcam rover images to
 identify targets considered to be ``novel'' for evaluating outlier
