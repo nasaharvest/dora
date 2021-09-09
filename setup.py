@@ -4,7 +4,7 @@ exec(open('dora_exp_pipeline/version.py').read())
 
 setup(
     name='dora_exp_pipeline',
-    version=__version__,
+    version=__version__,  # noqa: F821
     description='DORA Experiment Pipeline',
     url='https://github.com/nasaharvest/dora',
     author='DORA team',
@@ -24,7 +24,7 @@ setup(
         'tqdm==4.62.0',
         'tensorflow==2.5.1',
         'tensorflow-probability==0.13.0',
-        'tensorflow-addons==0.13.0'
+        'tensorflow-addons==0.13.0',
         'sklearn-som==1.1.0'
     ],
     provide=[

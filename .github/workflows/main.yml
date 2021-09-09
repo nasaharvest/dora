@@ -25,7 +25,7 @@ jobs:
           pip install .
       - name: Lint with flake8
         run: | 
-          flake8 --max-line-length 80 --per-file-ignores="__init__.py:F401" dora_exp_pipeline
+          flake8 --max-line-length 80
         
       - name: Test with pytest
         if: github.ref == 'refs/heads/issue14-unittests'
