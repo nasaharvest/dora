@@ -8,7 +8,9 @@ from six import add_metaclass
 from abc import ABCMeta, abstractmethod
 import matplotlib.pyplot as plt
 import numpy as np
+import rasterio as rio
 from sklearn.cluster import KMeans
+from sklearn_som.som import SOM
 
 
 METHOD_POOL = []
@@ -51,13 +53,14 @@ class ResultsOrganization(object):
             return False
 
     def run(self, data_ids, dts_scores, dts_sels, data_to_score,
-            outlier_alg_name, out_dir, logger, seed, **params):
+            outlier_alg_name, out_dir, logger, seed, top_n, **params):
         self._run(data_ids, dts_scores, dts_sels, data_to_score,
-                  outlier_alg_name, out_dir, logger, seed, **params)
+                  outlier_alg_name, out_dir, logger, seed, top_n,
+                  **params)
 
     @abstractmethod
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
-             outlier_alg_name, logger, seed, **params):
+             outlier_alg_name, logger, seed, top_n, **params):
         raise RuntimeError('This function must be implemented in a child class')
 
 
@@ -66,7 +69,7 @@ class SaveScoresCSV(ResultsOrganization):
         super(SaveScoresCSV, self).__init__('save_scores')
 
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
-             outlier_alg_name, out_dir, logger, seed):
+             outlier_alg_name, out_dir, logger, seed, top_n):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             if logger:
@@ -89,21 +92,20 @@ class SaveComparisonPlot(ResultsOrganization):
     def __init__(self):
         super(SaveComparisonPlot, self).__init__('comparison_plot')
 
-    def _run(self, data_ids, dts_scores, dts_sels, data_to_score, alg_name,
-             out_dir, logger, seed, validation_dir):
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, top_n, validation_dir):
         if(not(os.path.exists(out_dir))):
             os.makedirs(out_dir)
 
         # Outliers will be 1s and inliers will be 0s.
         labels = self._get_validation_labels(validation_dir)
-        scores = np.argsort(dts_scores)[::-1]
 
-        x = list(range(1, len(scores)+1))
+        x = list(range(1, len(dts_sels)+1))
         y = []
         numOutliers = 0
 
-        for i in range(len(scores)):
-            if(labels[scores[i]] == 1):
+        for i in range(len(dts_sels)):
+            if(labels[dts_sels[i]] == 1):
                 numOutliers += 1
             y.append(numOutliers)
 
@@ -111,7 +113,8 @@ class SaveComparisonPlot(ResultsOrganization):
         index = x.index(y[-1])
         area = np.trapz(y[:index+1], x[:index+1])
 
-        plt.plot(x, y, label=alg_name)
+        plt.plot(x, y, label=outlier_alg_name)
+        plt.plot(x, x, label='Best Line')
         plt.plot([], [], ' ', label=f'Area: {area}')
         plt.title('Correct Outliers vs Selected Outliers')
         plt.xlabel('Number of Outliers Selected')
@@ -119,7 +122,7 @@ class SaveComparisonPlot(ResultsOrganization):
         plt.legend()
         axes.set_xlim(1, x[-1])
         axes.set_ylim(1, y[-1])
-        plt.savefig(f'{out_dir}/comparison_plot_{alg_name}.png')
+        plt.savefig(f'{out_dir}/comparison_plot_{outlier_alg_name}.png')
 
     def _get_validation_labels(self, validation_dir):
         with open(validation_dir, 'r') as f:
@@ -142,7 +145,7 @@ class KmeansCluster(ResultsOrganization):
         super(KmeansCluster, self).__init__('kmeans')
 
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
-             outlier_alg_name, out_dir, logger, seed, n_clusters):
+             outlier_alg_name, out_dir, logger, seed, top_n, n_clusters):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             if logger:
@@ -172,6 +175,126 @@ class KmeansCluster(ResultsOrganization):
 kmeans_cluster = KmeansCluster()
 register_org_method(kmeans_cluster)
 
+
+class SOMCluster(ResultsOrganization):
+    def __init__(self):
+        super(SOMCluster, self).__init__('som')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, top_n, n_clusters):
+        if not os.path.exists(out_dir):
+            os.mkdir(out_dir)
+            if logger:
+                logger.text(f'Created output directory: {out_dir}')
+
+        out_file = open(f'{out_dir}/SOM-{outlier_alg_name}.csv', 'w')
+
+        data_to_cluster = []
+        for dts_ind in dts_sels:
+            data_to_cluster.append(data_to_score[dts_ind])
+        data_to_cluster = np.array(data_to_cluster, dtype=float)
+
+        som = SOM(m=n_clusters, n=1, dim=len(data_to_cluster[0]))
+        som.fit(data_to_cluster)
+        groups = som.predict(data_to_cluster)
+
+        for ind, (s_ind, dts_id, group) in enumerate(zip(dts_sels, data_ids,
+                                                         groups)):
+            out_file.write(f'{ind}, {s_ind}, {dts_id}, {group}\n')
+
+        out_file.close()
+
+
+som_cluster = SOMCluster()
+register_org_method(som_cluster)
+
+
+class ReshapeRaster(ResultsOrganization):
+    def __init__(self):
+        super(ReshapeRaster, self).__init__('reshape_raster')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, top_n,
+             raster_path, data_format, patch_size, colormap):
+        if not os.path.exists(out_dir):
+            os.mkdir(out_dir)
+            if logger:
+                logger.text(f'Created output directory: {out_dir}')
+
+        # Read the raster metadata
+        with rio.open(raster_path) as src:
+            height = src.meta['height']
+            width = src.meta['width']
+
+        # Reshape scores to original raster dimensions
+        if data_format == 'pixels':
+            # Check that top_n wasn't specified to be a subset of the pixels
+            if top_n != (height*width):
+                raise RuntimeError('Cannot use top_n with ReshapeRaster')
+            # Reorder scores to be in original index order, not sorted by score
+            scores = [s for _, s in sorted(zip(data_ids, dts_scores),
+                                           key=lambda pair: pair[0])]
+            scores = np.reshape(np.array(scores), [height, width])
+        elif data_format == 'patches':
+            # Check that top_n wasn't specified to be a subset of the pixels
+            if top_n != ((height-(patch_size-1))*(width-(patch_size-1))):
+                raise RuntimeError('Cannot use top_n with ReshapeRaster')
+            scores = np.zeros([height, width])
+            for ex, idx in enumerate(data_ids):
+                # get the patch center coordinates
+                i, j = idx.split('-')
+                i = int(i)
+                j = int(j)
+                # fill in the score for that index
+                scores[i, j] = dts_scores[ex]
+        else:
+            raise RuntimeError("data_format must be 'pixels' or 'patches'")
+
+        # Save as a preview image
+        fig, ax = plt.subplots(1)
+        plt.imshow(scores, cmap=colormap)
+        plt.savefig(f'{out_dir}/scores_image_{outlier_alg_name}.png')
+
+        # Save as raster
+        with rio.open(raster_path) as src:
+            profile = src.profile
+            profile.update(
+                count=1,
+                dtype=scores.dtype)
+            with rio.open(f'{out_dir}/scores_raster_{outlier_alg_name}.tif',
+                          'w',
+                          **profile) as dst:
+                dst.write(scores, 1)
+
+
+reshape_raster = ReshapeRaster()
+register_org_method(reshape_raster)
+
+
+class SaveHistogram(ResultsOrganization):
+    def __init__(self):
+        super(SaveHistogram, self).__init__('histogram')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score, alg_name,
+             out_dir, logger, seed, bins):
+        if(not(os.path.exists(out_dir))):
+            os.makedirs(out_dir)
+
+        scores = sorted(dts_scores)
+        fig, axs = plt.subplots()
+        # numBins = int((scores[-1]-scores[0])/increment)+1
+        # print(scores[0], scores[-1], increment, numBins)
+
+        yVals, bins, patches = axs.hist(scores, bins, density=True, alpha=0.5)
+
+        plt.title('Histogram of Anomaly Scores')
+        plt.xlabel('Score')
+        plt.ylabel('Frequency')
+        plt.savefig(f'{out_dir}/histogram_bar_graph-{alg_name}.png')
+
+
+save_histogram = SaveHistogram()
+register_org_method(save_histogram)
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").
 # U.S. Government sponsorship acknowledged.

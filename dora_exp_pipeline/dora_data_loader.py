@@ -98,7 +98,7 @@ class ImageLoader(DataLoader):
                 im_pil = Image.open(f)
                 im_data = np.array(im_pil)
                 im_pil.close()
-            elif file_ext == '.img':
+            elif file_ext.lower() == '.img':
                 im = PDS3Image.open(f)
                 im_data = im.image
             else:
@@ -115,9 +115,43 @@ image_loader = ImageLoader()
 register_data_loader(image_loader)
 
 
-class RasterLoader(DataLoader):
+class ImageDirectoryLoader(DataLoader):
     def __init__(self):
-        super(RasterLoader, self).__init__('raster')
+        super(ImageDirectoryLoader, self).__init__('image_dir')
+
+    def _load(self, dir_path: str) -> dict:
+        if not os.path.exists(dir_path):
+            raise RuntimeError(f'Directory not found: '
+                               f'{os.path.abspath(dir_path)}')
+
+        # List of supported file types
+        file_types = tuple(['.jpg', '.png', '.bmp', '.gif'])
+
+        file_list = glob.glob('%s/*' % dir_path)
+        file_ids = [os.path.basename(f) for f in file_list]
+
+        is_supported = [filename.endswith(file_types) for filename in file_list]
+        if not np.all(is_supported):
+            raise RuntimeError(f'The image directory loader only supports '
+                               f'{", ".join(file_types)}')
+
+        # Add extra dimension to match format of other input data
+        file_data = [[filename] for filename in file_list]
+        data_dict = {
+            'id': file_ids,
+            'data': file_data
+        }
+
+        return data_dict
+
+
+image_directory_loader = ImageDirectoryLoader()
+register_data_loader(image_directory_loader)
+
+
+class RasterPixelLoader(DataLoader):
+    def __init__(self):
+        super(RasterPixelLoader, self).__init__('raster_pixels')
 
     def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):
@@ -142,7 +176,6 @@ class RasterLoader(DataLoader):
                 # vectors where each pixel is a feature vector
                 img = np.reshape(img, [img.shape[0]*img.shape[1],
                                        img.shape[2]])
-                print(img.shape)
                 # set the ID to the index of the pixel
                 data_dict['id'] = range(img.shape[0])
                 data_dict['data'] = list(img)
@@ -154,8 +187,53 @@ class RasterLoader(DataLoader):
         return data_dict
 
 
-raster_loader = RasterLoader()
-register_data_loader(raster_loader)
+raster_pixel_loader = RasterPixelLoader()
+register_data_loader(raster_pixel_loader)
+
+
+class RasterPatchLoader(DataLoader):
+    def __init__(self):
+        super(RasterPatchLoader, self).__init__('raster_patches')
+
+    def _load(self, dir_path: str, patch_size: int) -> dict:
+        if not os.path.exists(dir_path):
+            raise RuntimeError(f'Directory not found: '
+                               f'{os.path.abspath(dir_path)}')
+
+        # List of supported file types
+        file_types = ['.tif']
+
+        data_dict = dict()
+        data_dict.setdefault('id', [])
+        data_dict.setdefault('data', [])
+
+        if dir_path.endswith('.tif'):
+            # Load the raster
+            with rio.open(dir_path) as src:
+                img = src.read()
+                # rasterio reads images in channels-first order
+                # we want to put it in channels-last order
+                img = np.moveaxis(img, 0, -1)
+                # extract patches from raster image
+                # i, j are patch center coordinates
+                w = int(patch_size/2)
+                for i in range(w, img.shape[0]-w):
+                    for j in range(w, img.shape[1]-w):
+                        patch = img[i-w:i+(w + 1), j-w:j+(w + 1)]
+                        # append the patch coordinate as the id
+                        data_dict['id'].append('%d-%d' % (i, j))
+                        # append the patch data
+                        data_dict['data'].append(patch.flatten())
+        else:
+            raise RuntimeError(f'File extension not supported. '
+                               f'Valid file extensions: '
+                               f'{file_types}')
+
+        return data_dict
+
+
+raster_patch_loader = RasterPatchLoader()
+register_data_loader(raster_patch_loader)
 
 
 class FeatureVectorLoader(DataLoader):
@@ -209,8 +287,6 @@ class TimeSeriesLoader(DataLoader):
         data_dict.setdefault('id', [])
         data_dict.setdefault('data', [])
 
-        # TODO: add support for other data types
-        # (e.g., .h5 dataframes, .npy)
         if dir_path.endswith('.csv'):
             # Load the csv data
             with open(dir_path, 'r') as csv_file:

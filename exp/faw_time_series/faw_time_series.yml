@@ -1,12 +1,12 @@
 # Data loading module parameters
-data_type: {
+data_loader: {
     name: 'Time series',
     params: {}
 }
 data_to_fit: 'sample_data/earth_fieldsamples/points_to_fit.csv'
 data_to_score: 'sample_data/earth_fieldsamples/kenya_points_to_predict.csv'
 zscore_normalization: False
-out_dir: 'PATH/TO/OUTPUT/DIR'
+out_dir: 'exp/faw_time_series/results'
 
 # Feature extraction module
 features: {
@@ -16,10 +16,15 @@ features: {
 }
 
 # Outlier detection module
-top_n: 10
+top_n: None
 outlier_detection: {
-    iforest: {},
+    iforest: {
+        n_trees: 100
+    },
     pca: {
+        k: 3
+    },
+    demud: {
         k: 3
     },
     rx: {},
@@ -32,7 +37,10 @@ outlier_detection: {
 # Results organization module
 results: {
     comparison_plot: {
-        'validation_dir': 'sample_data/earth_fieldsamples/kenya_labels.csv'
+       'validation_dir': 'sample_data/earth_fieldsamples/kenya_labels.csv'
     },
-    save_scores: {}
+    save_scores: {},
+    # histogram: {
+    #      'bins': 25
+    # }
 }

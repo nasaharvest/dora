@@ -1,6 +1,6 @@
 # Data loading module parameters
-data_type: {
-    name: 'FeatureVector',
+data_loader: {
+    name: 'Catalog',
     params: {}
 }
 data_to_fit: '/home/urebbapr/research/dora/sample_data/astronomy_des/Y3_mastercat_12_3_19_SOMv0.21_indexselect_p0.0001_lups_colors.h5'
@@ -18,7 +18,9 @@ features: {
 # Outlier detection module
 top_n: 10
 outlier_detection: {
-    iforest: {},
+    iforest: {
+        n_trees: 100
+    },
     pca: {
         k: 3
     },
@@ -32,6 +34,9 @@ outlier_detection: {
 # Results organization module
 results: {
     kmeans: {
+        n_clusters: 5
+    }
+    som: {
         n_clusters: 5
     }
 }

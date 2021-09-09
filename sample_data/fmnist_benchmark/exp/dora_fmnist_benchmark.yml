@@ -1,0 +1,34 @@
+# Data loading module parameters
+data_loader: {
+    name: 'image_dir',
+    params: {}
+}
+data_to_fit: 'sample_data/fmnist_benchmark/images_fit'
+data_to_score: 'sample_data/fmnist_benchmark/images_score'
+zscore_normalization: False
+out_dir: 'sample_data/fmnist_benchmark/exp/results'
+
+# Feature extraction module
+features: {
+    raw_values: {
+        # no args
+    }
+}
+
+# Outlier detection module
+top_n: 10
+outlier_detection: {
+    pae: {
+        latent_dim: 32,
+        max_epochs: 1000,
+        patience: 10,
+        optimizer: 'adam',
+        val_split: 0.25,
+        log_dir: 'sample_data/fmnist_benchmark/exp/logs'
+    }
+}
+
+# Results organization module
+results: {
+    save_scores: {}
+}

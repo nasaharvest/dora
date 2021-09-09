@@ -52,9 +52,11 @@ class OutlierDetection(object):
     def run(self, dtf: np.ndarray, dts: np.ndarray, dts_ids: list, out_dir: str,
             results_org_dict: dict, top_n: int, logger: LogUtil, seed: int,
             **kwargs) -> None:
-        if dtf is not None:
-            dtf = dtf.astype(np.float32)
-        dts = dts.astype(np.float32)
+        # Don't try to convert strings (i.e. filenames) to float32
+        if dts.dtype.type is not np.str_:
+            if dtf is not None:
+                dtf = dtf.astype(np.float32)
+            dts = dts.astype(np.float32)
 
         if top_n is None:
             top_n = len(dts)
@@ -81,7 +83,7 @@ class OutlierDetection(object):
             res_org_method = get_res_org_method(res_org_name)
             res_org_method.run(results['dts_ids'], results['scores'],
                                results['sel_ind'], dts, self._ranking_alg_name,
-                               sub_dir, logger, seed, **res_org_params)
+                               sub_dir, logger, seed, top_n, **res_org_params)
 
     @staticmethod
     def dict_to_str(params_dict: dict()) -> str:
@@ -91,7 +93,7 @@ class OutlierDetection(object):
         """
         ret_string = ''
         for k, v in params_dict.items():
-            ret_string += '-%s=%s' % (k, v)
+            ret_string += '-%s=%s' % (k, str(v).replace('/', ''))
 
         return ret_string
 
