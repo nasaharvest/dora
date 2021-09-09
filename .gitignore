@@ -7,6 +7,14 @@ sample_data/planetary_rover/pds/exp/sol01371
 sample_data/planetary_rover/png/exp/results
 sample_data/planetary_rover/png/exp/*.log
 
+# OS X
+.DS_Store
+
+# Electron/npm/yarn
+dora_vis/node_modules
+dora_vis/dist
+dora_vis/build
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
