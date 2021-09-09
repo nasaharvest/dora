@@ -21,7 +21,8 @@ setup(
         'PyYAML==5.4.1',
         'pandas==1.1.5',
         'rasterio==1.2.6',
-        'tqdm==4.62.0'
+        'tqdm==4.62.0',
+        'sklearn-som==1.1.0'
     ],
     provide=[
         'dora_exp_pipeline'
