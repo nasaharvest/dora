@@ -22,6 +22,9 @@ setup(
         'pandas==1.1.5',
         'rasterio==1.2.6',
         'tqdm==4.62.0',
+        'tensorflow==2.5.1',
+        'tensorflow-probability==0.13.0',
+        'tensorflow-addons==0.13.0'
         'sklearn-som==1.1.0'
     ],
     provide=[

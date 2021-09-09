@@ -10,6 +10,7 @@
 
 import os
 import sys
+import logging
 from tqdm import tqdm
 from dora_exp_pipeline.dora_config import DoraConfig
 from dora_exp_pipeline.dora_data_loader import get_data_loader_by_name
@@ -22,6 +23,7 @@ from dora_exp_pipeline.rx_outlier_detection import RXOutlierDetection
 from dora_exp_pipeline.random_outlier_detection import RandomOutlierDetection
 from dora_exp_pipeline.negative_sampling_outlier_detection import \
     NegativeSamplingOutlierDetection
+from dora_exp_pipeline.pae_outlier_detection import PAEOutlierDetection
 from dora_exp_pipeline.util import LogUtil
 from dora_exp_pipeline.dora_feature import extract_feature
 from dora_exp_pipeline.dora_feature import z_score_normalize
@@ -57,6 +59,10 @@ def register_od_algs():
     negative_sampling_outlier_detection = NegativeSamplingOutlierDetection()
     register_od_alg(negative_sampling_outlier_detection)
 
+    # Register PAE outlier detection algorithm in the pool
+    pae_outlier_detection = PAEOutlierDetection()
+    register_od_alg(pae_outlier_detection)
+
 
 def start(config_file: str, out_dir: str, log_file=None, seed=1234):
     if not os.path.exists(config_file):
@@ -82,6 +88,12 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
         if logger:
             logger.text(f'Created out_dir: '
                         f'{os.path.abspath(config.out_dir)}')
+
+    # Configure tensorflow
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'True'
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    logging.getLogger("tensorflow").setLevel(logging.ERROR)
 
     # Register all ranking algorithms supported
     register_od_algs()

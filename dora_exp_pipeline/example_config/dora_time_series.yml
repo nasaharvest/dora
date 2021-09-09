@@ -31,6 +31,9 @@ outlier_detection: {
     negative_sampling: {
         percent_increase: 20
     },
+    pae: {
+        latent_dim: 3
+    },
     random: {}
 }
 
