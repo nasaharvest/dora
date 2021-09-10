@@ -479,12 +479,13 @@ We used the full dataset of 6,757 samples to fit the ranking algorithms and
 used the independently-labeled set of 113 points in Kenya for evaluation.
 Table \ref{fig:faw_results} compares the performance of each ranking 
 algorithm by plotting the number of true outliers detected out of the top
-$N$ selections. We reported the area under the curve (AUC) in the legend
+$N$ selections. We reported the area under the curve (AUC), normalized
+by the total number of selections, in the legend
 for each algorithm to give a quantitative comparison of the curves.
 Table \ref{tab:faw_results} gives the precision at $N$ where
 $N=n_{outlier}=37$. The negative sampling algorithm had the best performance
-in both metrics. RX had the lowest precision at $N=n_{outlier}$ while PCA had
-the lowest AUC of all algorithms except random. 
+in both metrics. DEMUD, PCA, and PAE tied for the lowest precision at 
+$N=n_{outlier}$ while DEMUD and PCA tied for the lowest AUC.
 
 \begin{table}
   \caption{Precision at $N=n_{outlier}$ for Earth science dataset. }
@@ -494,12 +495,13 @@ the lowest AUC of all algorithms except random.
     \hline
     Algorithm & Precision at $N=n_{outlier}$ \\
     \hline
-    RX & 0.30 \\
     Random & 0.32 \\
-    DEMUD & 0.32 \\
-    PCA & 0.35 \\
+    DEMUD & 0.41 \\
+    PCA & 0.41 \\
+    PAE & 0.41 \\
+    RX & 0.43 \\
     Isolation Forest & 0.46 \\
-    \textbf{Negative Sampling} & \textbf{0.54} \\
+    \textbf{Negative Sampling} & \textbf{0.49} \\
     \hline
   \end{tabular}
 \end{table}
