@@ -98,14 +98,13 @@ class SaveComparisonPlot(ResultsOrganization):
 
         # Outliers will be 1s and inliers will be 0s.
         labels = self._get_validation_labels(validation_dir)
-        scores = np.argsort(dts_scores)[::-1]
 
-        x = list(range(1, len(scores)+1))
+        x = list(range(1, len(dts_sels)+1))
         y = []
         numOutliers = 0
 
-        for i in range(len(scores)):
-            if(labels[scores[i]] == 1):
+        for s in dts_sels:
+            if (labels[s] == 1):
                 numOutliers += 1
             y.append(numOutliers)
 
