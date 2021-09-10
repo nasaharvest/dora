@@ -1,6 +1,4 @@
 import os
-# import sys
-# sys.path.append('.')
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
@@ -9,7 +7,7 @@ import argparse
 def alg_indexes(filename):
     with open(filename, 'r') as f:
         text = f.read().split("\n")[:-1]
-        scores = sorted(text, key=lambda x: float(x.split(", ")[-1]))
+        scores = sorted(text, key=lambda x: float(x.split(", ")[0]))
         scores = [int(i.split(", ")[1]) for i in scores]
 
     return scores

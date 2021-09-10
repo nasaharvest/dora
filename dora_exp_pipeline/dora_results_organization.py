@@ -113,9 +113,8 @@ class SaveComparisonPlot(ResultsOrganization):
         index = x.index(y[-1])
         area = np.trapz(y[:index+1], x[:index+1])/len(labels)
 
-        plt.plot(x, y, label="{} (AUC: {:.2f})".format(outlier_alg_name, area),
-                 linestyle='--', color='k')
-        plt.plot(x, x, label='Oracle')
+        plt.plot(x, y, label="{} (AUC: {:.2f})".format(outlier_alg_name, area))
+        plt.plot(x, x, label='Oracle', linestyle='--', color='k')
         plt.title('Correct Outliers vs Selected Outliers')
         plt.xlabel('Number of Outliers Selected')
         plt.ylabel('Number of True Outliers')
