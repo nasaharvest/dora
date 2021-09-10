@@ -7,6 +7,7 @@
 # May 25, 2021
 
 import numpy as np
+from tqdm import tqdm
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
 
@@ -151,7 +152,7 @@ class DEMUDOutlierDetection(OutlierDetection):
         n_items = X.shape[1]
         orig_ind = np.arange(n_items)
         seen = initdata
-        for i in range(nsel):
+        for i in tqdm(range(nsel), desc='DEMUD'):
             # Select item with largest reconstruction error
             ind, _, score, _ = DEMUDOutlierDetection.select_next(X, U, mu)
             res['sels'] += [orig_ind[ind]]
