@@ -82,13 +82,13 @@ def combine_plots(resultsdir, label_path, precision_at_n):
     num_outliers = sum([x for x in validationLabels.values()])
 
     if precision_at_n:
-        plt.axhline(y=1, label='Best line', linestyle='--', color='k')
+        plt.axhline(y=1, label='Oracle', linestyle='--', color='k')
         plt.title('Precision at N')
         plt.xlabel('Number of selections (N)')
         plt.ylabel('Precision at N')
     else:
         bestLine = list(range(1, num_outliers+1))
-        plt.plot(bestLine, bestLine, label='Best line', linestyle='--',
+        plt.plot(bestLine, bestLine, label='Oracle', linestyle='--',
                  color='k')
         plt.title('True Outliers vs. Algorithm Selections')
         plt.xlabel('Number of selections')
@@ -104,8 +104,8 @@ def combine_plots(resultsdir, label_path, precision_at_n):
         else:
             x, y = get_selections_curve(scores, validationLabels)
             index = x.index(y[-1])
-            area = np.trapz(y[:index+1], x[:index+1])
-            plt.plot(x, y, label="{} (AUC: {})".format(labels[i], area))
+            area = np.trapz(y[:index+1], x[:index+1])/len(scores)
+            plt.plot(x, y, label="{} (AUC: {:.2f})".format(labels[i], area))
 
     axes.set_xlim(1, len(scores))
     plt.legend()
