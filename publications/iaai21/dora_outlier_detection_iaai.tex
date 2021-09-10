@@ -287,8 +287,7 @@ system (e.g., latitude/longitude in degrees). Most satellite data are
 distributed as rasters; common formats include GeoTIFF, NetCDF, and 
 \todo{HDF}. A data loader for each data type locates the data by the path(s)
 defined in the configuration file and loads samples into a dictionary of numpy
- arrays indexed by the sample id. This $data_dict$ (\todo{format as 
- fixed-width}) is then passed to each of the ranking algorithms specified in 
+ arrays indexed by the sample id. This \texttt{data\_dict} is then passed to each of the ranking algorithms specified in 
  the configuration file.
 
 \paragraph{Outlier ranking algorithms.} We implemented 7 algorithms for 
