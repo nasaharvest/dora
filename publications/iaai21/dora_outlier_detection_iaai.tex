@@ -266,14 +266,17 @@ domains?
 \section{Methods}
 
 \subsection{DORA configurable pipeline} 
-Figure \ref{fig:dora} illustrates the architecture of DORA.
-\todo{Steven please add a couple sentences about the
-approach/design choices for this pipeline.} \todo{Describe the configuration
-file setup. Discuss definitions of data to fit and data to score.
-Maybe include example files in the appendix?}
-We designed DORA to be readily extensible to support additional data types or 
-formats, outlier detection algorithms, and results organization or 
-visualization methods by writing new modules that follow the DORA API.
+Figure \ref{fig:dora} illustrates the architecture of DORA. It includes 
+data loading, feature extraction, outlier ranking, results organization, and 
+results visualizaiton modules. The DORA pipeline is implemented in Python 3.
+In order to improve the readability and execution speed of the code, we adopted
+object-oriented and functional programming practices.  We designed DORA to be 
+readily extensible to support additional data types or formats, outlier detection 
+algorithms, and results organization or visualization methods by writing new 
+modules that follow the DORA API. Experimental settings are controlled by 
+configuration files. In a configuration file, users can specify the input data, 
+feature extraction methods, normalization method, outlier ranking methods, and 
+results organization methods. 
 
 \paragraph{Data types.} We chose to initially implement data loaders for four
 data types that are commonly used by the machine learning and domain science
@@ -324,7 +327,14 @@ maximizes the fast discovery of distinct outlier types.
 
 \subparagraph{Likelihood.}
 \todo{Describe PAE: Hannah or Bryce (if it is ready to be included.)}
-\todo{Describe negative sampling: Steven.}
+The negative sampling algorithm is implemented by converting the unsupervised 
+outlier ranking problem into a semi-supervised problem. Negative (anomalous) 
+examples are created by sampling from a expanded space defined by the minimum 
+and maximum values of each dimension of the positive (normal) examples. The 
+negative and positive examples are then used to train a random forest 
+classifier. We use the posterior probabilities of the random forest classifier 
+as outlier scores, which means that the observations with higher posterior 
+probabilities are more likely to be outliers.
 
 \paragraph{Results organization.} 
 Each of the outlier ranking algorithms returns an array containing the sample
