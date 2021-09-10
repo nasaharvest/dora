@@ -265,7 +265,7 @@ domains?
 
 \section{Methods}
 
-\subsection{DORA configurable pipeline} 
+%\subsection{DORA configurable pipeline} 
 Figure \ref{fig:dora} illustrates the architecture of DORA. It includes 
 data loading, feature extraction, outlier ranking, results organization, and 
 results visualizaiton modules. The DORA pipeline is implemented in Python 3.
@@ -306,6 +306,13 @@ better performance for different datasets and use cases.
 \end{figure}
 
 \subparagraph{Reconstruction error.}
+Reconstruction-based methods aim to construct a model of a dataset by learning 
+a mapping between the data samples and a lower-dimensional representation that
+ minimizes the loss between the input and its reconstruction from the 
+ low-dimensional representation~\citep{kerner2020comparison}. The 
+ reconstruction error is used to compute the outlier score because samples
+  that are unlike the data used to fit the model will be more poorly 
+  reconstructed compared to inliers. 
 \todo{Describe PCA: Hannah.}
 The DEMUD algorithm~\citep{wagstaff:demud13} differs from other
 outlier ranking methods: instead of independently scoring all
