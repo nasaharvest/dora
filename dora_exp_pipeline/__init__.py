@@ -1,4 +1,4 @@
-from dora_exp_pipeline.version import __version__
+from dora_exp_pipeline.version import __version__  # noqa: F401
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").

@@ -11,6 +11,7 @@
 #
 
 import numpy as np
+from tqdm import tqdm
 from copy import deepcopy
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 from sklearn.model_selection import KFold
@@ -98,7 +99,7 @@ def generate_negative_example(data_train, percent_increase, random_state):
     rows, cols = data_train.shape
     negative_train = np.zeros((rows, cols), dtype=np.float32)
 
-    for dim in range(cols):
+    for dim in tqdm(range(cols), desc='Negative Sampling'):
         min_value = np.min(data_train[:, dim]) * (1 - percent_increase / 100.0)
         max_value = np.max(data_train[:, dim]) * (1 + percent_increase / 100.0)
 

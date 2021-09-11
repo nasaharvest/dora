@@ -13,6 +13,7 @@
 import warnings
 import numpy as np
 from copy import deepcopy
+from tqdm import tqdm
 from dora_exp_pipeline.outlier_detection import OutlierDetection
 
 
@@ -60,7 +61,7 @@ def compute_score(images, mu, cov):
     rows, cols = images.shape
     scores = np.ndarray(rows)
 
-    for i in range(rows):
+    for i in tqdm(range(rows), desc='RX'):
         # compute the L2 norm between input and reconstruction
         sub = images[i] - mu
         rx_score = np.dot(np.dot(sub, cov), sub.T)
