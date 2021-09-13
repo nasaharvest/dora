@@ -101,9 +101,8 @@ def combine_plots(resultsdir, label_path, precision_at_n):
             plt.plot(x, y, label="{}".format(labels[i]))
         else:
             x, y = get_selections_curve(scores, validationLabels)
-            index = x.index(y[-1])
-            area = np.trapz(y[:index+1], x[:index+1])/len(scores)
-            plt.plot(x, y, label="{} (AUC: {:.2f})".format(labels[i], area))
+            area = sum(y)/sum([i for i in range(len(scores))])
+            plt.plot(x, y, label="{} (MDR: {:.2f})".format(labels[i], area))
 
     axes.set_xlim(1, len(scores))
     plt.legend()

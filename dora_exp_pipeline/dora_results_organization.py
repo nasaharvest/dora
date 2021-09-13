@@ -104,16 +104,15 @@ class SaveComparisonPlot(ResultsOrganization):
         y = []
         numOutliers = 0
 
-        for s in dts_sels:
-            if (labels[s] == 1):
+        for i in range(len(dts_sels)):
+            if(labels[dts_sels[i]] == 1):
                 numOutliers += 1
             y.append(numOutliers)
 
         fig, axes = plt.subplots()
-        index = x.index(y[-1])
-        area = np.trapz(y[:index+1], x[:index+1])/len(labels)
+        area = sum(y)/sum([i for i in range(len(labels))])
 
-        plt.plot(x, y, label="{} (AUC: {:.2f})".format(outlier_alg_name, area))
+        plt.plot(x, y, label="{} (MDR: {:.2f})".format(outlier_alg_name, area))
         plt.plot(x, x, label='Oracle', linestyle='--', color='k')
         plt.title('Correct Outliers vs Selected Outliers')
         plt.xlabel('Number of Outliers Selected')
