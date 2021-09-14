@@ -162,13 +162,9 @@ class DataTable extends React.Component {
         accessor: "id"
       },
       {
-        Header: "Filename",
-        accessor: "fileName"
-      },
-      {
         Header: "Image",
         Cell: (row) => {
-          return <div><img height={100} src={"data:image/png;base64,"+row.row.original.imageData}/></div>;
+          return <div><img height={100} src={"data:image/png;base64,"+row.row.original.imageData} title={row.row.original.fileName}/></div>;
         },
         id: "image"
       },
