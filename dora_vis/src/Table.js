@@ -164,7 +164,13 @@ class DataTable extends React.Component {
       {
         Header: "Image",
         Cell: (row) => {
-          return <div><img height={100} src={"data:image/png;base64,"+row.row.original.imageData} title={row.row.original.fileName}/></div>;
+          return (
+          <div>
+            <a href="javascript:undefined;" onClick={() => {navigator.clipboard.writeText(row.row.original.fileName);alert(row.row.original.fileName+ " copied to clipboard.");}}>
+              <img height={100} src={"data:image/png;base64,"+row.row.original.imageData} title={row.row.original.fileName}/>
+            </a>
+          </div>
+          );
         },
         id: "image"
       },
