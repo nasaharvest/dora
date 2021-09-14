@@ -27,6 +27,9 @@ outlier_detection: {
     demud: {
         k: 3
     },
+    pae: {
+        latent_dim: 3
+    },
     rx: {},
     negative_sampling: {
         percent_increase: 20
