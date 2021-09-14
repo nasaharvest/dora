@@ -12,7 +12,52 @@ const DATALOADERS = ["image"];
 
 
 class NavBar extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleNavClick = this.handleNavClick.bind(this);
+  }
+
+  handleNavClick(e) {
+    e.preventDefault();
+    switch(e.target.innerText) {
+      case "Configure":
+        this.props.changeView("loadConfig");
+        break;
+      case "Aggregate View":
+        this.props.changeView("aggTable");
+        break;
+      case "Table View":
+        this.props.changeView("dataTable");
+        break;
+      case "Gallery View":
+        this.props.changeView("gallery");
+        break;
+      default:
+        break;
+    }
+  }
+
   render() {
+    let configureActive = "";
+    let aggregateActive = "";
+    let tableActive = "";
+    let galleryActive = "";
+    if (this.props.currView === "loadConfig" || this.props.currView === "parseConfig") {
+      configureActive = "active";
+      aggregateActive = tableActive = galleryActive = "";
+    } else if (this.props.currView === "aggTable") {
+      aggregateActive = "active";
+      configureActive = tableActive = galleryActive = "";
+    } else if (this.props.currView === "dataTable") {
+      tableActive = "active";
+      configureActive = aggregateActive = galleryActive = "";
+    } else if (this.props.currView === "gallery"){
+      galleryActive = "active";
+      configureActive = aggregateActive = tableActive = "";
+    } else {
+      configureActive = aggregateActive = tableActive = galleryActive = "";
+    }
     return(
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
@@ -23,13 +68,16 @@ class NavBar extends React.Component {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav mr-auto">
               <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="#">Configure</a>
+                <a className={"nav-link " + configureActive} href="#" onClick={this.handleNavClick}>Configure</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">Table View</a>
+                <a className={"nav-link " + aggregateActive} href="#" onClick={this.handleNavClick}>Aggregate View</a>
+              </li>
+              <li className="nav-item">
+                <a className={"nav-link " + tableActive} href="#" onClick={this.handleNavClick}>Table View</a>
               </li>
               <li className="nav-time">
-                <a className="nav-link" href="#">Gallery View</a>
+                <a className={"nav-link " + galleryActive} href="#" onClick={this.handleNavClick}>Gallery View</a>
               </li>
             </ul>
           </div>
@@ -51,6 +99,7 @@ class ConfigLoader extends React.Component {
 
   handleConfigPathChange(e) {
     /* Handle config file input field change */
+    e.preventDefault();
     this.setState({
       configPath: e.target.files[0].path,
       configFile: e.target.value
@@ -65,7 +114,7 @@ class ConfigLoader extends React.Component {
 
   render() {
     return(
-      <div>
+      <div className="container-fluid">
         <h1>Load DORA Config</h1>
         <form>
           <div className="form-group">
@@ -212,7 +261,7 @@ class ConfigParser extends React.Component {
     }
 
     return(
-      <div>
+      <div className="container-fluid">
         <h1>Parse DORA Config</h1>
         <form>
           {componentDataLoader}
@@ -233,14 +282,16 @@ class App extends React.Component {
     this.loadConfig = this.loadConfig.bind(this);
     this.setConfig = this.setConfig.bind(this);
     this.loadData = this.loadData.bind(this);
+    this.changeView = this.changeView.bind(this);
 
     this.state = {
+      viewset: ["loadConfig", "parseConfig", "dataTable"],
       view: "loadConfig",
       configData: null,
       dataLoader: null,
       dataRoot: null,
       outDir: null,
-      data: []
+      data: null
     };
   }
 
@@ -248,9 +299,9 @@ class App extends React.Component {
     try {
       const doc = yaml.load(fs.readFileSync(configPath, "utf8"));
       this.setState({
-        configData: doc,
-        view: "parseConfig"
+        configData: doc
       });
+      this.changeView("parseConfig");
     } catch (e) {
       console.log(e);
     }
@@ -260,9 +311,20 @@ class App extends React.Component {
     this.setState({
       dataLoader: setDataLoader,
       dataRoot: setDataRoot,
-      outDir: setOutDir,
-      view: "dataTable"
+      outDir: setOutDir
     })
+    this.changeView("dataTable");
+  }
+
+  changeView(view) {
+    if (this.state["viewset"].includes(view)) {
+      this.setState({
+        view: view
+      });
+      return(0);
+    } else {
+      return(1);
+    }
   }
 
   loadData(methodObject, methodName) {
@@ -314,12 +376,12 @@ class App extends React.Component {
         view = <DataTable configData={this.state["configData"]} loadData={this.loadData} data={this.state["data"]}/>;
         break;
       default:
-        view = null;
+        view = <h1> This view has not been implemented.</h1>;
     }
 
     return(
       <div> 
-        <NavBar />
+        <NavBar changeView={this.changeView} currView={this.state["view"]}/>
         {view}
       </div>
     );

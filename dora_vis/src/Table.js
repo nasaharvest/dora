@@ -137,11 +137,13 @@ class DataTable extends React.Component {
   }
 
   componentDidMount() {
-    this.props.loadData(this.props.configData["outlier_detection"], Object.keys(this.props.configData["outlier_detection"])[0]);
-    this.setState({
-      methods: Object.keys(this.props.configData["outlier_detection"]),
-      currMethod: Object.keys(this.props.configData["outlier_detection"])[0]
-    });
+    if (this.props.configData != null) {
+      this.props.loadData(this.props.configData["outlier_detection"], Object.keys(this.props.configData["outlier_detection"])[0]);
+      this.setState({
+        methods: Object.keys(this.props.configData["outlier_detection"]),
+        currMethod: Object.keys(this.props.configData["outlier_detection"])[0]
+      });
+    }
   }
 
   switchMethod(e) {
@@ -176,13 +178,22 @@ class DataTable extends React.Component {
       }
     ];
 
-    return (
-    <div>
-      <h1>{this.state["currMethod"]}</h1>
+    let datapass = null;
+    if (this.props.data == null) {
+      datapass = <h1> No DORA configuration loaded </h1>;
+    } else {
+      datapass = <>
       <Table columns={columns} data={this.props.data}/>
       <select onChange={this.switchMethod}>
         {this.state["methods"].map((method) => <option value={method}>{method}</option>)}
       </select>
+      </>;
+    }
+
+    return (
+    <div className="container-fluid">
+      <h1>{this.state["currMethod"]}</h1>
+      {datapass}
     </div>
     );
     
