@@ -505,20 +505,26 @@ in both metrics. DEMUD, PCA, and PAE tied for the lowest precision at
 $N=n_{outlier}$ while DEMUD and PCA tied for the lowest AUC.
 
 \begin{table}
-  \caption{Precision at $N=n_{outlier}$ for Earth science dataset. }
+  \caption{Precision at $N=n_{outlier}$ for three applications; the
+  best result for each data set is in bold.}
   \label{tab:faw_results}
   \centering
-  \begin{tabular}{cc}
+  \begin{tabular}{l|ccc}
     \hline
-    Algorithm & Precision at $N=n_{outlier}$ \\
+    Algorithm & Earth & Planetary & Astrophysics \\
     \hline
-    Random & 0.32 \\
-    DEMUD & 0.41 \\
-    PCA & 0.41 \\
-    PAE & 0.41 \\
-    RX & 0.43 \\
-    Isolation Forest & 0.46 \\
-    \textbf{Negative Sampling} & \textbf{0.49} \\
+    PCA               & 0.41 & 0.44 \\
+    DEMUD             & 0.41 & 0.44 \\
+    \hline
+    RX                & 0.43 & ---- \\
+    LRX               & ---- & 0.33 \\
+    \hline
+    Isolation Forest  & 0.46 & \textbf{0.56} \\
+    \hline
+    PAE               & 0.41 & 0.22 \\
+    Neg. Sampling & \textbf{0.49} & 0.33 \\
+    \hline
+    Random            & 0.32 & 0.11 \\
     \hline
   \end{tabular}
 \end{table}
