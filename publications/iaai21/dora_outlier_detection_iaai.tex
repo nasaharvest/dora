@@ -407,17 +407,25 @@ composition, and currently active processes on Mars.  Outliers
 identified in Mars observations can inspire new discoveries and inform
 the choice of which areas merit follow-up or deeper
 investigation~\cite{kerner2020comparison,wagstaff:rover-novelty20}.
-We collected \todo{XXX} images from the Navigation camera (Navcam) 
-onboard the Mars Science Laboratory (MSL) rover
+We collected \num{72} images from the Navigation camera (Navcam) 
+on the Mars Science Laboratory (MSL) rover
 and employed the Rockster~\cite{burl:rockster16}
 method currently used by onboard rover software to identify candidate rock
-targets with an area of at least 100 pixels, yielding \num{6005}
+targets with an area of at least 100 pixels, yielding \num{1050}
 targets.  We cropped out a \num{64}$\times$\num{64} pixel image
 centered on each target.
-%
+
+We simulated the operational setting in which the rover has observed
+targets up through mission day (sol) $s$ and the goal is to rank all
+subsequent targets (after sol $s$) to inform which recent targets
+merit further study.  We organized the Mars target images
+chronologically and partitioned them into the corresponding ``prior''
+set $D_s$ (sols \num{1343} to \num{1693}, $n=992$) and ``assessment''
+set $D_{s+}$ (sols \num{1694} to \num{1703}, $n=58)$. 
+
 We collaborated with an MSL science planning team member to
-independently review the targets and identify those that were
-considered novel by the mission ($n_{novel} = 108$).  Our goal for
+independently review the targets in $D_{s+}$ and identify those that were
+considered novel by the mission ($n_{outlier} = 9$).  Our goal for
 this application is to assess how well the selections made by each
 algorithm correlate with human novelty judgments to determine which
 methods would be most suitable for informing onboard decisions about
@@ -478,13 +486,8 @@ cases associated with each dataset domain.
 \todo{Umaa}
 
 \subsubsection{Targets in Mars rover images.}
-We simulated the operational setting in which the rover has observed
-targets up through mission day (sol) $s$ and the goal is to rank all
-subsequent targets (after sol $s$) to inform which recent targets
-merit further study.  We organized the Mars target images
-chronologically and partitioned them into the corresponding ``prior''
-set $D_s$ and ``assessment'' set $D_{s+}$. We initialized each
-algorithm with $D_s$ and requested a ranking of targets in $D_{s+}$.
+% We initialized each algorithm with $D_s$ and requested a ranking of
+% targets in $D_{s+}$. 
 \todo{Add table showing number (or percentage?) of novel targets in
 the top $N$ selections, where $N$ = known number of novel targets in
 $D_{s+}$.  And/or, report average rank of novel targets if alg ranks all
