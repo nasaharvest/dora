@@ -1,0 +1,48 @@
+# Data loading module parameters
+data_loader: {
+  name: 'image',
+  params: {}
+}
+data_to_fit: '/Users/bryce/Downloads/fmnist/train'
+data_to_score: '/Users/bryce/Downloads/data_to_score'
+zscore_normalization: False
+out_dir: 'exp/fmnist_benchmark/results'
+
+# Feature extraction module
+features: {
+  flattened_pixel_values: {
+    normalize_pixels: True
+  }
+}
+
+# Outlier detection module
+top_n: None
+outlier_detection: {
+  demud: {
+    k: 4
+  },
+  iforest: {
+    n_trees: 100
+  },
+  negative_sampling: {
+    percent_increase: 20
+  },
+  lrx: {
+    innter_window: 1,
+    outer_window: 4,
+    bands: 1
+  },
+  pae: {
+    latent_dim: 4,
+    use_flow: False,
+  },
+  random: { }
+}
+
+# Results organization module
+results: {
+  save_scores: { },
+    comparison_plot: {
+       'validation_dir': 'exp/fmnist_benchmark/labels.csv'
+    },
+}
