@@ -495,7 +495,7 @@ cases associated with each dataset domain.
 \subsubsection{Targets in Mars rover images.}
 % We initialized each algorithm with $D_s$ and requested a ranking of
 % targets in $D_{s+}$.
-\todo{Consider merging all three data set discussions since they are
+\todo{Hannah: Consider merging all three data set discussions since they are
 in one table? with their own figures? The point here isn't really to
 compare algs or data sets but instead to show that we CAN compare
 them, using DORA.}
@@ -509,8 +509,8 @@ the Isolation Forest achieved the highest precision (best outlier
 detection) when allowed to select only \num{9} images.
 Figure~\ref{fig:planetary_results} shows the complete (cumulative)
 outlier detection performance for each algorithm when ranking
-all \num{58} target images in $D_{1694-1703}$. \todo{Explain MDR the first
-time it appears. }
+all \num{58} target images in $D_{1694-1703}$. \todo{Hannah: Explain
+MDR the first time it appears. }
 
 
 \subsubsection{Satellite time series for ground-truth observations.}
@@ -525,7 +525,8 @@ Table \ref{tab:faw_results} gives the precision at $N$ where
 $N=n_{outlier}=37$. The negative sampling algorithm had the best performance
 in both metrics. DEMUD, PCA, and PAE tied for the lowest precision at 
 $N=n_{outlier}$ while DEMUD and PCA tied for the lowest
-AUC. \todo{For completeness, Explain why no LRX here.}
+AUC. \todo{Hannah: Update AUC -> MDR and for completeness, explain why
+no LRX here.} 
 
 \begin{table}
   \caption{Precision at $N=n_{outlier}$ for three applications; the
