@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.css';
+import './Table.css';
 
 import { useTable, useSortBy, usePagination} from 'react-table'
 
@@ -40,20 +40,22 @@ function Table({ columns, data }) {
   // Render the UI for your table
   return (
     <>
-      <table {...getTableProps()}>
+      <table className="table table-striped" {...getTableProps()}>
         <thead>
           {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+            <tr className="d-flex" {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                <th {...column.getHeaderProps({...column.getSortByToggleProps(),...{className: column.headerClassName}})}>
                 {column.render('Header')}
                 {/* Add a sort direction indicator */}
                 <span>
-                  {column.isSorted
-                    ? column.isSortedDesc
-                      ? ' 🔽'
-                      : ' 🔼'
-                    : ''}
+                  {column.canSort
+                    ? column.isSorted
+                      ? column.isSortedDesc
+                        ? ' 🔽'
+                        : ' 🔼'
+                      : ' ⏺️'
+                    : '  '}
                 </span>
               </th>
               ))}
@@ -64,9 +66,9 @@ function Table({ columns, data }) {
           {page.map((row, i) => {
             prepareRow(row)
             return (
-              <tr {...row.getRowProps()}>
+              <tr className="d-flex" {...row.getRowProps()}>
                 {row.cells.map(cell => {
-                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                  return <td {...cell.getCellProps({className: cell.column.className})}>{cell.render('Cell')}</td>
                 })}
               </tr>
             )
@@ -78,16 +80,16 @@ function Table({ columns, data }) {
         This is just a very basic UI implementation:
       */}
       <div className="pagination">
-        <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+        <button type="button" className="btn btn-outline-dark btn-sm" onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
           {'<<'}
         </button>{' '}
-        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+        <button type="button" className="btn btn-outline-dark btn-sm" onClick={() => previousPage()} disabled={!canPreviousPage}>
           {'<'}
         </button>{' '}
-        <button onClick={() => nextPage()} disabled={!canNextPage}>
+        <button type="button" className="btn btn-outline-dark btn-sm" onClick={() => nextPage()} disabled={!canNextPage}>
           {'>'}
         </button>{' '}
-        <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+        <button type="button" className="btn btn-outline-dark btn-sm" onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
           {'>>'}
         </button>{' '}
         <span>
@@ -155,28 +157,43 @@ class DataTable extends React.Component {
     const columns = [
       {
         Header: "Rank",
-        accessor: "rank"
+        accessor: "rank",
+        className: "rankCell",
+        headerClassName: "rankHeader"
       },
       {
         Header: "ID",
-        accessor: "id"
+        accessor: "id",
+        className: "idCell",
+        headerClassName: "idHeader"
       },
       {
         Header: "Image",
         Cell: (row) => {
           return (
           <div>
-            <a href="javascript:undefined;" onClick={() => {navigator.clipboard.writeText(row.row.original.fileName);alert(row.row.original.fileName+ " copied to clipboard.");}}>
-              <img height={100} src={"data:image/png;base64,"+row.row.original.imageData} title={row.row.original.fileName}/>
+            <a className="imageLink" onClick={() => {navigator.clipboard.writeText(row.row.original.fileName);alert(row.row.original.fileName+ " copied to clipboard.");}}>
+              <img src={"data:image/png;base64,"+row.row.original.imageData} title={row.row.original.fileName}/>
             </a>
           </div>
           );
         },
-        id: "image"
+        id: "image",
+        className: "imageCell",
+        headerClassName: "imageHeader"
       },
       {
         Header: "Score",
-        accessor: "score"
+        Cell: (row) => {
+          return (
+            <p>
+              {row.row.original.score.toFixed(4)}
+            </p>
+          );
+        },
+        accessor: "score",
+        className: "scoreCell",
+        headerClassName: "scoreHeader"
       }
     ];
 
@@ -193,7 +210,7 @@ class DataTable extends React.Component {
     }
 
     return (
-    <div className="container-fluid">
+    <div className="container">
       <h1>{this.state["currMethod"]}</h1>
       {datapass}
     </div>

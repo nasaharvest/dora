@@ -1,0 +1,38 @@
+.rankCell {
+  width: 5em;
+}
+
+.rankHeader {
+  width: 5em;
+}
+
+.idCell {
+  width: 5em;
+}
+
+.idHeader {
+  width: 5em;
+}
+
+.imageCell img {
+  width: 100px;
+}
+
+.imageHeader {
+  width: 100px;
+}
+
+.scoreCell {
+  width: 15em;
+  text-align: right;
+  font-family: monospace;
+}
+
+.scoreHeader {
+  width: 15em;
+  text-align: right;
+}
+
+.imageLink {
+  cursor: pointer;
+}
