@@ -270,8 +270,13 @@ class ConfigParser extends React.Component {
       <div className="container-fluid">
         <h1>Parse DORA Config</h1>
         <form>
+          <h2> Dataloader Check </h2>
           {componentDataLoader}
+          <br/>
+          <h2> Data Root Check </h2>
           {componentDataRoot}
+          <br/>
+          <h2> Results Dir Check </h2>
           {componentOutDir}
           <br/>
           {componentConfigButton}
