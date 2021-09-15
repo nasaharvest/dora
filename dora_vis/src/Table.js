@@ -159,13 +159,15 @@ class DataTable extends React.Component {
         Header: "Rank",
         accessor: "rank",
         className: "rankCell",
-        headerClassName: "rankHeader"
+        headerClassName: "rankHeader",
+        sortType: "number"
       },
       {
         Header: "ID",
         accessor: "id",
         className: "idCell",
-        headerClassName: "idHeader"
+        headerClassName: "idHeader",
+        sortType: "number"
       },
       {
         Header: "Image",
@@ -193,7 +195,8 @@ class DataTable extends React.Component {
         },
         accessor: "score",
         className: "scoreCell",
-        headerClassName: "scoreHeader"
+        headerClassName: "scoreHeader",
+        sortType: "number"
       }
     ];
 
