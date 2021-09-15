@@ -36,3 +36,7 @@
 .imageLink {
   cursor: pointer;
 }
+
+.methodSelect {
+  font-size: 2em;
+}

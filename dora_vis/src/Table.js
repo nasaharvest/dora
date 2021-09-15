@@ -201,18 +201,22 @@ class DataTable extends React.Component {
     if (this.props.data == null) {
       datapass = <h1> No DORA configuration loaded </h1>;
     } else {
-      datapass = <>
+      datapass = 
+      <>
+      <div className="col-md-4 methodSelect">
+        <label for="methodSel">Results from method:</label>
+        <select className="form-select form-select-lg" id="methodSel" onChange={this.switchMethod}>
+          {this.state["methods"].map((method) => <option value={method}>{method}</option>)}
+        </select>
+      </div>
       <Table columns={columns} data={this.props.data}/>
-      <select onChange={this.switchMethod}>
-        {this.state["methods"].map((method) => <option value={method}>{method}</option>)}
-      </select>
       </>;
     }
 
     return (
     <div className="container">
-      <h1>{this.state["currMethod"]}</h1>
       {datapass}
+      <br/>
     </div>
     );
     

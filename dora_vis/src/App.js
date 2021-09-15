@@ -117,10 +117,12 @@ class ConfigLoader extends React.Component {
       <div className="container-fluid">
         <h1>Load DORA Config</h1>
         <form>
-          <div className="form-group">
-            <label htmlFor="configPath">Specify path to the DORA Config</label>
-            <input type="file" className="form-control" id="configPath" onChange={this.handleConfigPathChange} value={this.state["configFile"]} required />
-            <button type="submit" className="btn btn-primary" onClick={this.handleConfigPathSubmit}>Submit</button>
+          <div className="col-md-6">
+            <div className="form-group">
+              <label htmlFor="configPath">Specify path to the DORA Config</label>
+              <input type="file" className="form-control" id="configPath" onChange={this.handleConfigPathChange} value={this.state["configFile"]} required />
+              <button type="submit" className="btn btn-primary" onClick={this.handleConfigPathSubmit}>Submit</button>
+            </div>
           </div>
         </form>
       </div>
@@ -233,10 +235,12 @@ class ConfigParser extends React.Component {
       componentDataRoot = <label>{this.state["dataRootPath"]} is a valid data root directory.</label>;
     } else {
       componentDataRoot = 
+      <div className="col-md-6">
       <div className="form-group">
         <label htmlFor="dataRootField">Can't locate {this.props.configData["data_to_score"]}, Specify the root directory of input data</label>
         <input type="file" className="form-control" id="dataRootField" onChange={this.handleDataRootChange} value={this.state["dataRoot"]} required directory="" webkitdirectory=""/>
         <button type="submit" className="btn btn-primary" onClick={this.handleDataRootSubmit}>Submit</button>
+      </div>
       </div>;
     }
 
@@ -246,10 +250,12 @@ class ConfigParser extends React.Component {
       componentOutDir = <label>{this.state["outDirPath"]} is a valid output directory.</label>;
     } else {
       componentOutDir = 
+      <div className="col-md-6">
       <div className="form-group">
         <label htmlFor="outDirField">Can't locate {this.props.configData["out_dir"]}, Specify the root directory of DORA results.</label>
         <input type="file" className="form-control" id="outDirField" onChange={this.handleOutDirChange} value={this.state["outDir"]} required directory="" webkitdirectory=""/>
         <button type="submit" className="btn btn-primary" onClick={this.handleOutDirSubmit}>Submit</button>
+      </div>
       </div>;
     }
 
