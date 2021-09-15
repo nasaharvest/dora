@@ -127,6 +127,60 @@ function Table({ columns, data }) {
   )
 }
 
+class AggTable extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    this.props.loadAggData();
+  }
+
+  render() {
+    const columns = [{
+      Header: "Rank",
+      accessor: "rank",
+      className: "rankCell",
+      headerClassName: "rankHeader",
+      sortType: "number"
+    }]
+
+    for (let methodName of Object.keys(this.props.configData["outlier_detection"])) {
+      columns.push({
+        Header: methodName,
+        className: "imageCell",
+        headerClassName: "imageHeader",
+        Cell: (row) => {
+          return(
+          <div>
+            <a className="imageLink" onClick={() => {navigator.clipboard.writeText(row.row.original[methodName+"Name"]);alert(row.row.original[methodName+"Name"]+ " copied to clipboard.");}}>
+              <img src={"data:image/png;base64,"+row.row.original[methodName]} title={row.row.original[methodName+"Name"]}/>
+            </a>
+          </div>
+          );
+        }
+      });
+    }
+
+    let datapass = null;
+    if (this.props.data == null) {
+      datapass = <h1> No DORA configuration loaded </h1>;
+    } else {
+      datapass = <>
+        <h1>Aggregate Results</h1>
+        <Table columns={columns} data={this.props.data}/>
+      </>;
+    }
+
+    return (
+    <div className="container">
+      {datapass}
+      <br/>
+    </div>
+    );
+  }
+}
+
 class DataTable extends React.Component {
   constructor(props) {
     super(props);
@@ -207,7 +261,7 @@ class DataTable extends React.Component {
       datapass = 
       <>
       <div className="col-md-4 methodSelect">
-        <label for="methodSel">Results from method:</label>
+        <label>Results from method:</label>
         <select className="form-select form-select-lg" id="methodSel" onChange={this.switchMethod}>
           {this.state["methods"].map((method) => <option value={method}>{method}</option>)}
         </select>
@@ -226,4 +280,4 @@ class DataTable extends React.Component {
   }
 }
 
-export default DataTable;
+export { DataTable, AggTable };

@@ -19,7 +19,8 @@
 }
 
 .imageHeader {
-  width: 100px;
+  width: 117px;
+  word-wrap: break-word;
 }
 
 .scoreCell {

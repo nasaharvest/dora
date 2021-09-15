@@ -1,7 +1,7 @@
 import React from 'react';
 //import ReactDOM from 'react-dom';
 import './App.css';
-import DataTable from './Table';
+import { DataTable, AggTable } from './Table';
 
 const parse = window.require('csv-parse')
 const yaml = window.require('js-yaml');
@@ -288,16 +288,18 @@ class App extends React.Component {
     this.loadConfig = this.loadConfig.bind(this);
     this.setConfig = this.setConfig.bind(this);
     this.loadData = this.loadData.bind(this);
+    this.loadAggData = this.loadAggData.bind(this);
     this.changeView = this.changeView.bind(this);
 
     this.state = {
-      viewset: ["loadConfig", "parseConfig", "dataTable"],
+      viewset: ["loadConfig", "parseConfig", "dataTable", "aggTable"],
       view: "loadConfig",
       configData: null,
       dataLoader: null,
       dataRoot: null,
       outDir: null,
-      data: null
+      data: null,
+      aggData: null
     };
   }
 
@@ -345,8 +347,7 @@ class App extends React.Component {
     const methodCSVName = "selections-" + methodName + ".csv";
     const methodCSVPath = path.join(this.state["outDir"], methodDirName, methodCSVName);
 
-    const data = [];
-    const dataObj = {};
+    let data = [];
 
     fs.createReadStream(methodCSVPath)
       .pipe(parse({delimiter: ', '}))
@@ -369,6 +370,55 @@ class App extends React.Component {
 
   }
 
+  loadAggData() {
+    // Get list of available methods
+    const methods = Object.keys(this.state["configData"]["outlier_detection"]);
+    let data = [];
+
+    // For each method available
+    for (let methodName of methods) {
+      const currData = [];
+
+      // Define and find CSV
+      const methodOptions = [methodName];
+      if (this.state["configData"]["outlier_detection"][methodName] != null) {
+        for (const [key, value] of Object.entries(this.state["configData"]["outlier_detection"][methodName])) {
+          methodOptions.push(key + '=' + value);
+        }
+      }
+      const methodDirName = methodOptions.join('-');
+      const methodCSVName = "selections-" + methodName + ".csv";
+      const methodCSVPath = path.join(this.state["outDir"], methodDirName, methodCSVName);
+      
+      // Read imagepaths from CSV
+      fs.createReadStream(methodCSVPath)
+        .pipe(parse({delimiter:', '}))
+        .on('data', csvrow => {
+          currData.push(csvrow)
+        })
+        .on('end', () => {
+          if (data.length == 0) {
+            for (let row of currData) {
+              let currRow = {}
+              currRow["rank"] = parseInt(row[0]);
+              currRow[methodName] = fs.readFileSync(path.join(this.state["dataRoot"], row[2])).toString('base64');
+              currRow[methodName+"Name"] = row[2];
+              data.push(currRow);
+            }
+          } else {
+            for (let [ind, row] of currData.entries()) {
+              let currRow = {}
+              currRow["rank"] = parseInt(row[0]);
+              currRow[methodName] = fs.readFileSync(path.join(this.state["dataRoot"], row[2])).toString('base64');
+              currRow[methodName+"Name"] = row[2];
+              data[ind] = {...data[ind], ...currRow};
+            }
+          }
+          this.setState({aggData: data});
+        });
+    }
+  }
+
   render() {
     var view = null;
     switch(this.state["view"]) {
@@ -380,6 +430,9 @@ class App extends React.Component {
         break;
       case "dataTable":
         view = <DataTable configData={this.state["configData"]} loadData={this.loadData} data={this.state["data"]}/>;
+        break;
+      case "aggTable":
+        view = <AggTable configData={this.state["configData"]} loadAggData={this.loadAggData} data={this.state["aggData"]}/>;
         break;
       default:
         view = <h1> This view has not been implemented.</h1>;
