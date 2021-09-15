@@ -5,6 +5,7 @@ import { useTable, useSortBy, usePagination} from 'react-table'
 
 const fs = window.require('fs');
 const path = window.require('path');
+const {clipboard} = window.require('electron');
 
 
 function Table({ columns, data }) {
@@ -153,7 +154,7 @@ class AggTable extends React.Component {
         Cell: (row) => {
           return(
           <div>
-            <a className="imageLink" onClick={() => {navigator.clipboard.writeText(row.row.original[methodName+"Name"]);alert(row.row.original[methodName+"Name"]+ " copied to clipboard.");}}>
+            <a className="imageLink" onClick={() => {clipboard.writeText(row.row.original[methodName+"Name"]);alert(row.row.original[methodName+"Name"]+ " copied to clipboard.");}}>
               <img src={"data:image/png;base64,"+row.row.original[methodName]} title={row.row.original[methodName+"Name"]}/>
             </a>
           </div>
@@ -228,7 +229,7 @@ class DataTable extends React.Component {
         Cell: (row) => {
           return (
           <div>
-            <a className="imageLink" onClick={() => {navigator.clipboard.writeText(row.row.original.fileName);alert(row.row.original.fileName+ " copied to clipboard.");}}>
+            <a className="imageLink" onClick={() => {clipboard.writeText(row.row.original.fileName);alert(row.row.original.fileName+ " copied to clipboard.");}}>
               <img src={"data:image/png;base64,"+row.row.original.imageData} title={row.row.original.fileName}/>
             </a>
           </div>
