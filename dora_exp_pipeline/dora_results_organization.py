@@ -114,9 +114,9 @@ class SaveComparisonPlot(ResultsOrganization):
 
         plt.plot(x, y, label="{} (MDR: {:.2f})".format(outlier_alg_name, area))
         plt.plot(x, x, label='Oracle', linestyle='--', color='k')
-        plt.title('Correct Outliers vs Selected Outliers')
+        plt.title('Known Outliers vs. Selected Outliers')
         plt.xlabel('Number of Outliers Selected')
-        plt.ylabel('Number of True Outliers')
+        plt.ylabel('Number of Known Outliers')
         plt.legend()
         axes.set_xlim(1, x[-1])
         axes.set_ylim(1, y[-1])
