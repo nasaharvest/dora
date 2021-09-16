@@ -362,14 +362,14 @@ and maximum values of each dimension of the positive (normal) examples. The
 negative and positive examples are then used to train a random forest 
 classifier. We use the posterior probabilities of the random forest classifier 
 as outlier scores, which means that the observations with higher posterior 
-probabilities are more likely to be outliers. 
-The probabilistic autoencoder is a generative model consisting of an 
+probabilities are more likely to be outliers.
+The probabilistic autoencoder is a generative model consisting of an
 autoencoder trained to reconstruct input data which is interpreted
 probabilistically after training using a normalizing flow on the autoencoder
-latent space~\cite{bohm2020probabilistic}. 
+latent space~\cite{bohm2020probabilistic}.
 Samples are scored as outliers using the log likelihood in the latent
 distribution, the autoencoder reconstruction error, or a combination of
-the two.
+both.
 
 \paragraph{Results organization.} 
 Each of the outlier ranking algorithms returns an array containing the sample
@@ -502,7 +502,7 @@ cases associated with each dataset domain.
 \subsubsection{Targets in Mars rover images.}
 % We initialized each algorithm with $D_s$ and requested a ranking of
 % targets in $D_{s+}$.
-\todo{Consider merging all three data set discussions since they are
+\todo{Hannah: Consider merging all three data set discussions since they are
 in one table? with their own figures? The point here isn't really to
 compare algs or data sets but instead to show that we CAN compare
 them, using DORA.}
@@ -516,8 +516,8 @@ the Isolation Forest achieved the highest precision (best outlier
 detection) when allowed to select only \num{9} images.
 Figure~\ref{fig:planetary_results} shows the complete (cumulative)
 outlier detection performance for each algorithm when ranking
-all \num{58} target images in $D_{1694-1703}$. \todo{Explain MDR the first
-time it appears. }
+all \num{58} target images in $D_{1694-1703}$. \todo{Hannah: Explain
+MDR the first time it appears. }
 
 
 \subsubsection{Satellite time series for ground-truth observations.}
@@ -532,15 +532,15 @@ defined MDR as:
 MDR = \frac{\sum^{N_s}_{i=1} n_i}{\sum^{N_s}_{i=1} s_i}
 \end{equation}
 where $i \in [1, N_s]$ is the selection index,
- $N_s$ is the total number of selections, 
- $s_i$ is the number of selections made up to index $i$, 
+ $N_s$ is the total number of selections,
+ $s_i$ is the number of selections made up to index $i$,
  and $n_i$ is the number of known outliers (true positives)
 among $s_i$ selections.
 Table \ref{tab:faw_results} gives the precision at $N$ where
 $N=n_{outlier}=37$. The negative sampling algorithm had the best performance
 in both metrics. DEMUD, PCA, and PAE tied for the lowest precision at 
 $N=n_{outlier}$ while DEMUD and PCA tied for the lowest
-MDR. We did not evaluate LRX for this time series dataset because LRX can only 
+MDR. We did not evaluate LRX for this time series dataset because LRX can only
 be applied to gridded image or raster data types.
 
 \begin{table}
@@ -560,7 +560,7 @@ be applied to gridded image or raster data types.
     \hline
     Iso. Forest  & & 0.46 & \textbf{0.56} \\
     \hline
-    PAE               & & 0.41 & 0.22 \\
+    PAE               & & 0.41 & 0.44 \\
     Neg. Sampling & & \textbf{0.49} & 0.33 \\
     \hline
     Random            & & 0.32 & 0.11 \\
