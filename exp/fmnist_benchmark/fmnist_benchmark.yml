@@ -19,22 +19,25 @@ features: {
 top_n: None
 outlier_detection: {
   demud: {
-    k: 4
+   k: 4
   },
   iforest: {
-    n_trees: 100
+   n_trees: 100
   },
   negative_sampling: {
-    percent_increase: 20
+   percent_increase: 20
   },
   lrx: {
-    inner_window: 1,
-    outer_window: 4,
-    bands: 1
+   inner_window: 1,
+   outer_window: 4,
+   bands: 1
   },
   pae: {
-    latent_dim: 4,
-    use_flow: False,
+   latent_dim: 4,
+   use_flow: False,
+  },
+  pca: {
+    k: 4
   },
   random: { }
 }
