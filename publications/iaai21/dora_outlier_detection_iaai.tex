@@ -525,14 +525,23 @@ We used the full dataset of 6,757 samples to fit the ranking algorithms and
 used the independently-labeled set of 113 points in Kenya for evaluation.
 Table \ref{fig:faw_results} compares the performance of each ranking 
 algorithm by plotting the number of true outliers detected out of the top
-$N$ selections. We reported the area under the curve (AUC), normalized
-by the total number of selections, in the legend
-for each algorithm to give a quantitative comparison of the curves.
+$N$ selections. We reported the Mean Discovery Rate (MDR) in the legend
+for each algorithm to give a quantitative comparison of the curves. We
+defined MDR as:
+\begin{equation}
+MDR = \frac{\sum^{N_s}_{i=1} n_i}{\sum^{N_s}_{i=1} s_i}
+\end{equation}
+where $i \in [1, N_s]$ is the selection index,
+ $N_s$ is the total number of selections, 
+ $s_i$ is the number of selections made up to index $i$, 
+ and $n_i$ is the number of known outliers (true positives)
+among $s_i$ selections.
 Table \ref{tab:faw_results} gives the precision at $N$ where
 $N=n_{outlier}=37$. The negative sampling algorithm had the best performance
 in both metrics. DEMUD, PCA, and PAE tied for the lowest precision at 
 $N=n_{outlier}$ while DEMUD and PCA tied for the lowest
-AUC. \todo{For completeness, Explain why no LRX here.}
+MDR. We did not evaluate LRX for this time series dataset because LRX can only 
+be applied to gridded image or raster data types.
 
 \begin{table}
   \caption{Precision at $N=n_{outlier}$ for three applications; the
