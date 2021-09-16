@@ -132,6 +132,9 @@ class FlattenedPixelValuesExtractor(FeatureExtractor):
             else:
                 ret_features[ind, :] = data.flatten()
 
+        if kwargs.get('normalize_pixels'):
+            ret_features = ret_features / 255.
+
         return ret_features
 
 
