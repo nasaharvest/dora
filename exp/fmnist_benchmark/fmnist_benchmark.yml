@@ -3,8 +3,8 @@ data_loader: {
   name: 'image',
   params: {}
 }
-data_to_fit: '/Users/bryce/Downloads/fmnist/train'
-data_to_score: '/Users/bryce/Downloads/data_to_score'
+data_to_fit: '/home/dubayahb/data/benchmark_data/train'
+data_to_score: '/home/dubayahb/data/benchmark_data/test'
 zscore_normalization: False
 out_dir: 'exp/fmnist_benchmark/results'
 
@@ -28,7 +28,7 @@ outlier_detection: {
     percent_increase: 20
   },
   lrx: {
-    innter_window: 1,
+    inner_window: 1,
     outer_window: 4,
     bands: 1
   },
