@@ -87,9 +87,9 @@ def combine_plots(resultsdir, label_path, precision_at_n):
         bestLine = list(range(1, num_outliers+1))
         plt.plot(bestLine, bestLine, label='Oracle', linestyle='--',
                  color='k')
-        plt.title('True Outliers vs. Algorithm Selections')
+        plt.title('Known Outliers vs. Algorithm Selections')
         plt.xlabel('Number of selections')
-        plt.ylabel('Number of true outliers')
+        plt.ylabel('Number of known outliers')
 
     for i in range(len(filenames)):
         scores = alg_indexes(filenames[i])
