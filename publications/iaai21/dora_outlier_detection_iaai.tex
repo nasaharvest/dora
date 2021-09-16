@@ -386,8 +386,7 @@ by outlier score). DORA provides results organization modules intended to help
  evaluation dataset containing known outliers is available, we provide a module
  to assess how well algorithm selections correlate with known outliers. This is
  done by plotting the number of true outliers vs. number of selections made. 
- This can also be represented as the precision at $N$, i.e., 
- the number of true outliers divided by the number of selections $N$~\citep{campos2016evaluation}. Finally,
+  Finally,
  we provide a module for plotting histograms of outlier scores to visualize the
  distribution of scores in the dataset (which may be, e.g., multimodal or 
  long-tailed).
@@ -491,45 +490,34 @@ Many Earth science applications using satellite Earth observation (EO) data
 We added this to demonstrate the capabilities of DORA with a traditional
 benchmark dataset. \todo{Bryce.}
 
+\begin{table}
+  \caption{Number of samples in the training and test sets for each dataset.}
+  \label{tab:datasets}
+  \centering
+  \begin{tabular}{l|c|cc}
+    \hline
+    Dataset & Training & \multicolumn{2}{c}{Test}\\
+     & Unlabeled &  Outliers &  Inliers \\
+    
+    \hline
+    Astrophysics &   &   &   \\
+    Earth & 6,757  &  37 & 76  \\
+    Planetary &   &   &   \\
+    (F)MNIST &   &   &   \\
+    \hline
+  \end{tabular}
+\end{table}
+
 \subsection{Results}
-In this section we discuss the experimental setup and results for each dataset.
-We designed the experiments to be relevant to the real-world scientific use 
-cases associated with each dataset domain. 
-
-\subsubsection{Astrophysical objects in Dark Energy Survey.}
-\todo{Umaa}
-
-\subsubsection{Targets in Mars rover images.}
-% We initialized each algorithm with $D_s$ and requested a ranking of
-% targets in $D_{s+}$.
-\todo{Hannah: Consider merging all three data set discussions since they are
-in one table? with their own figures? The point here isn't really to
-compare algs or data sets but instead to show that we CAN compare
-them, using DORA.}
-%
-Table~\ref{tab:faw_results} compares the performance of each ranking 
-algorithm by reporting the precision obtained when the number of
-selections is the same as the total number of outliers.  We could not
-employ RX in this case since the data dimensionality ($64 \times 64 =
-4096$) exceeded the data set size.  We found that
-the Isolation Forest achieved the highest precision (best outlier
-detection) when allowed to select only \num{9} images.
-Figure~\ref{fig:planetary_results} shows the complete (cumulative)
-outlier detection performance for each algorithm when ranking
-all \num{58} target images in $D_{1694-1703}$. \todo{Hannah: Explain
-MDR the first time it appears (defined in next section but will move when
-Astrophysics section filled in and results section reorganized pending Kiri's
-suggestion above. }
-
-
-\subsubsection{Satellite time series for ground-truth observations.}
-We used the full dataset of 6,757 samples to fit the ranking algorithms and
-used the independently-labeled set of 113 points in Kenya for evaluation.
-Table \ref{fig:faw_results} compares the performance of each ranking 
-algorithm by plotting the number of true outliers detected out of the top
-$N$ selections. We reported the Mean Discovery Rate (MDR) in the legend
-for each algorithm to give a quantitative comparison of the curves. We
-defined MDR as:
+The experimental setup for each dataset was to fit or train a model for
+each ranking algorithm using a larger unlabeled dataset and then apply 
+the models to compute the outlier scores for a smaller test dataset for which
+labels of known outliers were available (Table \ref{tab:datasets}). 
+For each test set, we created a plot of the number of known/true outliers 
+detected out of the top $N$ selections. We also 
+reported the Mean Discovery Rate (MDR) in the legend
+for each algorithm to give a quantitative comparison of the curves that could
+be comparable across the datasets. We defined MDR as:
 \begin{equation}
 MDR = \frac{\sum^{N_s}_{i=1} n_i}{\sum^{N_s}_{i=1} s_i}
 \end{equation}
@@ -538,12 +526,40 @@ where $i \in [1, N_s]$ is the selection index,
  $s_i$ is the number of selections made up to index $i$,
  and $n_i$ is the number of known outliers (true positives)
 among $s_i$ selections.
-Table \ref{tab:faw_results} gives the precision at $N$ where
-$N=n_{outlier}=37$. The negative sampling algorithm had the best performance
+We also reported the precision at $N=n_{outlier}$ for each test set where
+$n_{outlier}$ is the number of known outliers, i.e.,  the precision obtained 
+when the number of selections is the same as the total number of outliers. 
+Precision at $N$ is the number of true outliers divided by the number of 
+selections $N$~\citep{campos2016evaluation}.
+Table~\ref{tab:faw_results} compares the precision at $N=n_{outlier}$ for
+each dataset and ranking algorithm. 
+%\todo{Hannah: Consider merging all three data set discussions since they are
+%in one table? with their own figures? The point here isn't really to
+%compare algs or data sets but instead to show that we CAN compare
+%them, using DORA.}
+% We initialized each algorithm with $D_s$ and requested a ranking of
+% targets in $D_{s+}$.
+%
+
+For the planetary dataset, we found that
+the Isolation Forest achieved the highest precision (best outlier
+detection) when allowed to select only \num{9} images.
+Figure~\ref{fig:planetary_results} shows the complete (cumulative)
+outlier detection performance for each algorithm when ranking
+all \num{58} target images in $D_{1694-1703}$. We could not
+employ RX since the data dimensionality ($64 \times 64 =
+4096$) exceeded the data set size. 
+
+For the Earth dataset, the negative sampling algorithm had the best performance
 in both metrics. DEMUD, PCA, and PAE tied for the lowest precision at 
 $N=n_{outlier}$ while DEMUD and PCA tied for the lowest
-MDR. We did not evaluate LRX for this time series dataset because LRX can only
-be applied to gridded image or raster data types.
+MDR (Figure \ref{fig:faw_results}). We did not evaluate LRX for this time 
+series dataset because LRX can only be applied to gridded image or raster 
+data types.
+
+\todo{Umaa: add results for astro use case.}
+
+\todo{Bryce: add results for (F)MNIST use case.}
 
 \begin{table}
   \caption{Precision at $N=n_{outlier}$ for three applications; the
@@ -585,13 +601,6 @@ be applied to gridded image or raster data types.
     Earth science dataset.}
     \label{fig:faw_results}
 \end{figure}
-
-
-%\subsubsection{Volcanic thermal anomalies}
-
-\subsubsection{MNIST and FashionMNIST.}
-\todo{Bryce. TBD if we will end up including due to
-space and/or relevance.}
 
 
 \section{Discussion}
