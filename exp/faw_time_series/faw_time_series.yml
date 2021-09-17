@@ -5,7 +5,7 @@ data_loader: {
 }
 data_to_fit: 'sample_data/earth_fieldsamples/points_to_fit.csv'
 data_to_score: 'sample_data/earth_fieldsamples/kenya_points_to_predict.csv'
-zscore_normalization: False
+zscore_normalization: True
 out_dir: 'exp/faw_time_series/results'
 
 # Feature extraction module

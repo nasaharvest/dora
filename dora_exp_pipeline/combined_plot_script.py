@@ -2,6 +2,16 @@ import os
 import matplotlib.pyplot as plt
 import argparse
 
+alg_colors = {
+                'demud': 'red',
+                'pca': 'purple',
+                'iforest': 'pink',
+                'pae': 'blue',
+                'negative sampling': 'brown',
+                'random': 'gray',
+                'rx': 'green',
+                'lrx': 'orange'
+             }
 
 def alg_indexes(filename):
     with open(filename, 'r') as f:
@@ -97,11 +107,13 @@ def combine_plots(resultsdir, label_path, precision_at_n):
         if precision_at_n:
             print(labels[i])
             x, y = get_precision_curve(scores, validationLabels)
-            plt.plot(x, y, label="{}".format(labels[i]))
+            plt.plot(x, y, label="{}".format(labels[i]),
+                     color=alg_colors[labels[i]])
         else:
             x, y = get_selections_curve(scores, validationLabels)
             area = sum(y)/sum([i for i in range(len(scores))])
-            plt.plot(x, y, label="{} (MDR: {:.2f})".format(labels[i], area))
+            plt.plot(x, y, label="{} (MDR: {:.2f})".format(labels[i], area),
+                     color=alg_colors[labels[i]])
 
     axes.set_xlim(1, len(scores))
     plt.legend()
