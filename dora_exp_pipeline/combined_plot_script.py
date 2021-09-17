@@ -1,7 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 import argparse
-import math, statistics
+import math
 
 
 def alg_indexes(filename):
@@ -74,7 +74,9 @@ def get_precision_curve(scores, validationLabels):
 def random_sel_EV(scores, labels, n):
     n_scores = len(scores)
     n_outliers = sum(labels.values())
-    return sum([math.comb(n_outliers, i) * math.comb(n_scores-n_outliers, n-i) * i for i in range(n+1)]) / math.comb(n_scores, n)
+    return sum([math.comb(n_outliers, i) * \
+                math.comb(n_scores-n_outliers, n-i) * i \
+                for i in range(n+1)]) / math.comb(n_scores, n)
 
 
 def get_random_selections_curve(scores, validationLabels):
@@ -82,7 +84,7 @@ def get_random_selections_curve(scores, validationLabels):
     y = []
     for i in range(len(scores)):
         y.append(random_sel_EV(scores, validationLabels, i))
-    
+
     return x, y
 
 
@@ -127,14 +129,16 @@ def combine_plots(resultsdir, label_path, precision_at_n):
             x, y = get_selections_curve(scores, validationLabels)
             area = sum(y)/sum([i for i in range(len(scores))])
             plt.plot(x, y, label="{} (MDR: {:.2f})".format(labels[i], area))
-    
+
     if precision_at_n:
         x, y = get_random_precision_curve(scores, validationLabels)
         plt.plot(x, y, label="{}".format("Theoretical Random"), linestyle='--')
     else:
         x, y = get_random_selections_curve(scores, validationLabels)
         area = sum(y)/sum([i for i in range(len(scores))])
-        plt.plot(x, y, label="{} (MDR: {:.2f})".format("Theoretical Random", area), linestyle='--')
+        plt.plot(x, y, 
+                 label="{} (MDR: {:.2f})".format("Theoretical Random", area), 
+                 linestyle='--')
 
     axes.set_xlim(1, len(scores))
     plt.legend()
