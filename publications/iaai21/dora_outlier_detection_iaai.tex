@@ -395,9 +395,8 @@ by outlier score). DORA provides results organization modules intended to help
 \todo{Jake: describe website if ready by deadline.}
 \todo{Eric: describe causal graphs if added by deadline.}
 
-\section{Experiments}
+\section{Datasets}
 
-\subsection{Datasets}
 We constructed three datasets to evaluate the utility of DORA and the
 performance of each ranking algorithm for a variety of scientific domains
  (astrophysics, planetary science, and Earth science). We also included a 
@@ -488,7 +487,7 @@ Many Earth science applications using satellite Earth observation (EO) data
 
 \subsubsection{MNIST and Fashion-MNIST.}
 We included MNIST and F-MNIST to demonstrate the capabilities of DORA with a
-traditional benchmark dataset. In this experiment, we used 60,000 images from 
+traditional benchmark dataset. We used 60,000 images from 
 F-MNIST as the training set and a combined set of 2,000 images from MNIST and 
 F-MNIST as the evaluation set. Well-discriminating algorithms should assign 
 higher outlier scores to samples from MNIST than F-MNIST.
@@ -505,13 +504,13 @@ higher outlier scores to samples from MNIST than F-MNIST.
     \hline
     Astrophysics &   &   &   \\
     Earth & 6,757 & 37 & 76  \\
-    Planetary &   &   &   \\
+    Planetary & 992 &  9 & 49 \\
     F-MNIST & 60,000 & 1,000 & 1,000  \\
     \hline
   \end{tabular}
 \end{table}
 
-\subsection{Results}
+\section{Results}
 The experimental setup for each dataset was to fit or train a model for
 each ranking algorithm using a larger unlabeled dataset and then apply 
 the models to compute the outlier scores for a smaller test dataset for which
@@ -536,6 +535,7 @@ Precision at $N$ is the number of true outliers divided by the number of
 selections $N$~\citep{campos2016evaluation}.
 Table~\ref{tab:faw_results} compares the precision at $N=n_{outlier}$ for
 each dataset and ranking algorithm. 
+\todo{Jake: add description of theoretical random baseline.}
 %\todo{Hannah: Consider merging all three data set discussions since they are
 %in one table? with their own figures? The point here isn't really to
 %compare algs or data sets but instead to show that we CAN compare
@@ -562,13 +562,14 @@ data types.
 
 \todo{Umaa: add results for astro use case.}
 
-For the MNIST and F-MNIST dataset, PCA and DEMUD tied for the highest precision,
+For the MNIST and F-MNIST dataset, PCA and DEMUD tied for the highest
+ precision at $N=n_{outlier}$
 while DEMUD, PCA, and PAE tied for the highest MDR. Negative sampling had the 
 lowest performance in both metrics. 
 
 \begin{table}
-  \caption{Precision at $N=n_{outlier}$ for three applications; the
-  best result for each data set is in bold.}
+  \caption{Precision at $N=n_{outlier}$ for three applications and F-MNIST
+   benchmark; the best result for each data set is in bold.}
   \label{tab:faw_results}
   \centering
   \begin{tabular}{l|cccc}
@@ -616,14 +617,15 @@ lowest performance in both metrics.
 \end{figure}
 
 \section{Discussion}
-\todo{ 
-Potential topics TBD based on results:
-\begin{itemize}
-\item Discuss results from experiments
-\item Challenges of evaluating results in outlier detection?
-\item Downstream use of results in science applications
-\end{itemize}
-}
+
+\paragraph{Algorithm performance.} \todo{Discuss overall results from
+ experiments and that we left hyperparameter tuning and extensive
+ evaluation for future work.}
+ 
+\paragraph{Evaluation in outlier detection.} \todo{Discuss why evaluation
+in outlier detection applications is hard since we often don't have complete
+labeled data for testing and labels can be subjective.}
+
 \paragraph{Path to deployment.} \todo{Hannah - describe pip-installable
 package, open-source for extension by the wider scientific community, etc.}
 
