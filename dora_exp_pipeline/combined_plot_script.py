@@ -1,7 +1,6 @@
 import os
 import matplotlib.pyplot as plt
 import argparse
-import math
 
 alg_colors = {
                 'demud': 'red',
@@ -13,6 +12,19 @@ alg_colors = {
                 'rx': 'green',
                 'lrx': 'orange'
              }
+
+
+def comb(n: int, k: int) -> int:
+    if k < 0 or k > n:
+        return 0
+    if k == 0 or k == n:
+        return 1
+    k = min(k, n - k)  # Take advantage of symmetry
+    c = 1
+    for i in range(k):
+        c = c * (n - i) / (i + 1)
+    return c
+
 
 def alg_indexes(filename):
     with open(filename, 'r') as f:
@@ -84,9 +96,9 @@ def get_precision_curve(scores, validationLabels):
 def random_sel_EV(scores, labels, n):
     n_scores = len(scores)
     n_outliers = sum(labels.values())
-    return sum([math.comb(n_outliers, i) *
-                math.comb(n_scores-n_outliers, n-i) * i
-                for i in range(n+1)]) / math.comb(n_scores, n)
+    return sum([comb(n_outliers, i) *
+                comb(n_scores-n_outliers, n-i) * i
+                for i in range(n+1)]) / comb(n_scores, n)
 
 
 def get_random_selections_curve(scores, validationLabels):
