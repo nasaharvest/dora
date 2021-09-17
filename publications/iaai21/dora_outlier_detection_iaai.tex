@@ -401,7 +401,7 @@ by outlier score). DORA provides results organization modules intended to help
 We constructed three datasets to evaluate the utility of DORA and the
 performance of each ranking algorithm for a variety of scientific domains
  (astrophysics, planetary science, and Earth science). We also included a 
- benchmark dataset that uses MNIST and FashionMNIST. Here we describe
+ benchmark dataset that uses MNIST and Fashion-MNIST. Here we describe
  the details of each dataset.
 \todo{Maybe add
  a table with number of samples, number of reference known outliers (if 
@@ -486,9 +486,12 @@ Many Earth science applications using satellite Earth observation (EO) data
 % (Navcam). 
 %\subsubsection{Volcanic thermal anomalies}
 
-\subsubsection{MNIST and FashionMNIST.}
-We added this to demonstrate the capabilities of DORA with a traditional
-benchmark dataset. \todo{Bryce.}
+\subsubsection{MNIST and Fashion-MNIST.}
+We included MNIST and F-MNIST to demonstrate the capabilities of DORA with a
+traditional benchmark dataset. In this experiment, we used 60,000 images from 
+F-MNIST as the training set and a combined set of 2,000 images from MNIST and 
+F-MNIST as the evaluation set. Well-discriminating algorithms should assign 
+higher outlier scores to samples from MNIST than F-MNIST.
 
 \begin{table}
   \caption{Number of samples in the training and test sets for each dataset.}
@@ -503,7 +506,7 @@ benchmark dataset. \todo{Bryce.}
     Astrophysics &   &   &   \\
     Earth & 6,757 & 37 & 76  \\
     Planetary &   &   &   \\
-    (F)MNIST & 60,000 & 1,000 & 1,000  \\
+    F-MNIST & 60,000 & 1,000 & 1,000  \\
     \hline
   \end{tabular}
 \end{table}
@@ -559,7 +562,9 @@ data types.
 
 \todo{Umaa: add results for astro use case.}
 
-\todo{Bryce: add results for (F)MNIST use case.}
+For the MNIST and F-MNIST dataset, PCA and DEMUD tied for the highest precision,
+while DEMUD, PCA, and PAE tied for the highest MDR. Negative sampling had the 
+lowest performance in both metrics. 
 
 \begin{table}
   \caption{Precision at $N=n_{outlier}$ for three applications; the
@@ -568,12 +573,12 @@ data types.
   \centering
   \begin{tabular}{l|cccc}
     \hline
-    Algorithm & Astro. & Earth & Planetary & FMNIST \\
+    Algorithm & Astro. & Earth & Planetary & F-MNIST \\
     \hline
     PCA               & & 0.41 & 0.44 & \textbf{0.84} \\
     DEMUD             & & 0.41 & 0.44 & \textbf{0.84} \\
     \hline
-    RX                & & 0.43 & ---- & ---- \\
+    RX                & & 0.43 & ---- & 0.82 \\
     LRX               & & ---- & 0.33 & 0.56 \\
     \hline
     Iso. Forest  & & 0.46 & \textbf{0.56} & 0.74 \\
@@ -606,8 +611,8 @@ data types.
     \centering
     \includegraphics[width=\linewidth]{figures/fmnist_combined_plot.pdf}
     \caption{Number of true outliers ranked in top $N$ selections for 
-    FMNIST dataset.}
-    \label{fig:faw_results}
+    F-MNIST dataset.}
+    \label{fig:fmnist_results}
 \end{figure}
 
 \section{Discussion}
