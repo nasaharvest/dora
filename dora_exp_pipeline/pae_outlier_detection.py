@@ -25,6 +25,7 @@ from tensorflow.keras import layers, losses
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow_probability import distributions, bijectors, layers as tfpl
+from sklearn.metrics import mean_squared_error
 
 
 class PAEOutlierDetection(OutlierDetection):
@@ -33,7 +34,8 @@ class PAEOutlierDetection(OutlierDetection):
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        top_n, seed, latent_dim, max_epochs=1000, patience=10,
-                       val_split=0.25, optimizer='adam', log_dir=None):
+                       val_split=0.25, optimizer='adam', log_dir=None,
+                       use_flow=True):
         if data_to_fit is None:
             data_to_fit = deepcopy(data_to_score)
 
@@ -62,7 +64,7 @@ class PAEOutlierDetection(OutlierDetection):
         # Rank targets
         scores = train_fn(data_to_fit, data_to_score, latent_dim,
                           sample_shape, seed, max_epochs, patience, val_split,
-                          optimizer, log_dir)
+                          optimizer, log_dir, use_flow)
         selection_indices = np.argsort(scores)[::-1]
 
         results = dict()
@@ -78,7 +80,7 @@ class PAEOutlierDetection(OutlierDetection):
 
 
 def train_and_run_PAE(train, test, latent_dim, num_features, seed, max_epochs,
-                      patience, val_split, optimizer, log_dir):
+                      patience, val_split, optimizer, log_dir, use_flow):
     # Train autoencoder
     autoencoder = Autoencoder(latent_dim, num_features)
     autoencoder.compile(optimizer=optimizer, loss=losses.MeanSquaredError())
@@ -86,27 +88,34 @@ def train_and_run_PAE(train, test, latent_dim, num_features, seed, max_epochs,
                     callbacks=make_tf_callbacks(
                         'Autoencoder training', patience, log_dir),
                     validation_split=val_split)
+    encoded_test = autoencoder.encoder(test).numpy()
 
     # Train flow
-    encoded_train = autoencoder.encoder(train).numpy()
-    flow = NormalizingFlow(latent_dim)
-    flow.compile(optimizer=optimizer, loss=lambda y, rv_y: -rv_y.log_prob(y))
-    flow.fit(np.zeros((len(encoded_train), 0)), encoded_train,
-             epochs=max_epochs, verbose=0,
-             callbacks=make_tf_callbacks('Flow training', patience, log_dir),
-             validation_split=val_split)
-
-    # Calculate scores
-    trained_dist = flow.dist(np.zeros(0,))
-    encoded_test = autoencoder.encoder(test).numpy()
-    log_probs = trained_dist.log_prob(encoded_test).numpy()
-    scores = np.negative(log_probs)
+    if use_flow:
+        encoded_train = autoencoder.encoder(train).numpy()
+        flow = NormalizingFlow(latent_dim)
+        flow.compile(optimizer=optimizer,
+                     loss=lambda y, rv_y: -rv_y.log_prob(y))
+        flow.fit(np.zeros((len(encoded_train), 0)), encoded_train,
+                 epochs=max_epochs, verbose=0,
+                 callbacks=make_tf_callbacks('Flow training', patience,
+                                             log_dir),
+                 validation_split=val_split)
+        trained_dist = flow.dist(np.zeros(0,))
+        log_probs = trained_dist.log_prob(encoded_test).numpy()
+        scores = np.negative(log_probs)
+    # Use reconstruction error
+    else:
+        pred = autoencoder.decoder(encoded_test).numpy()
+        scores = [mean_squared_error(y_true, y_pred) for y_true, y_pred in
+                  zip(test, pred)]
 
     return scores
 
 
 def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
-                           max_epochs, patience, val_split, optimizer, log_dir):
+                           max_epochs, patience, val_split, optimizer, log_dir,
+                           use_flow):
     # Make tensorflow datasets
     channels = image_shape[2]
     train_ds, val_ds, test_ds = get_train_val_test(train, test, seed, channels,
@@ -128,8 +137,8 @@ def train_and_run_conv_PAE(train, test, latent_dim, image_shape, seed,
     flow = NormalizingFlow(latent_dim)
     flow.compile(optimizer=optimizer, loss=lambda y, rv_y: -rv_y.log_prob(y))
     flow.fit(np.zeros((len(encoded_train), 0)), encoded_train, verbose=0,
-             epochs=max_epochs, callbacks=make_tf_callbacks(
-                 'Flow training', patience, log_dir),
+             epochs=max_epochs,
+             callbacks=make_tf_callbacks('Flow training', patience, log_dir),
              validation_split=val_split)
 
     # Calculate scores
