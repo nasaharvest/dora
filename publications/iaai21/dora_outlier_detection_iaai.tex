@@ -429,8 +429,25 @@ by outlier score). DORA provides results organization modules intended to help
  distribution of scores in the dataset (which may be, e.g., multimodal or 
  long-tailed).
 
-\paragraph{Results visualization.} 
-\todo{Jake: describe website if ready by deadline.}
+\paragraph{Results visualization.}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.75\linewidth]{figures/doravis.png}
+  \caption{A screenshot of the DORA visualizer displaying results from the
+  planetary science dataset.}
+  \label{fig:doravis}
+\end{figure}
+
+We developed a desktop application to easily visualize DORA results with the
+Electron application framework and React frontend library. The application loads
+the DORA configuration file to locate the dataset and result CSVs. Then,
+it displays the ranked samples and their scores in a table sorted by their
+selection order. This allows for fast and easy comparison of the results of
+different methods. Figure \ref{fig:doravis} shows a screenshot of the
+``Aggregate Table'' view, which displays all results from different algorithms
+side-by-side.
+
 \todo{Eric: describe causal graphs if added by deadline.}
 
 \section{Datasets}
@@ -570,8 +587,13 @@ when the number of selections is the same as the total number of outliers.
 Precision at $N$ is the number of true outliers divided by the number of 
 selections $N$~\citep{campos2016evaluation}.
 Table~\ref{tab:faw_results} compares the precision at $N=n_{outlier}$ for
-each dataset and ranking algorithm. 
-\todo{Jake: add description of theoretical random baseline.}
+each dataset and ranking algorithm. \todo{Random desc by Jake, please edit}
+Metrics for random selection are calculated
+using the expected value of $n_i$ for $i$ random selections:
+\begin{equation}
+\mathbf{E}[n_i, i \in[1, N_s]] = \frac{\sum^i_{j=0} {n_{outlier}\choose j} {D-n_{outlier}\choose i-j} j}{{D\choose i}}
+\end{equation}
+
 %\todo{Hannah: Consider merging all three data set discussions since they are
 %in one table? with their own figures? The point here isn't really to
 %compare algs or data sets but instead to show that we CAN compare
