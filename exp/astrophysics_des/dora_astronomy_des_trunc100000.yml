@@ -1,0 +1,49 @@
+# Data loading module parameters
+data_loader: {
+    name: 'Catalog',
+    params: {}
+}
+data_to_fit: '/proj/des/products/Y3_GOLD_2_2_subsampled_filtered_public_for_dora.trunc100000.h5'
+data_to_score: '/proj/des/products/Y3_GOLD_2_2_subsampled_filtered_public_for_dora.trunc100000.h5'
+zscore_normalization: False
+out_dir: 'exp/astrophysics_des/results_trunc100000'
+
+# Feature extraction module
+features: {
+    raw_values: {
+        # no args
+    }
+}
+
+# Outlier detection module
+top_n: None
+outlier_detection: {
+    iforest: {
+        n_trees: 100
+    },
+    pca: {
+        k: 3
+    },
+#    demud: {
+#        k: 3
+#    },
+    pae: {
+        latent_dim: 3
+    },
+    rx: {},
+    negative_sampling: {
+        percent_increase: 20
+    },
+    random: {}
+}
+
+# Results organization module
+results: {
+    comparison_plot: {
+       'validation_dir': '/proj/des/products/find_discarded_objectids_in_dec2019_data.labels.trunc100000.csv'
+    },
+    save_scores: {},
+    # histogram: {
+    #      'bins': 25
+    # }
+}
