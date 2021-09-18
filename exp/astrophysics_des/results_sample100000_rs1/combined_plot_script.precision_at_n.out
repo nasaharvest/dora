@@ -1,0 +1,14 @@
+iforest
+Precision at N=25339: 0.342476
+pca
+Precision at N=25339: 0.415565
+pae
+Precision at N=25339: 0.349816
+rx
+Precision at N=25339: 0.400608
+negative sampling
+Precision at N=25339: 0.319389
+random
+Precision at N=25339: 0.255772
+random_theoretical
+Precision at N=25339: 0.253380
