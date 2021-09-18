@@ -460,6 +460,46 @@ performance of each ranking algorithm for a variety of scientific domains
 \subsubsection{Astrophysics: objects in Dark Energy Survey.}
 \todo{Umaa}
 
+Astronomical data sets are large and growing. Large modern optical
+imaging surveys are producing catalogs for of order $10^8$ stars
+and galaxies, with dozens or hundreds of distinct measured features
+for each entry. Discovery science becomes difficult at this data
+volume: the scale is too large for expert human inspection, and separating real
+astrophysical anomalies from non-astrophysical sources like detector artifacts or
+satellite trails is a challenging problem for current
+methods.
+
+The Dark Energy Survey (DES), an ongoing imaging survey of
+$5000~{\rm deg}^2$ of the southern sky conducted from the Cerro-Tololo
+Inter-American Observatory in Chile \cite{DESY1}. The galaxy catalogs produced from
+DES imaging have provided some of the strongest constraints to date on
+the physical properties of dark energy and the accelerated expansion
+of the Universe. The first version of this catalog, released in June 2018, incorporated
+only cuts on signal-to-noise, resolution, masks against known detector
+anomalies and data quality indicators, and the automated data quality
+flags produced during processing. In December 2019, the full catalog
+was released after 18 months of extensive manual vetting. Therefore,
+we were able to use the second version of the catalog as a validation
+set for anomaly detection on the first version.
+
+We compared all methods on a data set that consists of 100K galaxy objects
+observed by the Dark Energy Survey (DES) sampled from the initial June 2018 release.
+25,339 objects from this 100K set that did not appear in the later Dec 2019
+release were likely eliminated during the manual vetting process and were labeled as outliers.
+Note, that the remaining 74,661 objects may also contain outliers, but we assume them to be
+inliers in this experiment.
+
+We used publicly-available photometry from the $g-$, $r-$, $i-$ and $z-band$ DES exposures.  We
+transformed the photometry into luptitudes\footnote{A
+  ``Luptitude''~\cite{lupton99} is an arcsinh-scaled flux, with
+  properties quantitatively equal to
+  traditional astronomical magnitudes for bright sources, but which
+  gracefully handles non-detections and negative fluxes.}.  The inputs features used
+  were the $r$-band luptitude, colors computed as band differences between
+$g-r$, $i-r$, and $z-r$, and associated observational errors, for a total of eight features.
+%
+
+
 \subsubsection{Planetary: targets in Mars rover images.}
 Mars exploration is fundamentally an exercise in discovery with the
 goal of increasing our understanding of the history, evolution,
