@@ -593,7 +593,8 @@ F-MNIST as the evaluation set. Well-discriminating algorithms should assign
 higher outlier scores to samples from MNIST than F-MNIST.
 
 \begin{table}
-  \caption{Number of samples in the training and test sets for each dataset.}
+  \caption{Number of samples in the training and test sets for each dataset,
+  ordered by dataset size.}
   \label{tab:datasets}
   \centering
   \begin{tabular}{l|c|cc}
@@ -602,10 +603,10 @@ higher outlier scores to samples from MNIST than F-MNIST.
      & Unlabeled &  Outliers &  Inliers \\
     
     \hline
-    Astrophysics & 100,000   &  25,339 &  ---- \\
-    Earth & 6,757 & 37 & 76  \\
     Planetary & 992 &  9 & 49 \\
+    Earth & 6,757 & 37 & 76  \\
     F-MNIST & 60,000 & 1,000 & 1,000  \\
+    Astrophysics & 100,000   &  25,339 &  ---- \\
     \hline
   \end{tabular}
 \end{table}
