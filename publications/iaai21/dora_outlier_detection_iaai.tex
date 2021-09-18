@@ -756,9 +756,25 @@ practice and sense and left hyperparameter tuning, which would likely
 improve results for each dataset but would require
 creation of additional validation sets, for future work.
  
-\paragraph{Evaluation in outlier detection.}  \todo{Discuss why evaluation
-in outlier detection applications is hard since we often don't have complete
-labeled data for testing and labels can be subjective.}
+\paragraph{Evaluation in outlier detection.} Prior work has emphasized
+the difficulty of creating standardized metrics for outlier detection that 
+represents how models will perform in real world settings while also enabling
+intercomparison between datasets~\cite{campos2016evaluation}. We chose two
+complementary metrics with this in mind: precision at $N=n_{outliers}$, which
+measures the fraction of selections that are known outliers when the number of
+selections is equivalent to the number of outliers, and
+ Mean Discovery Rate, which measures the fraction of selections that are known outliers on average. 
+Designing experiments to evaluate outlier detection methods for real-world
+use cases is also difficult because it is difficult, or sometimes impossible, 
+to obtain labeled samples of outliers, inliers, or both for evaluation. 
+In addition, labels are often subjective or uncertain, 
+especially in the case of scientific datasets. For example, a dataset of known
+outliers was available for the astrophysics dataset from human annotation
+in prior work, but the remainder of samples in the dataset used for evaluation
+were not known to be inliers or outliers. This can result in evaluation metrics
+ that are deceptively low because unlabeled samples that might actually be
+ outliers (as was found to be common in prior work~\cite{wagstaff:des-anom20})
+ are counted as false positives. 
 
 \paragraph{Path to deployment.} \todo{Hannah - describe pip-installable
 package, open-source for extension by the wider scientific community, etc.}
