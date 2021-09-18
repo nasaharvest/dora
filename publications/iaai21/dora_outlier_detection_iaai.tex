@@ -639,6 +639,7 @@ Random'' using the expected value of $n_i$ for $i$ random selections:
 % targets in $D_{s+}$.
 %
 
+
 For the planetary dataset, we found that
 the Isolation Forest achieved the highest precision (best outlier
 detection) when allowed to select only \num{9} images.
@@ -655,7 +656,11 @@ MDR (Figure \ref{fig:faw_results}). We did not evaluate LRX for this time
 series dataset because LRX can only be applied to gridded image or raster 
 data types.
 
-\todo{Umaa: add results for astro use case.}
+For the astrophysics dataset (Figure~\ref{fig:des_results}, DEMUD was omitted due to computational time 
+and LRX was omitted as it applies only to image data.  Of the remaining methods, 
+PCA achieved the highest precision, following by RX.  Negative sampling 
+performs well initially before its performance drops off.  The PAE finds the most outliers 
+overall.  
 
 For the MNIST and F-MNIST dataset, PCA and DEMUD tied for the highest
  precision at $N=n_{outlier}$
