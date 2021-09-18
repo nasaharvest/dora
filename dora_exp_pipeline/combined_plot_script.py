@@ -119,7 +119,7 @@ def get_random_precision_curve(scores, validationLabels):
 
         if (i+1) == sum(validationLabels.values()):
             print('Precision at N=%d: %f' %
-                (sum(validationLabels.values()), float(numOutliers)/(i+1)))
+                  (sum(validationLabels.values()), float(numOutliers)/(i+1)))
 
     return x, y
 
