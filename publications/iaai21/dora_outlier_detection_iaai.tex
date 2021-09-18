@@ -238,30 +238,77 @@ or feature vector input data types and outlier detection methods that include
  rovers (planetary science). \todo{[We showed that ...]}
 
 \section{Related Work}
-In astrophysics, 
-    outlier detection methods have been employed for identifying astrophysical
-     objects with unique characteristics (Xiong et al., 2010; 
-     Storey-Fisher et al., 2020; Hayat et al., 2020) as well as 
-     data/modeling artifacts~\citep{wagstaff:des-anom20} (Lochner et al., 2020) in 
-     astronomical surveys. Examples of outlier detection applications in 
-     Earth science include detecting anomalous objects or materials 
-     (Chang and Chiang, 2002; Zhou et al., 2016), data artifacts/noise 
-     (Liu et al., 2017; Alvera-Azcárate et al., 2012), change (Touati et al.,
-      2020; Zhou et al., 2016),  and ocean extremes (Prochaska et al.). 
-      Planetary science applications of outlier detection have mostly focused 
-      on prioritizing samples with novel geologic or geochemical features for
-       follow-up targeting or analysis (Kerner et al., 2020a; Kerner et al., 
-       2020b) \citep{wagstaff:demud13}.
+Methods for outlier detection have been 
+surveyed extensively in prior work
+~\cite{pimentel2014review,chandola2009anomaly,markou2003novelty,
+markou2003novelty2}.
+Methods can be differentiated primarily based on how they define outlierness.
+%
+Reconstruction-based methods aim to construct a model of a dataset by learning 
+a mapping between the data samples and a lower-dimensional representation that
+ minimizes the loss between the input and its reconstruction from the 
+ low-dimensional representation~\citep{kerner2020comparison}. The 
+ reconstruction error is used to compute the outlier score because samples
+  that are unlike the data used to fit the model will be more poorly 
+  reconstructed compared to inliers. Reconstruction-based methods
+  include PCA~\cite{jablonski2015principal}, 
+  autoencoders~\cite{richter2017safe,park2018multimodal}, and
+  generative adversarial networks~\cite{akcay2018ganomaly}.
+%
+ Distance-based methods score outliers based on their distance from some
+``background'' which can be defined in a variety of ways. For example,
+the Reed-Xiaoli (RX) detector computes the 
+Mahalanobis distance between each sample and the background dataset
+defined by its mean and covariance matrix~\cite{reed1990adaptive}.
+%
+Sparsity-based methods, such as the isolation forest~\cite{liu2008isolation}
+and local outlier factor\cite{breunig2000lof},
+ score outliers based on how isolated or sparse they
+are in a given feature space. 
+%
+Probability distribution and density based methods estimate the underlying 
+distribution or probability density of a dataset and score samples based on
+their likelihood under the learned distribution. Examples include the probabilistic
+autoencoder, which scores samples based on the log likelihood under the learned
+latent space distribution~\cite{bohm2020probabilistic}, Gaussian mixture 
+Models, and kernel density estimators~\cite{chandola2009anomaly}. 
+%
+Other methods treat detection of outliers as a supervised classification 
+problem, usually with only one class constituted by the inliers or 
+known normal samples.
+Such methods include one-class support vector 
+machines~\cite{scholkopf1999support},
+support vector data description~\cite{pimentel2014review},
+and negative sampling~\cite{sipple:neg-sampling20}.
 
-\begin{itemize}
-\item Methods for outlier detection
-\item Applications of outlier detection related to our focus domains 
-(e.g., \citet{kerner2020comparison})
-\item Outlier detection toolkits: PyOD Python
-package~\citep{zhao:pyod19}, \url{https://github.com/yzhao062/pyod} 
-\item Tools for applying outlier detection or other methods across
-domains?
-\end{itemize}
+In astrophysics, 
+outlier detection methods have been employed for identifying astrophysical
+objects with unique characteristics~\cite{xiong2010anomaly,
+storey2020anomaly,hayat2021self} as well as data or modeling 
+artifacts in astronomical surveys~\citep{wagstaff:des-anom20,
+lochner2021astronomaly}. 
+Examples of outlier detection applications in 
+Earth science include detecting anomalous objects or materials
+~\cite{chang2002anomaly,zhou2016novel}, data artifacts or noise 
+~\cite{liu2017unsupervised,alvera2012outlier}, change~\cite{zhou2016novel,
+touati2020anomaly}, and ocean extremes~\cite{prochaska2021deep}. 
+Planetary science applications of outlier detection have mostly focused 
+on prioritizing samples with novel geologic or geochemical features for
+follow-up targeting or analysis~\cite{kerner2020analysis,kerner2020comparison,
+wagstaff:demud13}.
+%
+These examples show the promise of applying outlier detection methods in
+a variety of real-world science use cases. However, the effort required to 
+apply and evaluate the variety of available algorithms is non-trivial and can 
+be daunting for non-ML experts, thus impeding the uptake of outlier
+detection methods in science applications.  
+There is a need for tools that make it easier for domain scientists to apply
+outlier detection methods as well as compare results across datasets.
+While there have been some efforts to develop tools for facilitating the
+application of outlier detection methods~\cite{zhao2019pyod}, they cover
+limited data formats and algorithms. The aim of DORA is to fill the need 
+for tools that faciliate application, evaluation, and interpretation of outlier
+detection methods.
 
 \section{Methods}
 
@@ -307,13 +354,6 @@ better performance for different datasets and use cases.
 \end{figure}
 
 \subparagraph{Reconstruction error.}
-Reconstruction-based methods aim to construct a model of a dataset by learning 
-a mapping between the data samples and a lower-dimensional representation that
- minimizes the loss between the input and its reconstruction from the 
- low-dimensional representation~\citep{kerner2020comparison}. The 
- reconstruction error is used to compute the outlier score because samples
-  that are unlike the data used to fit the model will be more poorly 
-  reconstructed compared to inliers. 
 Principal component analysis (PCA) has been used for outlier detection by
 scoring samples using the reconstruction error (here, the L2 norm)
 between inputs and their inverse
@@ -330,8 +370,7 @@ outliers independently maximize coverage of outliers, while DEMUD
 maximizes the fast discovery of distinct outlier types.
 
 \subparagraph{Distance.}
-Distance-based methods score outliers based on their distance from some
-``background'' which is usually defined by a sample distribution. The 
+ The 
 Reed-Xiaoli (RX) detector is commonly used for anomaly detection in
 multispectral and hyperspectral remote sensing; RX uses the Mahalanobis
  distance between a sample and a background dataset mean and covariance
@@ -345,8 +384,7 @@ multispectral and hyperspectral remote sensing; RX uses the Mahalanobis
    the background distribution. 
 
 \subparagraph{Sparsity.}
-Sparsity-based methods score outliers based on how isolated or sparse they
-are in the feature space. Isolation forests are a common sparsity-based method
+Isolation forests are a common sparsity-based method
 that constructs many random binary trees from a 
 dataset~\cite{liu2008isolation}. The outlier score for
 a sample is quantified as the average distance from the root to the item’s 
