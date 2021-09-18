@@ -13,6 +13,7 @@ alg_colors = {
                 'lrx': 'orange'
              }
 
+
 def alg_indexes(filename):
     with open(filename, 'r') as f:
         text = f.read().split("\n")[:-1]
