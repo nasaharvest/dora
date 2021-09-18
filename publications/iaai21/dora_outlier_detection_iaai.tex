@@ -75,6 +75,7 @@
 \setcounter{secnumdepth}{0} %May be changed to 1 or 2 if section numbers are desired.
 
 \usepackage{siunitx}
+\usepackage{amsmath}
 \usepackage[dvipsnames]{xcolor}
 \newcommand{\todo}[1]{\textcolor{blue}{#1}}
 
@@ -586,9 +587,10 @@ Table~\ref{tab:faw_results} compares the precision at $N=n_{outlier}$ for
 each dataset and ranking algorithm. 
 We calculated a random selection baseline which we refer to as ``Theoretical
 Random'' using the expected value of $n_i$ for $i$ random selections:
-\begin{equation}
-\mathbf{E}[n_i, i \in[1, N_s]] = \frac{\sum^i_{j=0} {n_{outlier}\choose j} {D-n_{outlier}\choose i-j} j}{{D\choose i}}
-\end{equation}
+\begin{align}
+\mathbf{E}[n_i, i \in[1, N_s]] &= \frac{\sum^i_{j=0} {n_{outlier}\choose j} {D-n_{outlier}\choose i-j} j}{{D\choose i}} \\
+&= \frac{n_{outlier}i}{D}
+\end{align}
 
 %\todo{Hannah: Consider merging all three data set discussions since they are
 %in one table? with their own figures? The point here isn't really to
