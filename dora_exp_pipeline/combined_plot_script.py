@@ -156,13 +156,14 @@ def combine_plots(resultsdir, label_path, precision_at_n):
 
     if precision_at_n:
         x, y = get_random_precision_curve(scores, validationLabels)
-        plt.plot(x, y, label="{}".format("Theoretical Random"), linestyle='--')
+        plt.plot(x, y, label="{}".format("Theoretical Random"), linestyle='--',
+                 color=alg_colors['random'])
     else:
         x, y = get_random_selections_curve(scores, validationLabels)
         area = sum(y)/sum([i for i in range(len(scores))])
         plt.plot(x, y,
                  label="{} (MDR: {:.2f})".format("Theoretical Random", area),
-                 linestyle='--')
+                 linestyle='--', color=alg_colors['random'])
 
     axes.set_xlim(1, len(scores))
     plt.legend()
