@@ -86,7 +86,7 @@ def random_sel_EV(scores, labels, n):
     n_outliers = sum(labels.values())
 
     # Full formulation
-    #return sum([comb(n_outliers, i) *
+    # return sum([comb(n_outliers, i) *
     #            comb(n_scores-n_outliers, n-i) * i
     #            for i in range(n+1)]) / comb(n_scores, n)
 
