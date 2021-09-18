@@ -458,7 +458,46 @@ performance of each ranking algorithm for a variety of scientific domains
  below.
 
 \subsubsection{Astrophysics: objects in Dark Energy Survey.}
-\todo{Umaa}
+
+Astronomical data sets are large and growing. Large modern optical
+imaging surveys are producing catalogs for of order $10^8$ stars
+and galaxies, with dozens or hundreds of distinct measured features
+for each entry. Discovery science becomes difficult at this data
+volume: the scale is too large for expert human inspection, and separating real
+astrophysical anomalies from non-astrophysical sources like detector artifacts or
+satellite trails is a challenging problem for current
+methods.
+
+The Dark Energy Survey (DES), an ongoing imaging survey of
+$5000~{\rm deg}^2$ of the southern sky conducted from the Cerro-Tololo
+Inter-American Observatory in Chile \cite{DESY1}. The galaxy catalogs produced from
+DES imaging have provided some of the strongest constraints to date on
+the physical properties of dark energy and the accelerated expansion
+of the Universe. The first version of this catalog, released in June 2018, incorporated
+only cuts on signal-to-noise, resolution, masks against known detector
+anomalies and data quality indicators, and the automated data quality
+flags produced during processing. In December 2019, the full catalog
+was released after 18 months of extensive manual vetting. Therefore,
+we were able to use the second version of the catalog as a validation
+set for anomaly detection on the first version.
+
+We compared all methods on a data set that consists of 100K galaxy objects
+observed by the Dark Energy Survey (DES) sampled from the initial June 2018 release.
+25,339 objects from this 100K set that did not appear in the later Dec 2019
+release were likely eliminated during the manual vetting process and were labeled as outliers.
+Note, that the remaining 74,661 objects may also contain outliers, but we assume them to be
+inliers in this experiment.  
+
+We used publicly-available photometry from the $g-$, $r-$, $i-$ and $z-$band DES exposures.  We
+transformed the photometry into luptitudes\footnote{A
+  ``Luptitude''~\cite{lupton99} is an arcsinh-scaled flux, with
+  properties quantitatively equal to
+  traditional astronomical magnitudes for bright sources, but which
+  gracefully handles non-detections and negative fluxes.}.  The inputs features used
+  were the $r$-band luptitude, colors computed as band differences between
+$g-r$, $i-r$, and $z-r$, and associated observational errors, for a total of eight features.
+%
+
 
 \subsubsection{Planetary: targets in Mars rover images.}
 Mars exploration is fundamentally an exercise in discovery with the
@@ -552,7 +591,7 @@ higher outlier scores to samples from MNIST than F-MNIST.
      & Unlabeled &  Outliers &  Inliers \\
     
     \hline
-    Astrophysics &   &   &   \\
+    Astrophysics & 100,000   &  25,339 &  ---- \\
     Earth & 6,757 & 37 & 76  \\
     Planetary & 992 &  9 & 49 \\
     F-MNIST & 60,000 & 1,000 & 1,000  \\
@@ -600,6 +639,7 @@ Random'' using the expected value of $n_i$ for $i$ random selections:
 % targets in $D_{s+}$.
 %
 
+
 For the planetary dataset, we found that
 the Isolation Forest achieved the highest precision (best outlier
 detection) when allowed to select only \num{9} images.
@@ -616,7 +656,11 @@ MDR (Figure \ref{fig:faw_results}). We did not evaluate LRX for this time
 series dataset because LRX can only be applied to gridded image or raster 
 data types.
 
-\todo{Umaa: add results for astro use case.}
+For the astrophysics dataset (Figure~\ref{fig:des_results}, DEMUD was omitted due to computational time 
+and LRX was omitted as it applies only to image data.  Of the remaining methods, 
+PCA achieved the highest precision, following by RX.  Negative sampling 
+performs well initially before its performance drops off.  The PAE finds the most outliers 
+overall.  
 
 For the MNIST and F-MNIST dataset, PCA and DEMUD tied for the highest
  precision at $N=n_{outlier}$
@@ -632,21 +676,32 @@ lowest performance in both metrics.
     \hline
     Algorithm & Astro. & Earth & Planetary & F-MNIST \\
     \hline
-    PCA               & & 0.41 & 0.44 & \textbf{0.84} \\
-    DEMUD             & & 0.41 & 0.44 & \textbf{0.84} \\
+    PCA               & \textbf{0.42} & 0.41 & 0.44 & \textbf{0.84} \\
+    DEMUD             & ---- & 0.41 & 0.44 & \textbf{0.84} \\
     \hline
-    RX                & & 0.43 & ---- & 0.82 \\
-    LRX               & & ---- & 0.33 & 0.56 \\
+    RX                & 0.40 & 0.43 & ---- & 0.82 \\
+    LRX               & ----& ---- & 0.33 & 0.56 \\
     \hline
-    Iso. Forest  & & 0.46 & \textbf{0.56} & 0.74 \\
+    Iso. Forest  & 0.34 & 0.46 & \textbf{0.56} & 0.74 \\
     \hline
-    PAE               & & 0.41 & 0.44 & 0.83 \\
-    Neg. Sampling & & \textbf{0.49} & 0.33 & 0.43 \\
+    PAE               & 0.35 & 0.41 & 0.44 & 0.83 \\
+    Neg. Sampling & 0.32 & \textbf{0.49} & 0.33 & 0.43 \\
     \hline
-    Random            & & 0.32 & 0.14 & 0.49 \\
+    Random            & 0.26 & 0.32 & 0.14 & 0.49 \\
     \hline
   \end{tabular}
 \end{table}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/des_combined_plot.pdf}
+    \caption{Number of true outliers ranked in top $N$ selections for 
+    the astrophysics (DES) dataset.}
+    \label{fig:des_results}
+\end{figure}
+
+
 
 \begin{figure}
     \centering
@@ -671,6 +726,7 @@ lowest performance in both metrics.
     F-MNIST dataset.}
     \label{fig:fmnist_results}
 \end{figure}
+
 
 \section{Discussion}
 
