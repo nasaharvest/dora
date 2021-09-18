@@ -114,7 +114,12 @@ def get_random_precision_curve(scores, validationLabels):
     x = list(range(1, len(scores)+1))
     y = []
     for i in range(len(scores)):
-        y.append(random_sel_EV(scores, validationLabels, i) / (i+1))
+        numOutliers = random_sel_EV(scores, validationLabels, i)
+        y.append(numOutliers / (i+1))
+
+        if (i+1) == sum(validationLabels.values()):
+            print('Precision at N=%d: %f' %
+                (sum(validationLabels.values()), float(numOutliers)/(i+1)))
 
     return x, y
 
@@ -155,6 +160,7 @@ def combine_plots(resultsdir, label_path, precision_at_n):
                      color=alg_colors[labels[i]])
 
     if precision_at_n:
+        print("random_theoretical")
         x, y = get_random_precision_curve(scores, validationLabels)
         plt.plot(x, y, label="{}".format("Theoretical Random"), linestyle='--')
     else:
