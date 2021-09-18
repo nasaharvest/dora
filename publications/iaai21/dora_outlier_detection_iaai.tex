@@ -409,11 +409,20 @@ Samples are scored as outliers using the log likelihood in the latent
 distribution, the autoencoder reconstruction error, or a combination of
 both.
 
-\paragraph{Results organization.} 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/website.png}
+    \caption{Example view of algorithm ranking results in DORA web interface 
+    for planetary dataset.}
+    \label{fig:website}
+\end{figure}
+
+\paragraph{Results interpretation.} 
 Each of the outlier ranking algorithms returns an array containing the sample
 index, outlier score, and selection index (index of each sample after sorting
-by outlier score). DORA provides results organization modules intended to help
- users interpret and make decisions based on these outputs. The simplest 
+by outlier score). DORA provides organization and visualization modules 
+intended to help users interpret and make decisions based on these outputs. 
+The simplest 
  module saves a CSV of the samples sorted by their outlier score 
  (i.e., selection order). Clustering the top
   $N$ outlier selections can enable users to investigate the different types of 
@@ -424,14 +433,13 @@ by outlier score). DORA provides results organization modules intended to help
  evaluation dataset containing known outliers is available, we provide a module
  to assess how well algorithm selections correlate with known outliers. This is
  done by plotting the number of true outliers vs. number of selections made. 
-  Finally,
- we provide a module for plotting histograms of outlier scores to visualize the
+We provide a module for plotting histograms of outlier scores to visualize the
  distribution of scores in the dataset (which may be, e.g., multimodal or 
  long-tailed).
-
-\paragraph{Results visualization.} 
-\todo{Jake: describe website if ready by deadline.}
-\todo{Eric: describe causal graphs if added by deadline.}
+In addition, we are developing a web interface which will be packaged as an
+executable desktop app to further facilitate
+viewing and probing of the results. Figure \ref{fig:website} shows an example 
+view of the rankings across algorithms for the planetary dataset.
 
 \section{Datasets}
 
@@ -443,10 +451,10 @@ performance of each ranking algorithm for a variety of scientific domains
  samples used for evaluation for each dataset. We describe each in detail
  below.
 
-\subsubsection{Astrophysical objects in Dark Energy Survey.}
+\subsubsection{Astrophysics: objects in Dark Energy Survey.}
 \todo{Umaa}
 
-\subsubsection{Targets in Mars rover images.}
+\subsubsection{Planetary: targets in Mars rover images.}
 Mars exploration is fundamentally an exercise in discovery with the
 goal of increasing our understanding of the history, evolution,
 composition, and currently active processes on Mars.  Outliers
@@ -479,7 +487,7 @@ algorithm correlate with human novelty judgments to determine which
 methods would be most suitable for informing onboard decisions about
 follow-up observations.
 
-\subsubsection{Satellite time series for ground-truth observations.}
+\subsubsection{Earth: satellite time series for ground-truth observations.}
 Many Earth science applications using satellite Earth observation (EO) data
  require ground-truth observations for understanding and modeling ground-
  identified objects in the satellite observations. These ground observations
@@ -521,7 +529,7 @@ Many Earth science applications using satellite Earth observation (EO) data
 % (Navcam). 
 %\subsubsection{Volcanic thermal anomalies}
 
-\subsubsection{MNIST and Fashion-MNIST.}
+\subsubsection{Benchmark: MNIST and Fashion-MNIST.}
 We included MNIST and F-MNIST to demonstrate the capabilities of DORA with a
 traditional benchmark dataset. We used 60,000 images from 
 F-MNIST as the training set and a combined set of 2,000 images from MNIST and 
@@ -671,6 +679,7 @@ Summarize conclusions and plans for future work
 [Note that these datasets could also be used by other researchers as OOD
  benchmark tasks?]
  \todo{Can we make any of these datasets publicly available with the paper?}
+ \todo{Future work: other algorithms, datasets, causal graphs.}
 }
 
 \bibliography{dora_references}
