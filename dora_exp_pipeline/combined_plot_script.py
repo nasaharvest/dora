@@ -14,6 +14,18 @@ alg_colors = {
              }
 
 
+def comb(n: int, k: int) -> int:
+    if k < 0 or k > n:
+        return 0
+    if k == 0 or k == n:
+        return 1
+    k = min(k, n - k)  # Take advantage of symmetry
+    c = 1
+    for i in range(k):
+        c = c * (n - i) / (i + 1)
+    return c
+
+
 def alg_indexes(filename):
     with open(filename, 'r') as f:
         text = f.read().split("\n")[:-1]
@@ -81,6 +93,37 @@ def get_precision_curve(scores, validationLabels):
     return x, y
 
 
+def random_sel_EV(scores, labels, n):
+    n_scores = len(scores)
+    n_outliers = sum(labels.values())
+    return sum([comb(n_outliers, i) *
+                comb(n_scores-n_outliers, n-i) * i
+                for i in range(n+1)]) / comb(n_scores, n)
+
+
+def get_random_selections_curve(scores, validationLabels):
+    x = list(range(1, len(scores)+1))
+    y = []
+    for i in range(len(scores)):
+        y.append(random_sel_EV(scores, validationLabels, i))
+
+    return x, y
+
+
+def get_random_precision_curve(scores, validationLabels):
+    x = list(range(1, len(scores)+1))
+    y = []
+    for i in range(len(scores)):
+        numOutliers = random_sel_EV(scores, validationLabels, i)
+        y.append(numOutliers / (i+1))
+
+        if (i+1) == sum(validationLabels.values()):
+            print('Precision at N=%d: %f' %
+                  (sum(validationLabels.values()), float(numOutliers)/(i+1)))
+
+    return x, y
+
+
 def combine_plots(resultsdir, label_path, precision_at_n):
     filenames, labels = filenames_and_labels(resultsdir)
 
@@ -115,6 +158,18 @@ def combine_plots(resultsdir, label_path, precision_at_n):
             area = sum(y)/sum([i for i in range(len(scores))])
             plt.plot(x, y, label="{} (MDR: {:.2f})".format(labels[i], area),
                      color=alg_colors[labels[i]])
+
+    if precision_at_n:
+        print("random_theoretical")
+        x, y = get_random_precision_curve(scores, validationLabels)
+        plt.plot(x, y, label="{}".format("Theoretical Random"), linestyle='--',
+                 color=alg_colors['random'])
+    else:
+        x, y = get_random_selections_curve(scores, validationLabels)
+        area = sum(y)/sum([i for i in range(len(scores))])
+        plt.plot(x, y,
+                 label="{} (MDR: {:.2f})".format("Theoretical Random", area),
+                 linestyle='--', color=alg_colors['random'])
 
     axes.set_xlim(1, len(scores))
     plt.legend()
