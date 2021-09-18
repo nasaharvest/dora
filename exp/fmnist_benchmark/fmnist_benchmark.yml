@@ -39,6 +39,9 @@ outlier_detection: {
   pca: {
     k: 4
   },
+  rx: {
+    k: 4
+  },
   random: { }
 }
 
