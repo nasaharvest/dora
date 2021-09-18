@@ -7,6 +7,9 @@ sample_data/planetary_rover/pds/exp/sol01371
 sample_data/planetary_rover/png/exp/results
 sample_data/planetary_rover/png/exp/*.log
 
+# Node
+dora_vis/node_modules
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

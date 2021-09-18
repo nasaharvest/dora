@@ -412,17 +412,17 @@ both.
 \begin{figure}
     \centering
     \includegraphics[width=0.9\linewidth]{figures/website.png}
-    \caption{Example view of algorithm ranking results in DORA web interface 
+    \caption{Example view of algorithm ranking results in DORA web interface
     for planetary dataset.}
     \label{fig:website}
 \end{figure}
 
-\paragraph{Results interpretation.} 
+\paragraph{Results interpretation.}
 Each of the outlier ranking algorithms returns an array containing the sample
 index, outlier score, and selection index (index of each sample after sorting
-by outlier score). DORA provides organization and visualization modules 
-intended to help users interpret and make decisions based on these outputs. 
-The simplest 
+by outlier score). DORA provides organization and visualization modules
+intended to help users interpret and make decisions based on these outputs.
+The simplest
  module saves a CSV of the samples sorted by their outlier score 
  (i.e., selection order). Clustering the top
   $N$ outlier selections can enable users to investigate the different types of 
@@ -436,10 +436,23 @@ The simplest
 We provide a module for plotting histograms of outlier scores to visualize the
  distribution of scores in the dataset (which may be, e.g., multimodal or 
  long-tailed).
-In addition, we are developing a web interface which will be packaged as an
-executable desktop app to further facilitate
-viewing and probing of the results. Figure \ref{fig:website} shows an example 
-view of the rankings across algorithms for the planetary dataset.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.75\linewidth]{figures/doravis.png}
+  \caption{A screenshot of the DORA visualizer displaying results from the
+  planetary science dataset.}
+  \label{fig:doravis}
+\end{figure}
+
+We developed a desktop application to easily visualize DORA results with the
+Electron application framework and React frontend library. The application loads
+the DORA configuration file to locate the dataset and result CSVs. Then,
+it displays the ranked samples and their scores in a table sorted by their
+selection order. This allows for fast and easy comparison of the results of
+different methods. Figure \ref{fig:doravis} shows a screenshot of the
+``Aggregate Table'' view, which displays all results from different algorithms
+side-by-side.
 
 \section{Datasets}
 
@@ -578,8 +591,13 @@ when the number of selections is the same as the total number of outliers.
 Precision at $N$ is the number of true outliers divided by the number of 
 selections $N$~\citep{campos2016evaluation}.
 Table~\ref{tab:faw_results} compares the precision at $N=n_{outlier}$ for
-each dataset and ranking algorithm. 
-\todo{Jake: add description of theoretical random baseline.}
+each dataset and ranking algorithm. \todo{Random desc by Jake, please edit}
+Metrics for random selection are calculated
+using the expected value of $n_i$ for $i$ random selections:
+\begin{equation}
+\mathbf{E}[n_i, i \in[1, N_s]] = \frac{\sum^i_{j=0} {n_{outlier}\choose j} {D-n_{outlier}\choose i-j} j}{{D\choose i}}
+\end{equation}
+
 %\todo{Hannah: Consider merging all three data set discussions since they are
 %in one table? with their own figures? The point here isn't really to
 %compare algs or data sets but instead to show that we CAN compare
