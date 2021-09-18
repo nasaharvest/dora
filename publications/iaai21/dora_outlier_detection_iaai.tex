@@ -583,9 +583,9 @@ when the number of selections is the same as the total number of outliers.
 Precision at $N$ is the number of true outliers divided by the number of 
 selections $N$~\citep{campos2016evaluation}.
 Table~\ref{tab:faw_results} compares the precision at $N=n_{outlier}$ for
-each dataset and ranking algorithm. \todo{Random desc by Jake, please edit}
-Metrics for random selection are calculated
-using the expected value of $n_i$ for $i$ random selections:
+each dataset and ranking algorithm. 
+We calculated a random selection baseline which we refer to as ``Theoretical
+Random'' using the expected value of $n_i$ for $i$ random selections:
 \begin{equation}
 \mathbf{E}[n_i, i \in[1, N_s]] = \frac{\sum^i_{j=0} {n_{outlier}\choose j} {D-n_{outlier}\choose i-j} j}{{D\choose i}}
 \end{equation}
