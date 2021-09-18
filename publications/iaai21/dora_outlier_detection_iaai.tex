@@ -742,20 +742,21 @@ lowest performance in both metrics.
 \section{Discussion}
 
 \paragraph{Algorithm performance.} There was no one algorithm that 
-consistently had the best performance across all four datasets. PCA had
-the best performance overall for the astrophysics and F-MNIST datasets, 
-while negative sampling and isolation forest had the best performance for
-the Earth science and planetary datasets respectively. [This shows why
-it is best for us to include a variety of algorithms because the best 
-algorithm will vary depending on the dataset.] The purpose of this study
-was to demonstrate how DORA could be used to facilitate comprehensive
+ had the best performance across all four datasets. PCA had
+the best performance for the astrophysics and F-MNIST datasets, 
+while negative sampling and isolation forest was best for
+the Earth science and planetary datasets respectively. This illustrates
+the importance of including a diverse set of algorithms and tools for
+easily inter-comparing them in DORA, since the best
+algorithm will vary for different datasets. The purpose of this study
+was to demonstrate how DORA could be used to facilitate 
 outlier detection experiments and compare results across datasets from 
 different domains. Thus we chose hyperparameters based on common 
-practice and sense and leave hyperparameter tuning, which would likely 
+practice and sense and left hyperparameter tuning, which would likely 
 improve results for each dataset but would require
 creation of additional validation sets, for future work.
  
-\paragraph{Evaluation in outlier detection.} \todo{Discuss why evaluation
+\paragraph{Evaluation in outlier detection.}  \todo{Discuss why evaluation
 in outlier detection applications is hard since we often don't have complete
 labeled data for testing and labels can be subjective.}
 
