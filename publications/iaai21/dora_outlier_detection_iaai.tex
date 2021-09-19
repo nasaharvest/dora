@@ -197,7 +197,7 @@ or feature vector input data types and outlier detection methods that include
     datasets (Earth Science), 
      2) flagging non-astrophysical objects in the Dark Energy Survey 
      (astrophysics), and 3) novelty-guided onboard targeting of instruments
-      for Mars rovers (planetary science). [We showed that ...]
+      for Mars rovers (planetary science). \todo{[We showed that ...]}
 \end{abstract}
 
 \section{Introduction}
@@ -251,42 +251,42 @@ or feature vector input data types and outlier detection methods that include
 
 \section{Related Work}
 Methods for outlier detection have been 
-surveyed extensively in prior work
+surveyed extensively and can be differentiated primarily based on how they 
+score outliers
 ~\cite{pimentel2014review,chandola2009anomaly,markou2003novelty,
 markou2003novelty2}.
-Methods can be differentiated primarily based on how they define outlierness.
 %
-Reconstruction-based methods aim to construct a model of a dataset by learning 
-a mapping between the data samples and a lower-dimensional representation that
+Reconstruction-based methods construct a model of a dataset by learning 
+a mapping between the input data and a lower-dimensional representation that
  minimizes the loss between the input and its reconstruction from the 
  low-dimensional representation~\citep{kerner2020comparison}. The 
- reconstruction error is used to compute the outlier score because samples
+ reconstruction error is used as the outlier score because samples
   that are unlike the data used to fit the model will be more poorly 
   reconstructed compared to inliers. Reconstruction-based methods
   include PCA~\cite{jablonski2015principal}, 
   autoencoders~\cite{richter2017safe,park2018multimodal}, and
   generative adversarial networks~\cite{akcay2018ganomaly}.
 %
- Distance-based methods score outliers based on their distance from some
+ Distance-based methods score outliers based on their distance from a
 ``background'' which can be defined in a variety of ways. For example,
 the Reed-Xiaoli (RX) detector computes the 
 Mahalanobis distance between each sample and the background dataset
 defined by its mean and covariance matrix~\cite{reed1990adaptive}.
 %
-Sparsity-based methods, such as the isolation forest~\cite{liu2008isolation}
-and local outlier factor\cite{breunig2000lof},
- score outliers based on how isolated or sparse they
+Sparsity-based methods such as isolation forest~\cite{liu2008isolation}
+and local outlier factor~\cite{breunig2000lof}
+ score outliers based on how isolated or sparse samples 
 are in a given feature space. 
 %
 Probability distribution and density based methods estimate the underlying 
 distribution or probability density of a dataset and score samples based on
-their likelihood under the learned distribution. Examples include the probabilistic
+their likelihood. Examples include the probabilistic
 autoencoder, which scores samples based on the log likelihood under the learned
 latent space distribution~\cite{bohm2020probabilistic}, Gaussian mixture 
 Models, and kernel density estimators~\cite{chandola2009anomaly}. 
 %
-Other methods treat detection of outliers as a supervised classification 
-problem, usually with only one class constituted by the inliers or 
+Other methods formulate outlier detection as supervised classification, 
+usually with only one class constituted by the inliers or 
 known normal samples.
 Such methods include one-class support vector 
 machines~\cite{scholkopf1999support},
@@ -337,24 +337,22 @@ configuration files. In a configuration file, users can specify the input data,
 feature extraction methods, normalization method, outlier ranking methods, and 
 results organization methods. 
 
-\paragraph{Data types.} We chose to initially implement data loaders for four
+\paragraph{Data types.} We chose to implement data loaders for four
 data types that are commonly used by the machine learning and domain science
 communities: time series, feature vectors, images (grayscale or RGB), and 
-$N$-band rasters. $N$-band rasters are essentially images in which every pixel
-is associated with a location defined by a geographic coordinate reference 
-system (e.g., latitude/longitude in degrees). Most satellite data are 
-distributed as rasters; common formats include GeoTIFF, NetCDF, and 
-HDF. A data loader for each data type locates the data by the path(s)
+$N$-band rasters. $N$-band rasters are images or grids in which every pixel
+is associated with a location (e.g., latitude/longitude in degrees); 
+most satellite data are distributed as rasters.
+A data loader for each data type locates the data by the path(s)
 defined in the configuration file and loads samples into a dictionary of numpy
- arrays indexed by the sample id. This \texttt{data\_dict} is then passed to each of the ranking algorithms specified in 
- the configuration file.
+ arrays indexed by the sample id. This \texttt{data\_dict} is then passed to each of the ranking algorithms.
 
-\paragraph{Outlier ranking algorithms.} We implemented 7 algorithms for 
-scoring and 
-ranking samples by outlierness. All algorithms are unsupervised.
+\paragraph{Outlier ranking algorithms.} We implemented 7 unsupervised 
+algorithms for scoring and 
+ranking samples by outlierness. 
 We chose these algorithms to include a diverse
-set of approaches to scoring outliers since different algorithms may have 
-better performance for different datasets and use cases. 
+set of approaches to scoring outliers since different algorithms may  
+perform better for different datasets and use cases. 
 %We describe each
 %approach to scoring outliers and the associated methods below.
 
@@ -460,51 +458,46 @@ side-by-side.
 
 \section{Datasets}
 
-We constructed three datasets to evaluate the utility of DORA and the
-performance of each ranking algorithm for a variety of scientific domains
+We constructed three datasets to evaluate the utility of DORA and 
+algorithm performance for a variety of scientific domains
  (astrophysics, planetary science, and Earth science). We also included a 
  benchmark dataset that uses MNIST and Fashion-MNIST. Table \ref{tab:datasets}
- summarizes the number of unlabeled samples used for training and labeled
- samples used for evaluation for each dataset. We describe each in detail
- below.
+ summarizes the number of unlabeled samples used for training evaluation for
+ each dataset. We describe each dataset in detail below.
 
 \subsubsection{Astrophysics: objects in Dark Energy Survey.}
-
 Astronomical data sets are large and growing. Large modern optical
-imaging surveys are producing catalogs for of order $10^8$ stars
+imaging surveys are producing catalogs of order $10^8$ stars
 and galaxies, with dozens or hundreds of distinct measured features
 for each entry. Discovery science becomes difficult at this data
 volume: the scale is too large for expert human inspection, and separating real
 astrophysical anomalies from non-astrophysical sources like detector artifacts or
-satellite trails is a challenging problem for current
-methods.
+satellite trails is a challenging problem for current methods.
 
-The Dark Energy Survey (DES), an ongoing imaging survey of
-$5000~{\rm deg}^2$ of the southern sky conducted from the Cerro-Tololo
-Inter-American Observatory in Chile \cite{DESY1}. The galaxy catalogs produced from
-DES imaging have provided some of the strongest constraints to date on
-the physical properties of dark energy and the accelerated expansion
-of the Universe. The first version of this catalog, released in June 2018, incorporated
-only cuts on signal-to-noise, resolution, masks against known detector
+The Dark Energy Survey (DES) is an ongoing imaging survey of
+$5000~{\rm deg}^2$ of the southern sky from the Cerro-Tololo
+Inter-American Observatory in Chile \cite{DESY1}. The resulting galaxy catalogs produced have provided some of the strongest constraints to date on
+the physical properties of dark energy and accelerated expansion
+of the Universe. The first version of this catalog, released June 2018, incorporated
+only cuts on signal-to-noise and resolution, masks against known detector
 anomalies and data quality indicators, and the automated data quality
-flags produced during processing. In December 2019, the full catalog
-was released after 18 months of extensive manual vetting. Therefore,
-we were able to use the second version of the catalog as a validation
-set for anomaly detection on the first version.
+flags produced during processing to filter outliers. 
+In December 2019, the full catalog
+was released after 18 months of extensive manual vetting. We used the samples 
+that were removed in the second version of the catalog as a set of known
+outliers for evaluating anomaly detection methods on the first version.
 
-We compared all methods on a data set that consists of 100K galaxy objects
+We compared all methods on a dataset of 100K galaxy objects
 observed by the Dark Energy Survey (DES) sampled from the initial June 2018 release.
-25,339 objects from this 100K set that did not appear in the later Dec 2019
-release were likely eliminated during the manual vetting process and were labeled as outliers.
-Note, that the remaining 74,661 objects may also contain outliers, but we assume them to be
-inliers in this experiment.  
-
-We used publicly-available photometry from the $g-$, $r-$, $i-$ and $z-$band DES exposures.  We
+We labeled the 25,339 objects from this 100K set that did not appear in the later December 2019
+release, thus were likely eliminated during the manual vetting process, 
+as outliers.
+While the remaining 74,661 objects may also contain outliers, we assume them to be inliers in this experiment. We used publicly-available photometry from the $g-$, $r-$, $i-$ and $z-$band DES exposures.  We
 transformed the photometry into luptitudes\footnote{A
   ``Luptitude''~\cite{lupton99} is an arcsinh-scaled flux, with
   properties quantitatively equal to
   traditional astronomical magnitudes for bright sources, but which
-  gracefully handles non-detections and negative fluxes.}.  The inputs features used
+  gracefully handles non-detections and negative fluxes.}.  The input features 
   were the $r$-band luptitude, colors computed as band differences between
 $g-r$, $i-r$, and $z-r$, and associated observational errors, for a total of eight features.
 %
@@ -532,48 +525,43 @@ merit further study.  Our rover image data covers sols \num{1343}
 to \num{1703}.  We partitioned the images chronologically to assess
 outlier detection in the 10 most recent sols, using ``prior'' set
 $D_{1343-1693}$ ($n=992$) and ``assessment'' set $D_{1694-1703}$
-($n=58)$ for evaluation.
-
-We collaborated with an MSL science planning team member to
+($n=58)$ for evaluation. We collaborated with an MSL science team member to
 independently review the targets in $D_{1694-1703}$ and identify those
-that were 
 considered novel by the mission ($n_{outlier} = 9$).  Our goal for
 this application is to assess how well the selections made by each
 algorithm correlate with human novelty judgments to determine which
 methods would be most suitable for informing onboard decisions about
 follow-up observations.
 
-\subsubsection{Earth: satellite time series for ground-truth observations.}
+\subsubsection{Earth: satellite time series for ground observations.}
 Many Earth science applications using satellite Earth observation (EO) data
- require ground-truth observations for understanding and modeling ground-
+ require ground-truth observations for identifying and modeling ground-
  identified objects in the satellite observations. These ground observations
  also serve as labels that are paired with satellite data inputs for machine 
  learning models. For example, a model trained to classify crop types in
- satellite observations requires geo-referenced labels of crop type annotated
- in the field~\cite{tseng2021learning}. A widespread challenge of using ground-
- annotated datasets is that there are often points with erroneous location or 
+ satellite observations requires ground-annotated labels of crop type~\cite{tseng2021learning}. A widespread challenge for ground-
+ annotated labels is that there are often points with erroneous location or 
  label information (e.g., due to GPS location error or human entry error) that
- need to be cleaned before the dataset can be used for machine learning or
- other downstream use cases. Automatically detecting these outliers could save 
+ need to be cleaned before the labels can be used for machine learning or
+ other downstream uses. Automatically detecting these outliers could save 
  substantial time required for cleaning datasets and improve the performance of
  downstream analyses that rely on high-quality datasets. 
- %
- We used a dataset of ground
- observations of fall army worm (FAW) in maize crops collected by the UN Food
+ 
+ We used a dataset of ground annotations of maize crops collected by the UN Food
  and Agriculture Organization (FAO). This dataset includes 6,757 samples
  with location (latitude/longitude) metadata primarily in Africa and Southeast
  Asia. Most locations coincide with crop
  fields but there are many outliers that coincide with other land cover types 
  such as water, buildings, or forests. We constructed an evaluation set 
- consisting of all samples in Kenya ($n=113$) and manually annotated whether 
- each sample was considered an inlier (i.e., located in a crop field) or not 
- using high-resolution Planet satellite images in Collect Earth 
- Online~\cite{planetdata} ($n_{inlier}=76$, $n_{outlier}=37$). We used Google
+ of all samples in Kenya ($n=113$) and manually annotated whether 
+ each sample was located in a crop field (inlier) or not (outlier)
+ using high-resolution satellite images in Collect Earth 
+ Online ($n_{inlier}=76$, $n_{outlier}=37$). We used Google
  Earth Engine to export the Sentinel-1 synthetic aperture radar (SAR) monthly
- time series for each sample location, using data from year each sample was 
+ time series for each sample location, using data from the year each sample was 
  collected. We used SAR data because it is sensitive to ground texture and
   penetrates clouds, which is important for the often-cloudy region covered
-  by the dataset. Our goal for this application is to assess how well the 
+  by the dataset. Our goal for this application was to assess how well the 
   selections made by each algorithm correlate with outliers determined by
   visual inspection of the satellite images.
 % descoped for lack of time and space
@@ -586,11 +574,12 @@ Many Earth science applications using satellite Earth observation (EO) data
 %\subsubsection{Volcanic thermal anomalies}
 
 \subsubsection{Benchmark: MNIST and Fashion-MNIST.}
-We included MNIST and F-MNIST to demonstrate the capabilities of DORA with a
+We used MNIST and F-MNIST to demonstrate the capabilities of DORA with a
 traditional benchmark dataset. We used 60,000 images from 
-F-MNIST as the training set and a combined set of 2,000 images from MNIST and 
-F-MNIST as the evaluation set. Well-discriminating algorithms should assign 
-higher outlier scores to samples from MNIST than F-MNIST.
+F-MNIST as the training set and a test set of 1,000 images from MNIST (outliers)
+ and 1,000 from F-MNIST (inliers). 
+ %Well-discriminating algorithms should assign 
+%higher outlier scores to samples from MNIST than F-MNIST.
 
 \begin{table}
   \caption{Number of samples in the training and test sets for each dataset,
@@ -606,7 +595,7 @@ higher outlier scores to samples from MNIST than F-MNIST.
     Planetary & 992 &  9 & 49 \\
     Earth & 6,757 & 37 & 76  \\
     F-MNIST & 60,000 & 1,000 & 1,000  \\
-    Astrophysics & 100,000   &  25,339 &  ---- \\
+    Astrophysics & 100,000   &  25,339 &  74,661 \\
     \hline
   \end{tabular}
 \end{table}
@@ -650,7 +639,6 @@ Random'' using the expected value of $n_i$ for $i$ random selections:
 % We initialized each algorithm with $D_s$ and requested a ranking of
 % targets in $D_{s+}$.
 %
-
 
 For the planetary dataset, we found that
 the Isolation Forest achieved the highest precision (best outlier
