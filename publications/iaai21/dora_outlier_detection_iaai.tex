@@ -207,12 +207,9 @@ sets is of interest for a wide variety of scientific domains. Depending on the
   detection, outlier detection, or novelty detection. More broadly, this is 
   referred to as out-of-distribution (OOD) detection. In general, the goal of 
   OOD detection systems is to identify samples that deviate from the majority
-   of samples in a dataset in an unsupervised manner (Pimentel et al., 2014). 
+   of samples in a dataset in an unsupervised manner~\cite{pimentel2014review}. 
    In machine learning, these methods are commonly used for identifying 
-   mislabeled or otherwise invalid samples in a dataset 
-   (e.g., Liang et al., 2018; Böhm et al., 2020). 
-   
-   When working with science datasets, OOD detection can be used for 
+   mislabeled or otherwise invalid samples in a dataset. When working with science datasets, OOD detection can be used for 
    cleaning datasets, e.g., flagging ground-truth labels with GPS or human
     entry error or identifying wrongly categorized objects in a catalog. 
     It could also be used for discovery, e.g., to flag novel samples in order 
@@ -220,6 +217,7 @@ sets is of interest for a wide variety of scientific domains. Depending on the
    is the detection of rare objects that are known to exist but the known
    examples are too few to create a large enough labeled dataset for 
    supervised classification algorithms. 
+   
   Despite wide differences in applications, data types, and dimensionality,
  the same underlying machine learning algorithms can be employed across 
  all of these domains. A challenge for applying them however is that domain
@@ -270,7 +268,7 @@ a mapping between the input data and a lower-dimensional representation that
   that are unlike the data used to fit the model will be more poorly 
   reconstructed compared to inliers. Reconstruction-based methods
   include PCA~\cite{jablonski2015principal}, 
-  autoencoders~\cite{richter2017safe,park2018multimodal}, and
+  autoencoders~\cite{richter2017safe}, and
   generative adversarial networks~\cite{akcay2018ganomaly}.
 %
  Distance-based methods score outliers based on their distance from a
@@ -285,34 +283,32 @@ and local outlier factor~\cite{breunig2000lof}
 are in a given feature space. 
 %
 Probability distribution and density based methods estimate the underlying 
-distribution or probability density of a dataset and score samples based on
-their likelihood. Examples include the probabilistic
-autoencoder, which scores samples based on the log likelihood under the learned
+distribution or probability density of a dataset and score samples using
+ likelihood. Examples include the probabilistic
+autoencoder, which scores samples based on the log likelihood under the 
 latent space distribution~\cite{bohm2020probabilistic}, Gaussian mixture 
 Models, and kernel density estimators~\cite{chandola2009anomaly}. 
 %
 Other methods formulate outlier detection as supervised classification, 
-usually with only one class constituted by the inliers or 
+usually with only one class constituted by 
 known normal samples.
 Such methods include one-class support vector 
-machines~\cite{scholkopf1999support},
-support vector data description~\cite{pimentel2014review},
+machines~\cite{scholkopf1999support}
 and negative sampling~\cite{sipple:neg-sampling20}.
 
 In astrophysics, 
 outlier detection methods have been used to identify astrophysical
-objects with unique characteristics~\cite{xiong2010anomaly,
-storey2020anomaly,hayat2021self} as well as data or modeling 
-artifacts in astronomical surveys~\citep{wagstaff:des-anom20,
-lochner2021astronomaly}. 
+objects with unique characteristics~\cite{hayat2021self} 
+as well as data or modeling 
+artifacts in astronomical surveys~\citep{wagstaff:des-anom20}. 
 Example outlier detection applications in 
 Earth science include detecting anomalous objects or materials
-~\cite{chang2002anomaly,zhou2016novel}, data artifacts or noise 
-~\cite{liu2017unsupervised,alvera2012outlier}, change~\cite{zhou2016novel,
-touati2020anomaly}, and ocean extremes~\cite{prochaska2021deep}. 
+~\cite{zhou2016novel}, data artifacts or noise 
+~\cite{liu2017unsupervised}, change~\cite{touati2020anomaly}, 
+and ocean extremes~\cite{prochaska2021deep}. 
 Planetary science applications have mostly focused 
 on prioritizing samples with novel geologic or geochemical features for
-follow-up targeting or analysis~\cite{kerner2020analysis,kerner2020comparison,
+follow-up targeting or analysis~\cite{kerner2020comparison,
 wagstaff:demud13}.
 %
 These examples show the benefit of applying outlier detection methods in
@@ -462,7 +458,7 @@ side-by-side.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.9\linewidth]{figures/doravis.png}
+  \includegraphics[width=0.83\linewidth]{figures/doravis.png}
   \caption{A screenshot of the DORA visualizer displaying results from the
   planetary science dataset.}
   \label{fig:doravis}
@@ -506,7 +502,7 @@ satellite trails is a challenging problem for current methods.
 
 The Dark Energy Survey (DES) is an ongoing imaging survey of
 $5000~{\rm deg}^2$ of the southern sky from the Cerro-Tololo
-Inter-American Observatory in Chile \cite{DESY1}. The resulting galaxy catalogs produced have provided some of the strongest constraints to date on
+Inter-American Observatory in Chile~\cite{zuntz2018dark}. The resulting galaxy catalogs produced have provided some of the strongest constraints to date on
 the physical properties of dark energy and accelerated expansion
 of the Universe. The first version of this catalog, released June 2018, incorporated
 only cuts on signal-to-noise and resolution, masks against known detector
@@ -569,7 +565,7 @@ Many Earth science applications using satellite Earth observation (EO) data
  identified objects in the satellite observations. These ground observations
  also serve as labels that are paired with satellite data inputs for machine 
  learning models. For example, a model trained to classify crop types in
- satellite observations requires ground-annotated labels of crop type~\cite{tseng2021learning}. A widespread challenge for ground-
+ satellite observations requires ground-annotated labels of crop type. A widespread challenge for ground-
  annotated labels is that there are often points with erroneous location or 
  label information (e.g., due to GPS location error or human entry error) that
  need to be cleaned before the labels can be used for machine learning or
@@ -586,9 +582,9 @@ Many Earth science applications using satellite Earth observation (EO) data
  of all samples in Kenya ($n=113$) and manually annotated whether 
  each sample was located in a crop field (inlier) or not (outlier)
  using high-resolution satellite images in Collect Earth 
- Online ($n_{inlier}=76$, $n_{outlier}=37$). We used Google
- Earth Engine to export the Sentinel-1 synthetic aperture radar (SAR) monthly
- time series for each sample location, using data from the year each sample was 
+ Online ($n_{inlier}=76$, $n_{outlier}=37$). We used the Sentinel-1 
+ synthetic aperture radar (SAR) monthly median
+ time series for each sample location from the year the sample was 
  collected. We used SAR data because it is sensitive to ground texture and
   penetrates clouds, which is important for the often-cloudy region covered
   by the dataset. Our goal for this application was to assess how well the 
@@ -666,8 +662,7 @@ labels of known outliers were available (Table \ref{tab:datasets}).
 For each test set, we created a plot of the number of known outliers 
 detected out of the top $N$ selections. We also 
 reported the Mean Discovery Rate (MDR) in the legend
-for each algorithm to give a quantitative comparison of the curves that could
-be comparable across the datasets. We defined MDR as:
+for each algorithm to give a quantitative comparison across the datasets. We defined MDR as:
 \begin{equation}
 MDR = \frac{\sum^{N_s}_{i=1} n_i}{\sum^{N_s}_{i=1} s_i}
 \end{equation}
