@@ -323,24 +323,24 @@ There is a need for tools that make it easier for domain scientists to apply
 outlier detection methods as well as compare results across datasets.
 While there have been some efforts to develop tools for facilitating the
 application of outlier detection methods~\cite{zhao2019pyod}, they cover
-limited data formats and algorithms. The aim of DORA is to fill the need 
+limited data formats and algorithms. DORA aims to fill the need 
 for tools that faciliate application, evaluation, and interpretation of outlier
 detection methods.
 
 \section{Methods}
-
 %\subsection{DORA configurable pipeline} 
-Figure \ref{fig:dora} illustrates the architecture of DORA. It includes 
-data loading, feature extraction, outlier ranking, results organization, and 
-results visualizaiton modules. The DORA pipeline is implemented in Python 3.
+Figure \ref{fig:dora} illustrates the architecture of DORA including 
+data loading, feature extraction, outlier ranking, and results organization
+and visualization modules. 
 In order to improve the readability and execution speed of the code, we adopted
 object-oriented and functional programming practices.  We designed DORA to be 
 readily extensible to support additional data types or formats, outlier detection 
 algorithms, and results organization or visualization methods by writing new 
 modules that follow the DORA API. Experimental settings are controlled by 
-configuration files. In a configuration file, users can specify the input data, 
+configuration files in which users can specify the input data, 
 feature extraction methods, normalization method, outlier ranking methods, and 
 results organization methods. 
+DORA is implemented in Python 3.
 
 \paragraph{Data types.} We chose to implement data loaders for four
 data types that are commonly used by the machine learning and domain science
@@ -373,30 +373,30 @@ Principal component analysis (PCA) has been used for outlier detection by
 scoring samples using the reconstruction error (here, the L2 norm)
 between inputs and their inverse
  transformation from the principal subspace~\citep{kerner2020comparison}.
-The DEMUD algorithm~\citep{wagstaff:demud13} differs from other
+ DEMUD~\citep{wagstaff:demud13} differs from other
 outlier ranking methods: instead of independently scoring all
 observations, DEMUD incrementally identifies the most unusual
 remaining item, then incorporates it into the model of ``known''
 (non-outlier) observations before selecting the next most unusual
 item.  DEMUD's goal is to identify diverse outliers and avoid
-redundant selections.  Once an outlier is encountered, repeated
+redundant selections.  Once an outlier is found, repeated
 occurrences of that outlier are deprioritized.  Methods that score
-outliers independently maximize coverage of outliers, while DEMUD
-maximizes the fast discovery of distinct outlier types.
+samples independently maximize coverage of outliers, while DEMUD
+maximizes fast discovery of distinct outlier types.
 
 \subparagraph{Distance.}
  The 
 Reed-Xiaoli (RX) detector is commonly used for anomaly detection in
-multispectral and hyperspectral remote sensing; RX uses the Mahalanobis
- distance between a sample and a background dataset mean and covariance
- to score samples~\citep{reed1990adaptive}. The local variant of RX (Local
- RX or LRX) can be used for image or raster data types and scores each pixel in
+multispectral and hyperspectral remote sensing. RX scores samples using
+ the Mahalanobis
+ distance between a sample and a background mean and covariance
+ ~\citep{reed1990adaptive}. The local variant of RX (Local
+ RX or LRX) can be used for image or raster data and scores each pixel in
   an image with respect to a window ``ring'' of pixels surrounding 
   it~\citep{molero2013analysis}. 
-  LRX requires two parameters that define the ring: an outer window which 
-  defines the size of the window surrounding the pixel and an inner window
-   which defines the size of the window around the target pixel to exclude from
-   the background distribution. 
+  LRX requires two parameters to define the size of the outer window 
+  surrounding the pixel and the inner window
+   around the target pixel to exclude from the background distribution. 
 
 \subparagraph{Sparsity.}
 Isolation forests are a common sparsity-based method
@@ -426,7 +426,7 @@ both.
 
 \paragraph{Results interpretation.}
 Each of the outlier ranking algorithms returns an array containing the sample
-index, outlier score, and selection index (index of each sample after sorting
+index, outlier score, and selection index (index after sorting
 by outlier score). DORA provides organization and visualization modules
 intended to help users interpret and make decisions based on these outputs.
 The simplest
@@ -439,10 +439,25 @@ The simplest
  (SOMs) algorithms for clustering the top-N outliers. For use cases in which an
  evaluation dataset containing known outliers is available, we provide a module
  to assess how well algorithm selections correlate with known outliers. This is
- done by plotting the number of true outliers vs. number of selections made. 
+ done by plotting the number of known outliers vs. number of selections made. 
 We provide a module for plotting histograms of outlier scores to visualize the
  distribution of scores in the dataset (which may be, e.g., multimodal or 
- long-tailed).
+ long-tailed). 
+We developed a desktop application to easily visualize DORA results with the
+Electron application framework and React frontend library. 
+This enables fast and easy comparison of the results from
+different methods. Figure \ref{fig:doravis} shows a screenshot of the
+``Aggregate Table'' view, which displays all algorithm results 
+side-by-side.
+
+%We developed a desktop application to easily visualize DORA results with the
+%Electron application framework and React frontend library. The application loads
+%the DORA configuration file to locate the dataset and result CSVs. Then,
+%it displays the ranked samples and their scores in a table sorted by their
+%selection order. This allows for fast and easy comparison of the results of
+%different methods. Figure \ref{fig:doravis} shows a screenshot of the
+%``Aggregate Table'' view, which displays all results from different algorithms
+%side-by-side.
 
 \begin{figure}
   \centering
@@ -452,17 +467,15 @@ We provide a module for plotting histograms of outlier scores to visualize the
   \label{fig:doravis}
 \end{figure}
 
-We developed a desktop application to easily visualize DORA results with the
-Electron application framework and React frontend library. The application loads
-the DORA configuration file to locate the dataset and result CSVs. Then,
-it displays the ranked samples and their scores in a table sorted by their
-selection order. This allows for fast and easy comparison of the results of
-different methods. Figure \ref{fig:doravis} shows a screenshot of the
-``Aggregate Table'' view, which displays all results from different algorithms
-side-by-side.
-
 \section{Datasets}
-\begin{table}
+We constructed three datasets to evaluate the utility of DORA and 
+algorithm performance for a variety of scientific domains
+ (astrophysics, planetary science, and Earth science). We also included a 
+ benchmark dataset that uses MNIST and Fashion-MNIST. Table \ref{tab:datasets}
+ summarizes the number of unlabeled samples used for training evaluation for
+ each dataset. We describe each dataset in detail below.
+ 
+ \begin{table}
   \caption{Number of samples in the training and test sets for each dataset,
   ordered by dataset size.}
   \label{tab:datasets}
@@ -480,13 +493,6 @@ side-by-side.
     \hline
   \end{tabular}
 \end{table}
-
-We constructed three datasets to evaluate the utility of DORA and 
-algorithm performance for a variety of scientific domains
- (astrophysics, planetary science, and Earth science). We also included a 
- benchmark dataset that uses MNIST and Fashion-MNIST. Table \ref{tab:datasets}
- summarizes the number of unlabeled samples used for training evaluation for
- each dataset. We describe each dataset in detail below.
 
 \subsubsection{Astrophysics: objects in Dark Energy Survey.}
 Astronomical data sets are large and growing. Large modern optical
@@ -528,15 +534,15 @@ $g-r$, $i-r$, and $z-r$, and associated observational errors, for a total of eig
 
 \subsubsection{Planetary: targets in Mars rover images.}
 Mars exploration is fundamentally an exercise in discovery with the
-goal of increasing our understanding of the history, evolution,
-composition, and currently active processes on Mars.  Outliers
+goal of increasing our understanding of Mars's history, evolution,
+composition, and currently active processes.  Outliers
 identified in Mars observations can inspire new discoveries and inform
 the choice of which areas merit follow-up or deeper
 investigation~\cite{kerner2020comparison,wagstaff:rover-novelty20}.
 We collected \num{72} images from the Navigation camera (Navcam) 
 on the Mars Science Laboratory (MSL) rover
-and employed the Rockster~\cite{burl:rockster16}
-method currently used by onboard rover software to identify candidate rock
+and employed Rockster~\cite{burl:rockster16}
+(currently used by onboard rover software) to identify candidate rock
 targets with an area of at least 100 pixels, yielding \num{1050}
 targets.  We cropped out a \num{64}$\times$\num{64} pixel image
 centered on each target.
@@ -604,8 +610,7 @@ F-MNIST as the training set and a test set of 1,000 images each from MNIST (outl
 %higher outlier scores to samples from MNIST than F-MNIST.
 
 \begin{table}
-  \caption{Precision at $N=n_{outlier}$ for three applications and F-MNIST
-   benchmark; the best result for each data set is in bold.}
+  \caption{Precision at $N=n_{outlier}$ for four datasets; the best result for each data set is in bold.}
   \label{tab:faw_results}
   \centering
   \begin{tabular}{l|cccc}
@@ -629,25 +634,35 @@ F-MNIST as the training set and a test set of 1,000 images each from MNIST (outl
 \end{table}
 
 \section{Results}
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=\linewidth]{figures/planetary_combined_plot.pdf}
-    \caption{Number of true outliers ranked in top $N$ selections for 
+    \caption{Number of known outliers ranked in top $N$ selections for 
     planetary rover dataset.}
     \label{fig:planetary_results}
 \end{figure}
-\begin{figure}
+
+\begin{figure}[h]
     \centering
     \includegraphics[width=\linewidth]{figures/faw_combined_plot.pdf}
-    \caption{Number of true outliers ranked in top $N$ selections for 
+    \caption{Number of known outliers ranked in top $N$ selections for 
     Earth science dataset.}
     \label{fig:faw_results}
 \end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{figures/des_combined_plot.pdf}
+    \caption{Number of known outliers ranked in top $N$ selections for 
+    the astrophysics (DES) dataset.}
+    \label{fig:des_results}
+\end{figure}
+
 The experimental setup for each dataset was to fit or train a model for
 each ranking algorithm using a larger unlabeled dataset and then apply 
 the models to compute the outlier scores for a smaller test dataset for which
 labels of known outliers were available (Table \ref{tab:datasets}). 
-For each test set, we created a plot of the number of known/true outliers 
+For each test set, we created a plot of the number of known outliers 
 detected out of the top $N$ selections. We also 
 reported the Mean Discovery Rate (MDR) in the legend
 for each algorithm to give a quantitative comparison of the curves that could
@@ -663,7 +678,7 @@ among $s_i$ selections.
 We also reported the precision at $N=n_{outlier}$ for each test set where
 $n_{outlier}$ is the number of known outliers, i.e.,  the precision obtained 
 when the number of selections is the same as the total number of outliers. 
-Precision at $N$ is the number of true outliers divided by the number of 
+Precision at $N$ is the number of known outliers divided by the number of 
 selections $N$~\citep{campos2016evaluation}.
 Table~\ref{tab:faw_results} compares the precision at $N=n_{outlier}$ for
 each dataset and ranking algorithm. 
@@ -691,7 +706,7 @@ all \num{58} target images in $D_{1694-1703}$. We could not
 employ RX since the data dimensionality ($64 \times 64 =
 4096$) exceeded the data set size. 
 
-For the Earth dataset, the negative sampling algorithm had the best performance
+For the Earth dataset, negative sampling had the best performance
 in both metrics. DEMUD, PCA, and PAE tied for the lowest precision at 
 $N=n_{outlier}$ while DEMUD and PCA tied for the lowest
 MDR (Figure \ref{fig:faw_results}). We did not evaluate LRX for this time 
@@ -709,27 +724,18 @@ For the MNIST and F-MNIST dataset, PCA and DEMUD tied for the highest
 while DEMUD, PCA, and PAE tied for the highest MDR. Negative sampling had the 
 lowest performance in both metrics. 
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{figures/des_combined_plot.pdf}
-    \caption{Number of true outliers ranked in top $N$ selections for 
-    the astrophysics (DES) dataset.}
-    \label{fig:des_results}
-\end{figure}
+\section{Discussion}
 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/fmnist_combined_plot.pdf}
-    \caption{Number of true outliers ranked in top $N$ selections for 
+    \caption{Number of known outliers ranked in top $N$ selections for 
     F-MNIST dataset.}
     \label{fig:fmnist_results}
 \end{figure}
 
-
-\section{Discussion}
-
 \paragraph{Algorithm performance.} 
-There was no one algorithm that 
+No one algorithm  
  had the best performance across all four datasets. PCA had
 the best performance for the astrophysics and F-MNIST datasets, 
 while negative sampling and isolation forest was best for
@@ -739,10 +745,8 @@ easily inter-comparing them in DORA, since the best
 algorithm will vary for different datasets. The purpose of this study
 was to demonstrate how DORA could be used to facilitate 
 outlier detection experiments and compare results across datasets from 
-different domains. Thus we chose hyperparameters based on common 
-practice and sense and left hyperparameter tuning, which would likely 
-improve results for each dataset but would require
-creation of additional validation sets, for future work.
+different domains. Thus we did not perform hyperparameter tuning which
+could improve results for each dataset; we leave this for future work.
  
 \paragraph{Evaluation in outlier detection.} 
 Prior work has emphasized
@@ -814,7 +818,7 @@ Directorate (under the NASA Cross-Divisional AI Use Case Demonstration grants)
 
 \todo{Acknowledge DES?}
 We thank the UN Food and Agriculture Organization (FAO) and Dr. Ritvik Sahajpal
-(University of Maryland/NASA Harvest) for providing the fall army worm ground
+(University of Maryland/NASA Harvest) for providing the maize ground
  observation dataset.
 
 We thank Raymond Francis for analyzing the Navcam rover images to
