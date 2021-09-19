@@ -173,31 +173,30 @@
 \maketitle
 
 \begin{abstract}
-Automatic detection of out-of-distribution (OOD) samples or features is
-universally needed when working with scientific datasets. For example,
-OOD detection methods can be used for cleaning datasets or flagging
-novel samples in order to guide instrument acquisition or scientific analysis.
-We present Domain-agnostic Outlier Ranking Algorithms (DORA) to provide
-a configurable pipeline that makes it easy for scientists to apply and evaluate
+Automatic detection of outliers is
+universally needed when working with scientific datasets, e.g., for cleaning 
+datasets or flagging novel samples to guide instrument acquisition or
+ scientific analysis.
+We present Domain-agnostic Outlier Ranking Algorithms (DORA),
+a configurable pipeline that facilitates application and evaluation of
 outlier detection methods in a variety of domains. DORA allows users to 
-configure outlier detection experiments by specifying the location of their 
+configure experiments by specifying the location of their 
 dataset(s), the input data type, feature extraction methods, and which 
 algorithms should be applied. DORA supports image, raster, time series, 
 or feature vector input data types and outlier detection methods that include
- Isolation Forest, Discovery via Eigenbasis Modeling of Uninteresting Data 
- (DEMUD), principal component analysis (PCA), Reed-Xiaoli (RX) detector, 
- Local RX, negative sampling, and probabilistic autoencoder. Given a set of
-  data samples, each algorithm assigns an outlier score to each sample. DORA
-   provides results organization and visualization modules to help users 
+ Isolation Forest, DEMUD, PCA, RX detector, 
+ Local RX, negative sampling, and probabilistic autoencoder. Each algorithm assigns an outlier score to each data sample. DORA
+   provides results interpretation modules to help users 
    process the results, including sorting samples by outlier score, evaluating 
-   outlier recall for a set of known/labeled outliers, clustering groups of 
-   similar outliers together, and causal graphs. To demonstrate the 
-   cross-domain applicability of DORA, we conducted outlier detection
-    experiments for three real-world use cases: 1) cleaning noisy ground-truth 
-    datasets (Earth Science), 
-     2) flagging non-astrophysical objects in the Dark Energy Survey 
-     (astrophysics), and 3) novelty-guided onboard targeting of instruments
-      for Mars rovers (planetary science). \todo{[We showed that ...]}
+   the fraction of known outliers in $n$ selections, clustering groups of 
+   similar outliers together, and web visualization. We demonstrated how DORA
+   facilitates application, evaluation, and interpretation of outlier detection
+   methods by performing
+    experiments for three real-world datasets from Earth science, planetary
+  science, and astrophysics, as well as one benchmark dataset 
+  (MNIST/Fashion-MNIST). We found that no single algorithm
+      performed best across all datasets, underscoring the need for a tool 
+      that enables comparison of multiple algorithms.
 \end{abstract}
 
 \section{Introduction}
@@ -227,8 +226,9 @@ sets is of interest for a wide variety of scientific domains. Depending on the
  to apply the algorithms themselves using existing tools. Given the widespread 
  applicability and transferability of OOD methods, the scientific community 
  would benefit from a tool that made it easy for them to apply popular outlier
- detection algorithms to their science datasets. We created DORA (Domain-
- agnostic Outlier Ranking Algorithms) to provide a tool for applying outlier 
+ detection algorithms to their science datasets. We created DORA 
+ (Domain-agnostic Outlier Ranking Algorithms) 
+ to provide a tool for applying outlier 
  detection algorithms to a variety of scientific data sets with minimal coding
  required. Users need only to specify details for their data/application 
  including the data type, location, and algorithms to run in an experiment
@@ -238,16 +238,21 @@ or feature vector input data types and outlier detection methods that include
  (DEMUD)~\citep{wagstaff:demud13}, principal component analysis (PCA),
    Reed-Xiaoli (RX) detector,  
  Local RX, negative sampling~\cite{sipple:neg-sampling20}, and probabilistic 
- autoencoder. Given a set of data samples, each algorithm assigns an outlier 
- score to each sample. DORA provides results organization and visualization 
+ autoencoder (PAE). 
+ Each algorithm assigns an outlier 
+ score to each sample in a given dataset. 
+ DORA provides results organization and visualization 
  modules to help users process the results, including sorting samples by outlier 
  score, evaluating outlier recall for a set of known/labeled outliers, clustering 
- groups of similar outliers together, and causal graphs. To demonstrate the 
- cross-domain applicability of DORA, we conducted outlier detection experiments 
- for three real-world use cases: 1) cleaning noisy ground-truth datasets (Earth 
- Science), 2) flagging non-astrophysical objects in the Dark Energy Survey 
- (astrophysics), and 3) novelty-guided onboard targeting of instruments for Mars 
- rovers (planetary science). \todo{[We showed that ...]}
+ groups of similar outliers together, and web visualization. 
+ We demonstrated how DORA
+   facilitates application, evaluation, and interpretation of outlier detection
+   methods by performing
+    experiments for three real-world datasets from Earth science, planetary
+  science, and astrophysics, as well as one benchmark dataset 
+  (MNIST/Fashion-MNIST). We found that no single algorithm
+      performed best across all datasets, underscoring the need for a tool 
+      that enables comparison of multiple algorithms.
 
 \section{Related Work}
 Methods for outlier detection have been 
@@ -574,10 +579,9 @@ Many Earth science applications using satellite Earth observation (EO) data
 %\subsubsection{Volcanic thermal anomalies}
 
 \subsubsection{Benchmark: MNIST and Fashion-MNIST.}
-We used MNIST and F-MNIST to demonstrate the capabilities of DORA with a
+We used MNIST and F-MNIST to demonstrate DORA with a
 traditional benchmark dataset. We used 60,000 images from 
-F-MNIST as the training set and a test set of 1,000 images from MNIST (outliers)
- and 1,000 from F-MNIST (inliers). 
+F-MNIST as the training set and a test set of 1,000 images each from MNIST (outliers) and F-MNIST (inliers). 
  %Well-discriminating algorithms should assign 
 %higher outlier scores to samples from MNIST than F-MNIST.
 
