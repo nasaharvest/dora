@@ -29,9 +29,6 @@ class NavBar extends React.Component {
       case "Table View":
         this.props.changeView("dataTable");
         break;
-      case "Gallery View":
-        this.props.changeView("gallery");
-        break;
       default:
         break;
     }
@@ -41,21 +38,17 @@ class NavBar extends React.Component {
     let configureActive = "";
     let aggregateActive = "";
     let tableActive = "";
-    let galleryActive = "";
     if (this.props.currView === "loadConfig" || this.props.currView === "parseConfig") {
       configureActive = "active";
-      aggregateActive = tableActive = galleryActive = "";
+      aggregateActive = tableActive = "";
     } else if (this.props.currView === "aggTable") {
       aggregateActive = "active";
-      configureActive = tableActive = galleryActive = "";
+      configureActive = tableActive = "";
     } else if (this.props.currView === "dataTable") {
       tableActive = "active";
-      configureActive = aggregateActive = galleryActive = "";
-    } else if (this.props.currView === "gallery"){
-      galleryActive = "active";
-      configureActive = aggregateActive = tableActive = "";
+      configureActive = aggregateActive = "";
     } else {
-      configureActive = aggregateActive = tableActive = galleryActive = "";
+      configureActive = aggregateActive = tableActive = "";
     }
     return(
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -74,9 +67,6 @@ class NavBar extends React.Component {
               </li>
               <li className="nav-item">
                 <a className={"nav-link " + tableActive} href="#" onClick={this.handleNavClick}>Table View</a>
-              </li>
-              <li className="nav-time">
-                <a className={"nav-link " + galleryActive} href="#" onClick={this.handleNavClick}>Gallery View</a>
               </li>
             </ul>
           </div>
