@@ -1,21 +1,27 @@
 # DORA Visualizer
 
-## Dependencies
+This is a visualization tool for DORA results. 
 
-This tool is meant for use from your local machine - eventually, everything
-will be backaged into an .exe or .dmg for installation on your Windows or OSX
-machines.
+## Usage Instructions
 
-Requirements for the development server:
+**OS X:** Install from `dora_vis/release/dora-vis-0.1.0.dmg`
+
+**Windows:** TBD...
+
+## Development Instructions
+
+### Dependencies
+
 * `node` 14.17.6 LTS
   * Install from https://nodejs.org/en/
 * `yarn` ~=1.22.11
   * `npm install yarn`
 
-## Dev Launch
+### Launching the development server
 1. `cd dora_vis`
 2. `yarn`
-3. `npm run electron-dev`
+3. `yarn electron-dev`
 
-## Build Standalone
-_coming soon_
+### Building and packaging
+1. `yarn build`
+2. `yarn dist`
