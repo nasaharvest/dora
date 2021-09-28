@@ -23,5 +23,7 @@ This is a visualization tool for DORA results.
 3. `yarn electron-dev`
 
 ### Building and packaging
-1. `yarn build`
-2. `yarn dist`
+1. Delete `node_modules`
+2. `yarn install --production`
+3. `yarn build`
+4. `yarn dist`

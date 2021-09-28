@@ -3,8 +3,6 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
-const url = require('url');
-const isDev = require('electron-is-dev');
 
 let mainWindow;
 
@@ -18,7 +16,7 @@ function createWindow() {
       contextIsolation: false
     }
   });
-  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+  mainWindow.loadURL(app.isPackaged ? `file://${path.join(__dirname, '../build/index.html')}` : 'http://localhost:3000');
   mainWindow.on('closed', () => mainWindow = null);
 }
 

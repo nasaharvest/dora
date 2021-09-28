@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { DataTable, AggTable } from './Table';
 
-const parse = window.require('csv-parse')
+const parse = window.require('csv-parse');
 const yaml = window.require('js-yaml');
 const fs = window.require('fs');
 const path = window.require('path');
