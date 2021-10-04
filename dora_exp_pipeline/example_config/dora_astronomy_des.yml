@@ -21,9 +21,9 @@ outlier_detection: {
     iforest: {
         n_trees: 100
     },
-    # pca: {
-    #     k: 3
-    # },
+    pca: {
+        k: 3
+    },
     # rx: {},
     # negative_sampling: {
     #    percent_increase: 20
