@@ -1,0 +1,45 @@
+# Data loading module parameters
+data_loader: {
+    name: 'Time series',
+    params: {}
+}
+data_to_fit: 'sample_data/earth_fieldsamples/points_to_fit.csv'
+data_to_score: 'sample_data/earth_fieldsamples/points_to_fit.csv'
+zscore_normalization: False
+out_dir: 'exp/faw_time_series/full-dataset/results'
+
+# Feature extraction module
+features: {
+    raw_values: {
+        # no args
+    }
+}
+
+# Outlier detection module
+top_n: None
+outlier_detection: {
+    iforest: {
+        n_trees: 100
+    },
+    pca: {
+        k: 3
+    },
+    demud: {
+        k: 3
+    },
+    pae: {
+        latent_dim: 3
+    },
+    rx: {},
+    negative_sampling: {
+        percent_increase: 20
+    }
+}
+
+# Results organization module
+results: {
+    save_scores: {},
+    # histogram: {
+    #      'bins': 25
+    # }
+}
