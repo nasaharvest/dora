@@ -5,6 +5,11 @@
 
 import os
 import sys
+sys.path.append("/Users/youlu/Desktop/dora/work/causal_graph/fges-py")
+import SEMScore
+import fges
+import knowledge
+import networkx as nx
 from six import add_metaclass
 from abc import ABCMeta, abstractmethod
 import matplotlib.pyplot as plt
@@ -12,12 +17,6 @@ import numpy as np
 import rasterio as rio
 from sklearn.cluster import KMeans
 from sklearn_som.som import SOM
-sys.path.append("/Users/youlu/Desktop/dora/work/causal_graph/fges-py")
-import SEMScore
-import fges
-import knowledge
-import networkx as nx
-
 
 METHOD_POOL = []
 
@@ -177,8 +176,8 @@ class KmeansCluster(ResultsOrganization):
         out_file.close()
 
         if causal_graph:
-            generate_causal_graphs(data_to_fit, data_to_cluster, groups, out_dir,
-                                   logger, seed)
+            generate_causal_graphs(data_to_fit, data_to_cluster, groups,
+                                   out_dir, logger, seed)
 
 
 kmeans_cluster = KmeansCluster()
@@ -215,8 +214,8 @@ class SOMCluster(ResultsOrganization):
         out_file.close()
 
         if causal_graph:
-            generate_causal_graphs(data_to_fit, data_to_cluster, groups, out_dir,
-                                   logger, seed)
+            generate_causal_graphs(data_to_fit, data_to_cluster, groups,
+                                   out_dir, logger, seed)
 
 
 som_cluster = SOMCluster()
@@ -233,8 +232,8 @@ class NodeBlock:
         self.order = order
 
 
-def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups, out_dir,
-                           logger, seed):
+def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups,
+                           out_dir, logger, seed):
     causal_tags = ['feature-%d' % col for col in range(len(data_to_cluster[0]))]
     causal_tags = causal_tags + ['outlier']
 
@@ -244,7 +243,8 @@ def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups, out_dir
                         'more than 20 features.')
 
     unique_groups = np.unique(cluster_groups)
-    data_to_fit = np.append(data_to_fit, np.zeros((len(data_to_fit), 1)), axis=1)
+    data_to_fit = np.append(data_to_fit, np.zeros((len(data_to_fit), 1)),
+                            axis=1)
     for group_label in unique_groups:
         in_group = cluster_groups == group_label
         outliers = data_to_cluster[in_group]
@@ -296,13 +296,14 @@ def arrange_nodes(blocks, labelheight=2, colwidth=20, blocksep=20,
                   bottom_margin=20):
     """
     takes a list-like of 'blocks' objects.
-    arranges nodes into a hopefully-pleasing shape according to block membership.
-    Note that this expects each node belongs to only a single block. No
-    guarantees if that's not true.
+    arranges nodes into a hopefully-pleasing shape according to block
+    membership. Note that this expects each node belongs to only a single block.
+    No guarantees if that's not true.
     """
     # Let's assume that the node labels are arranged into blocks.
     # Within a block, they need to spaced widely enough.
-    # Let's also assume that each block has a number indicating its order of precedence.
+    # Let's also assume that each block has a number indicating its order of
+    # precedence.
     block_orders = np.array([block.order for block in blocks])
     orders = np.sort(np.unique(block_orders.copy()))
     pos = {}
