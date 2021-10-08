@@ -25,7 +25,9 @@ setup(
         'tensorflow==2.5.1',
         'tensorflow-probability==0.13.0',
         'tensorflow-addons==0.13.0',
-        'sklearn-som==1.1.0'
+        'sklearn-som==1.1.0',
+        'sortedcontainers==2.4.0',
+        'dill==0.3.4'
     ],
     provide=[
         'dora_exp_pipeline'
