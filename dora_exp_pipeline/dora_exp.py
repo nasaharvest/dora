@@ -100,8 +100,6 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
 
     # Get data loader
     data_loader = get_data_loader_by_name(config.data_loader['name'])
-    if logger:
-        logger.text(f'Use data loader: {config.data_loader["name"]}')
 
     # Read data_to_fit (dtf)
     print('Loading data_to_fit')
@@ -116,6 +114,11 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
     # Feature extraction
     dtf_features = extract_feature(dtf_dict, config.features)
     dts_features = extract_feature(dts_dict, config.features)
+    if logger:
+        logger.text(f'data_to_fit dimension (row x column): '
+                    f'{dtf_features.shape[0]} x {dtf_features.shape[1]}')
+        logger.text(f'data_to_socre dimension (row x column): '
+                    f'{dts_features.shape[0]} x {dts_features.shape[1]}')
 
     # zscore normalization
     if config.zscore_normalization:
