@@ -1,6 +1,6 @@
 # Data loading module parameters
 data_loader: {
-    name: 'Catalog',
+    name: 'FeatureVector',
     params: {}
 }
 data_to_fit: '/home/urebbapr/research/dora/sample_data/astronomy_des/Y3_mastercat_12_3_19_SOMv0.21_indexselect_p0.0001_lups_colors.h5'

@@ -9,11 +9,14 @@ class IForestOutlierDetection(OutlierDetection):
         super(IForestOutlierDetection, self).__init__('iforest')
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
-                       top_n, seed, n_trees):
+                       top_n, seed, n_trees, fit_single_trees):
         if data_to_fit is None:
             data_to_fit = deepcopy(data_to_score)
 
-        scores = train_and_run_ISO(data_to_fit, data_to_score, n_trees, seed)
+        if not fit_single_trees:
+            scores = train_and_run_ISO(data_to_fit, data_to_score, n_trees, seed)
+        else:
+            scores = single_tree_ISO(data_to_fit, data_to_score, n_trees, seed)
         selection_indices = np.argsort(scores)
 
         results = dict()
@@ -27,6 +30,9 @@ class IForestOutlierDetection(OutlierDetection):
 
         return results
 
+def single_tree_ISO(train, test, n_trees, seed):
+
+    return None
 
 def train_and_run_ISO(train, test, n_trees, seed):
     random_state = np.random.RandomState(seed)
