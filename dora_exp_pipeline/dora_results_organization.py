@@ -60,7 +60,7 @@ class ResultsOrganization(object):
 
     @abstractmethod
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
-             outlier_alg_name, logger, seed, top_n, **params):
+             outlier_alg_name, out_dir, logger, seed, top_n, **params):
         raise RuntimeError('This function must be implemented in a child class')
 
 
@@ -238,16 +238,22 @@ class ReshapeRaster(ResultsOrganization):
             scores = np.reshape(np.array(scores), [height, width])
         elif data_format == 'patches':
             # Check that top_n wasn't specified to be a subset of the pixels
-            if top_n != ((height-(patch_size-1))*(width-(patch_size-1))):
+            if top_n != len(data_ids):
                 raise RuntimeError('Cannot use top_n with ReshapeRaster')
             scores = np.zeros([height, width])
+            # Keep track of overlapping patches at each pixel
+            counts = np.zeros([height, width])
             for ex, idx in enumerate(data_ids):
-                # get the patch center coordinates
+                # get the patch top left coordinates
                 i, j = idx.split('-')
                 i = int(i)
                 j = int(j)
-                # fill in the score for that index
-                scores[i, j] = dts_scores[ex]
+                # fill in the score for that patch
+                score = dts_scores[ex]
+                scores[i:i+patch_size, j:j+patch_size] += score
+                counts[i:i+patch_size, j:j+patch_size] += 1
+            counts[counts == 0] = np.nan
+            scores /= counts
         else:
             raise RuntimeError("data_format must be 'pixels' or 'patches'")
 
