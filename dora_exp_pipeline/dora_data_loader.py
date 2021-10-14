@@ -268,7 +268,8 @@ class FeatureVectorLoader(DataLoader):
                     # Assumes the first column is the ID
                     # and all other columns are (float) feature values
                     data_dict['id'].append(row[0])
-                    data_dict['data'].append(np.array([float(v) for v in row[1:]]))
+                    data_dict['data'].append(np.array(
+                        [float(v) for v in row[1:]]))
 
         else:
             raise RuntimeError(f'File extension not supported. '
