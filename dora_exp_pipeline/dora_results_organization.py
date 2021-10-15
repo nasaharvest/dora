@@ -235,7 +235,7 @@ class NodeBlock:
 def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups,
                            out_dir, logger, seed):
     causal_tags = ['feature-%d' % col for col in range(len(data_to_cluster[0]))]
-    causal_tags = causal_tags + ['outlier']
+    causal_tags = causal_tags + ['cluster']
 
     if len(causal_tags) > 20:
         if logger:
@@ -251,10 +251,10 @@ def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups,
         outliers = np.append(outliers, np.ones((len(outliers), 1)), axis=1)
         data = np.vstack((data_to_fit, outliers))
 
-        # Define knowledge that forbids any connections from features to outlier
+        # Define knowledge that forbids any connections from features to cluster
         ken = knowledge.Knowledge()
         block1 = ['feature-%d' % col for col in range(len(data_to_cluster[0]))]
-        block2 = ['outlier']
+        block2 = ['cluster']
         for i, i_label in enumerate(causal_tags):
             for j, j_label in enumerate(causal_tags):
                 if (i_label in block1) & (j_label in block2):
@@ -275,58 +275,11 @@ def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups,
 
         # Save graph
         out_file = '%s/causal_graph_cluster_%d' % (out_dir, group_label)
-
-        block1_nodes = NodeBlock(members=causal_tags[:-1], order=2)
-        block2_nodes = NodeBlock(members=['outlier'], order=1)
-        pos = arrange_nodes([block1_nodes, block2_nodes])
-        outlier_pos = pos['outlier']
-        outlier_pos = (outlier_pos[0], -10)
-        pos['outlier'] = outlier_pos
+        pos = nx.circular_layout(graph, scale=2, dim=2)
         nx.draw(graph, with_labels=True, pos=pos)
-        x_values, y_values = zip(*pos.values())
-        xmin, xmax = min(x_values), max(x_values)
-        xmargin = 0.25 * (xmax - xmin)
-        plt.xlim(xmin - xmargin, xmax + xmargin)
 
         plt.savefig(out_file)
         plt.clf()
-
-
-def arrange_nodes(blocks, labelheight=2, colwidth=20, blocksep=20,
-                  bottom_margin=20):
-    """
-    takes a list-like of 'blocks' objects.
-    arranges nodes into a hopefully-pleasing shape according to block
-    membership. Note that this expects each node belongs to only a single block.
-    No guarantees if that's not true.
-    """
-    # Let's assume that the node labels are arranged into blocks.
-    # Within a block, they need to spaced widely enough.
-    # Let's also assume that each block has a number indicating its order of
-    # precedence.
-    block_orders = np.array([block.order for block in blocks])
-    orders = np.sort(np.unique(block_orders.copy()))
-    pos = {}
-    labels = []
-    for iorder, thisorder in enumerate(orders):
-        these = np.arange(len(block_orders))[block_orders == thisorder]
-        left_position = iorder * colwidth
-        order_heights = []
-        for iblock, blockindex in enumerate(these):
-            for imember, member in enumerate(blocks[blockindex].members):
-                height = iblock*blocksep + imember*2*labelheight + bottom_margin
-                pos.update({member: (left_position, height)})
-                labels.append(member)
-                order_heights.append(height)
-        meanheight = np.mean(order_heights)
-        for iblock, blockindex in enumerate(these):
-            for imember, member in enumerate(blocks[blockindex].members):
-                height = iblock*blocksep + imember*2*labelheight + bottom_margin
-                pos.update({member: (left_position, height - meanheight)})
-                labels.append(member)
-                order_heights.append(height)
-
-    return pos
 
 
 class ReshapeRaster(ResultsOrganization):
