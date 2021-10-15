@@ -32,7 +32,13 @@ class IForestOutlierDetection(OutlierDetection):
 
 def single_tree_ISO(train, test, n_trees, seed):
 
-    return None
+    random_state = np.random.RandomState(seed)
+    scores = np.empty((test.shape[0], n_trees))
+
+    for i in range(n_trees):
+        scores[:,i] = train_and_run_ISO(train, test, 1, random_state.randint(0, 1000000))
+
+    return np.mean(scores, axis=1)
 
 def train_and_run_ISO(train, test, n_trees, seed):
     random_state = np.random.RandomState(seed)
