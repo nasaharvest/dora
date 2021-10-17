@@ -177,7 +177,7 @@ class RasterPixelLoader(DataLoader):
                 img = np.reshape(img, [img.shape[0]*img.shape[1],
                                        img.shape[2]])
                 # set the ID to the index of the pixel
-                data_dict['id'] = range(img.shape[0])
+                data_dict['id'] = [str(i) for i in range(img.shape[0])]
                 data_dict['data'] = list(img)
         else:
             raise RuntimeError(f'File extension not supported. '
@@ -256,7 +256,7 @@ class FeatureVectorLoader(DataLoader):
         if dir_path.endswith('.h5'):
             # Load the .h5
             df = pd.read_hdf(dir_path)
-            data_dict['id'] = df.index
+            data_dict['id'] = df.index.astype(str)
             data_dict['data'] = df.values
 
         else:
@@ -295,7 +295,7 @@ class TimeSeriesLoader(DataLoader):
                 for row in csv_reader:
                     # Assumes the first column is the ID
                     # and all other columns are time steps
-                    data_dict['id'].append(row[0])
+                    data_dict['id'].append(str(int(row[0])))
                     data_dict['data'].append(np.array(row[1:]))
         else:
             raise RuntimeError(f'File extension not supported. '
