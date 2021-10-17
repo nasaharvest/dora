@@ -133,7 +133,10 @@ class FlattenedPixelValuesExtractor(FeatureExtractor):
                 ret_features[ind, :] = data.flatten()
 
         if kwargs.get('normalize_pixels'):
-            ret_features = ret_features / 255.
+            min_val = np.min(ret_features)
+            max_val = np.max(ret_features)
+            scaled = np.subtract(ret_features, min_val) / (max_val - min_val)
+            ret_features = scaled
 
         return ret_features
 

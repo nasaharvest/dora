@@ -230,7 +230,7 @@ class RasterPatchLoader(DataLoader):
                             # append the patch coordinate as the id
                             data_dict['id'].append('%d-%d' % (i, j))
                             # append the patch data
-                            data_dict['data'].append(patch.flatten())
+                            data_dict['data'].append(patch)
                             j += stride
                     i += stride
         else:
