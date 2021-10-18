@@ -222,16 +222,6 @@ som_cluster = SOMCluster()
 register_org_method(som_cluster)
 
 
-class NodeBlock:
-    """
-    members is a list of node names
-    order is a single integer. Low-->high is left-->right
-    """
-    def __init__(self, members=None, order=None):
-        self.members = members
-        self.order = order
-
-
 def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups,
                            out_dir, logger, seed):
     causal_tags = ['feature-%d' % col for col in range(len(data_to_cluster[0]))]
