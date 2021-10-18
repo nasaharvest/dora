@@ -149,7 +149,7 @@ class KmeansCluster(ResultsOrganization):
 
     def _run(self, data_ids, dts_scores, dts_sels, data_to_fit, data_to_score,
              outlier_alg_name, out_dir, logger, seed, top_n, n_clusters,
-             causal_graph):
+             causal_graph, sparsity):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             if logger:
@@ -177,7 +177,7 @@ class KmeansCluster(ResultsOrganization):
 
         if causal_graph:
             generate_causal_graphs(data_to_fit, data_to_cluster, groups,
-                                   out_dir, logger, seed)
+                                   out_dir, logger, seed, sparsity)
 
 
 kmeans_cluster = KmeansCluster()
@@ -190,7 +190,7 @@ class SOMCluster(ResultsOrganization):
 
     def _run(self, data_ids, dts_scores, dts_sels, data_to_fit, data_to_score,
              outlier_alg_name, out_dir, logger, seed, top_n, n_clusters,
-             causal_graph):
+             causal_graph, sparsity):
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
             if logger:
@@ -203,7 +203,8 @@ class SOMCluster(ResultsOrganization):
             data_to_cluster.append(data_to_score[dts_ind])
         data_to_cluster = np.array(data_to_cluster, dtype=float)
 
-        som = SOM(m=n_clusters, n=1, dim=len(data_to_cluster[0]))
+        som = SOM(m=n_clusters, n=1, dim=len(data_to_cluster[0]),
+                  random_state=seed)
         som.fit(data_to_cluster)
         groups = som.predict(data_to_cluster)
 
@@ -215,7 +216,7 @@ class SOMCluster(ResultsOrganization):
 
         if causal_graph:
             generate_causal_graphs(data_to_fit, data_to_cluster, groups,
-                                   out_dir, logger, seed)
+                                   out_dir, logger, seed, sparsity)
 
 
 som_cluster = SOMCluster()
@@ -223,8 +224,8 @@ register_org_method(som_cluster)
 
 
 def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups,
-                           out_dir, logger, seed):
-    causal_tags = ['feature-%d' % col for col in range(len(data_to_cluster[0]))]
+                           out_dir, logger, seed, sparsity):
+    causal_tags = ['feat-%d' % col for col in range(len(data_to_cluster[0]))]
     causal_tags = causal_tags + ['cluster']
 
     if len(causal_tags) > 20:
@@ -243,7 +244,7 @@ def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups,
 
         # Define knowledge that forbids any connections from features to cluster
         ken = knowledge.Knowledge()
-        block1 = ['feature-%d' % col for col in range(len(data_to_cluster[0]))]
+        block1 = ['feat-%d' % col for col in range(len(data_to_cluster[0]))]
         block2 = ['cluster']
         for i, i_label in enumerate(causal_tags):
             for j, j_label in enumerate(causal_tags):
@@ -252,7 +253,7 @@ def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups,
 
         # Generate causal graphs
         variables = list(range(len(data[0])))
-        score = SEMScore.SEMBicScore(2, dataset=data)
+        score = SEMScore.SEMBicScore(sparsity, dataset=data)
         cs = fges.FGES(variables, score, knowledge=ken)
         cs.search()
         graph = cs.graph
@@ -260,13 +261,26 @@ def generate_causal_graphs(data_to_fit, data_to_cluster, cluster_groups,
         # Assign names to graph nodes
         node_labels = dict()
         for idx, tag in enumerate(causal_tags):
+            if tag == 'cluster':
+                tag = 'cluster-%d' % group_label
+
             node_labels.update({idx: tag})
         graph = nx.relabel_nodes(graph, node_labels)
 
         # Save graph
         out_file = '%s/causal_graph_cluster_%d' % (out_dir, group_label)
         pos = nx.circular_layout(graph, scale=2, dim=2)
-        nx.draw(graph, with_labels=True, pos=pos)
+        for edge in graph.edges():
+            if 'cluster-%d' % group_label in edge:
+                graph[edge[0]][edge[1]]['color'] = 'red'
+            else:
+                graph[edge[0]][edge[1]]['color'] = 'blue'
+
+        colors = [graph[u][v]['color'] for u, v in graph.edges()]
+
+        plt.figure(figsize=(12, 8))
+        nx.draw(graph, with_labels=True, edge_color=colors, pos=pos,
+                node_size=3000, node_color='lightgreen')
 
         plt.savefig(out_file)
         plt.clf()
