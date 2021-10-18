@@ -91,7 +91,7 @@ def start(config_file: str, out_dir: str, log_file=None, seed=1234):
 
     # Configure tensorflow
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'True'
+    os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     logging.getLogger("tensorflow").setLevel(logging.ERROR)
 
