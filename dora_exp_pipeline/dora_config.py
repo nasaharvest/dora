@@ -62,6 +62,7 @@ class DoraConfig(object):
         self.logger.text(f'data_to_score: {self.data_to_score:<20}')
         self.logger.text(f'zscore_normalization: '
                          f'{self.zscore_normalization:<20}')
+        self.logger.text(f'out_dir: {self.out_dir:<20}')
         self.logger.text(f'features: {self.features}')
         self.logger.text(f'top_n: {self.top_n}')
         self.logger.text(f'outlier_detection: {self.outlier_detection}')

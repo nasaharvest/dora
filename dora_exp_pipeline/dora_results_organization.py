@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import rasterio as rio
 from sklearn.cluster import KMeans
+from sklearn_som.som import SOM
 
 
 METHOD_POOL = []
@@ -98,26 +99,27 @@ class SaveComparisonPlot(ResultsOrganization):
 
         # Outliers will be 1s and inliers will be 0s.
         labels = self._get_validation_labels(validation_dir)
-        scores = np.argsort(dts_scores)[::-1]
 
-        x = list(range(1, len(scores)+1))
+        x = list(range(1, len(labels)+1))
         y = []
         numOutliers = 0
 
-        for i in range(len(scores)):
-            if(labels[scores[i]] == 1):
-                numOutliers += 1
-            y.append(numOutliers)
+        for i in range(len(data_ids)):
+            label = labels.get(data_ids[i])
+            # Only include labelled values in experiment
+            if label is not None:
+                if label == 1:
+                    numOutliers += 1
+                y.append(numOutliers)
 
         fig, axes = plt.subplots()
-        index = x.index(y[-1])
-        area = np.trapz(y[:index+1], x[:index+1])
+        area = sum(y)/sum([i for i in range(len(labels))])
 
-        plt.plot(x, y, label=outlier_alg_name)
-        plt.plot([], [], ' ', label=f'Area: {area}')
-        plt.title('Correct Outliers vs Selected Outliers')
+        plt.plot(x, y, label="{} (MDR: {:.2f})".format(outlier_alg_name, area))
+        plt.plot(x, x, label='Oracle', linestyle='--', color='k')
+        plt.title('Known Outliers vs. Selected Outliers')
         plt.xlabel('Number of Outliers Selected')
-        plt.ylabel('Number of True Outliers')
+        plt.ylabel('Number of Known Outliers')
         plt.legend()
         axes.set_xlim(1, x[-1])
         axes.set_ylim(1, y[-1])
@@ -130,7 +132,7 @@ class SaveComparisonPlot(ResultsOrganization):
         labels = {}
         for i in text:
             line = i.split(",")
-            labels[int(line[0])] = int(line[1])
+            labels[line[0]] = int(line[1])
 
         return labels
 
@@ -173,6 +175,39 @@ class KmeansCluster(ResultsOrganization):
 
 kmeans_cluster = KmeansCluster()
 register_org_method(kmeans_cluster)
+
+
+class SOMCluster(ResultsOrganization):
+    def __init__(self):
+        super(SOMCluster, self).__init__('som')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, top_n, n_clusters):
+        if not os.path.exists(out_dir):
+            os.mkdir(out_dir)
+            if logger:
+                logger.text(f'Created output directory: {out_dir}')
+
+        out_file = open(f'{out_dir}/SOM-{outlier_alg_name}.csv', 'w')
+
+        data_to_cluster = []
+        for dts_ind in dts_sels:
+            data_to_cluster.append(data_to_score[dts_ind])
+        data_to_cluster = np.array(data_to_cluster, dtype=float)
+
+        som = SOM(m=n_clusters, n=1, dim=len(data_to_cluster[0]))
+        som.fit(data_to_cluster)
+        groups = som.predict(data_to_cluster)
+
+        for ind, (s_ind, dts_id, group) in enumerate(zip(dts_sels, data_ids,
+                                                         groups)):
+            out_file.write(f'{ind}, {s_ind}, {dts_id}, {group}\n')
+
+        out_file.close()
+
+
+som_cluster = SOMCluster()
+register_org_method(som_cluster)
 
 
 class ReshapeRaster(ResultsOrganization):
@@ -236,6 +271,31 @@ class ReshapeRaster(ResultsOrganization):
 reshape_raster = ReshapeRaster()
 register_org_method(reshape_raster)
 
+
+class SaveHistogram(ResultsOrganization):
+    def __init__(self):
+        super(SaveHistogram, self).__init__('histogram')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score, alg_name,
+             out_dir, logger, seed, bins):
+        if(not(os.path.exists(out_dir))):
+            os.makedirs(out_dir)
+
+        scores = sorted(dts_scores)
+        fig, axs = plt.subplots()
+        # numBins = int((scores[-1]-scores[0])/increment)+1
+        # print(scores[0], scores[-1], increment, numBins)
+
+        yVals, bins, patches = axs.hist(scores, bins, density=True, alpha=0.5)
+
+        plt.title('Histogram of Anomaly Scores')
+        plt.xlabel('Score')
+        plt.ylabel('Frequency')
+        plt.savefig(f'{out_dir}/histogram_bar_graph-{alg_name}.png')
+
+
+save_histogram = SaveHistogram()
+register_org_method(save_histogram)
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").
 # U.S. Government sponsorship acknowledged.
