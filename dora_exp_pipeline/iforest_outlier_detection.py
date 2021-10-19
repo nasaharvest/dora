@@ -9,11 +9,16 @@ class IForestOutlierDetection(OutlierDetection):
         super(IForestOutlierDetection, self).__init__('iforest')
 
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
-                       top_n, seed):
+                       top_n, seed, n_trees, fit_single_trees):
         if data_to_fit is None:
             data_to_fit = deepcopy(data_to_score)
 
-        scores = train_and_run_ISO(data_to_fit, data_to_score, seed)
+        if not fit_single_trees:
+            scores = train_and_run_ISO(data_to_fit, data_to_score,
+                                       n_trees, seed)
+        else:
+            scores = single_tree_ISO(data_to_fit, data_to_score,
+                                     n_trees, seed)
         selection_indices = np.argsort(scores)
 
         results = dict()
@@ -28,12 +33,24 @@ class IForestOutlierDetection(OutlierDetection):
         return results
 
 
-def train_and_run_ISO(train, test, seed):
+def single_tree_ISO(train, test, n_trees, seed):
+
+    random_state = np.random.RandomState(seed)
+    scores = np.empty((test.shape[0], n_trees))
+
+    for i in range(n_trees):
+        scores[:, i] = train_and_run_ISO(train, test, 1,
+                                         random_state.randint(0, 1000000))
+
+    return np.mean(scores, axis=1)
+
+
+def train_and_run_ISO(train, test, n_trees, seed):
     random_state = np.random.RandomState(seed)
 
     # initialize isolation forest
-    clf_iso = IsolationForest(max_samples=train.shape[0], contamination=0.1,
-                              random_state=random_state)
+    clf_iso = IsolationForest(n_estimators=n_trees, max_samples=train.shape[0],
+                              contamination=0.1, random_state=random_state)
 
     # train isolation forest
     clf_iso.fit(train)

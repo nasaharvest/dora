@@ -1,12 +1,12 @@
 # Data loading module parameters
 data_loader: {
-    name: 'Catalog',
+    name: 'FeatureVector',
     params: {}
 }
 data_to_fit: '/home/urebbapr/research/dora/sample_data/astronomy_des/Y3_mastercat_12_3_19_SOMv0.21_indexselect_p0.0001_lups_colors.h5'
 data_to_score: '/home/urebbapr/research/dora/sample_data/astronomy_des/Y3_mastercat_12_3_19_SOMv0.21_indexselect_p0.0001_lups_colors.h5'
 zscore_normalization: False
-out_dir: '/home/urebbapr/research/dora/local/runs/dataloader_test'
+out_dir: 'exp/astrophysics_des/results_Y3_mastercat_12_3_19_SOMv0.21_indexselect_p0.0001_lups_colors'
 
 # Feature extraction module
 features: {
@@ -16,22 +16,37 @@ features: {
 }
 
 # Outlier detection module
-top_n: 10
+
+# Outlier detection module
+top_n: None
 outlier_detection: {
-    iforest: {},
+    iforest: {
+        n_trees: 100,
+        fit_single_trees: False,
+    },
     pca: {
         k: 3
     },
+#    demud: {
+#        k: 3
+#    },
+    pae: {
+        latent_dim: 3
+    },
     rx: {},
     negative_sampling: {
-       percent_increase: 20
+        percent_increase: 20
     },
     random: {}
 }
 
 # Results organization module
 results: {
-    kmeans: {
-        n_clusters: 5
-    }
+#    comparison_plot: {
+#       'validation_dir': '/proj/des/products/find_discarded_objectids_in_dec2019_data.labels.trunc1000.csv'
+#    },
+    save_scores: {},
+    # histogram: {
+    #      'bins': 25
+    # }
 }
