@@ -31,7 +31,7 @@ class TestEarthTimeSeries(TestCase):
 
         # Check results for each algorithm
         for file_base in ['demud-k=3/selections-demud.csv',
-                          'iforest-n_trees=100/selections-iforest.csv',
+                          'iforest-n_trees=100-fit_single_trees=False/selections-iforest.csv',
                           'negative_sampling-percent_increase=20/selections-negative_sampling.csv',
                           'pca-k=3/selections-pca.csv',
                           'rx/selections-rx.csv',

@@ -31,7 +31,7 @@ class TestPlanetary(TestCase):
 
         # Check results for each algorithm
         for file_base in ['demud-k=5/selections-demud.csv',
-                          'iforest-n_trees=100/selections-iforest.csv',
+                          'iforest-n_trees=100-fit_single_trees=False/selections-iforest.csv',
                           'lrx-inner_window=3-outer_window=9-bands=1/selections-lrx.csv',
                           'negative_sampling-percent_increase=20/selections-negative_sampling.csv',
                           'pca-k=5/selections-pca.csv',
