@@ -13,6 +13,7 @@ import pytest
 from test_utils import check_results
 from dora_exp_pipeline.dora_exp import start
 
+
 @pytest.mark.functional
 class TestPlanetary(TestCase):
 
@@ -31,13 +32,17 @@ class TestPlanetary(TestCase):
 
         # Check results for each algorithm
         for file_base in ['demud-k=5/selections-demud.csv',
-                          'iforest-n_trees=100-fit_single_trees=False/selections-iforest.csv',
-                          'lrx-inner_window=3-outer_window=9-bands=1/selections-lrx.csv',
-                          'negative_sampling-percent_increase=20/selections-negative_sampling.csv',
+                          'iforest-n_trees=100-fit_single_trees=False/'
+                          'selections-iforest.csv',
+                          'lrx-inner_window=3-outer_window=9-bands=1/'
+                          'selections-lrx.csv',
+                          'negative_sampling-percent_increase=20/'
+                          'selections-negative_sampling.csv',
                           'pca-k=5/selections-pca.csv',
                           'random/selections-random.csv'
                           ]:
-            correct_file = 'test/ref-results/planetary_rover/functional/%s' % file_base
+            correct_file = 'test/ref-results/planetary_rover/functional' \
+                            '/%s' % file_base
             output_file = '%s/%s' % (self.outdir, file_base)
 
             # Check results against correct output

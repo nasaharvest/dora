@@ -13,6 +13,7 @@ import pytest
 from test_utils import check_results
 from dora_exp_pipeline.dora_exp import start
 
+
 @pytest.mark.functional
 class TestEarthVolcanoesPatches(TestCase):
 
@@ -31,14 +32,18 @@ class TestEarthVolcanoesPatches(TestCase):
 
         # Check results for each algorithm
         for file_base in ['demud-k=3/selections-demud.csv',
-                          'iforest-n_trees=100-fit_single_trees=False/selections-iforest.csv',
-                          'lrx-inner_window=7-outer_window=11-bands=1/selections-lrx.csv',
-                          'negative_sampling-percent_increase=20/selections-negative_sampling.csv',
+                          'iforest-n_trees=100-fit_single_trees=False/'
+                          'selections-iforest.csv',
+                          'lrx-inner_window=7-outer_window=11-bands=1/'
+                          'selections-lrx.csv',
+                          'negative_sampling-percent_increase=20/'
+                          'selections-negative_sampling.csv',
                           'pca-k=3/selections-pca.csv',
                           'rx/selections-rx.csv',
                           'random/selections-random.csv'
                           ]:
-            correct_file = 'test/ref-results/earth_volcanoes_patches/%s' % file_base
+            correct_file = 'test/ref-results/earth_volcanoes_patches' \
+                            '/%s' % file_base
             output_file = '%s/%s' % (self.outdir, file_base)
 
             # Check results against correct output
