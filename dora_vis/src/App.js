@@ -10,8 +10,8 @@ const hdf5 = window.require('jsfive');
 
 // All supported data loaders
 // image - imageset, data is directory of image files
-// catalog - h5 export of pandas dataframe
-const DATALOADERS = ["image", "catalog", "featurevector"];
+// featurevector - h5 export of pandas dataframe
+const DATALOADERS = ["image", "featurevector"];
 // Dataloaders that require a directory data root
 const DIRLOADERS = ["image"];
 
@@ -386,7 +386,7 @@ class App extends React.Component {
           });
           this.setState({data: dataObj});
         });
-    } else if (this.state["dataLoader"] === "catalog" || this.state["dataLoader"] === "featurevector") {
+    } else if (this.state["dataLoader"] === "featurevector") {
       // jsfive
       var rawData = fs.readFileSync(this.state["dataRoot"]);
       var h5File = new hdf5.File(rawData.buffer);
