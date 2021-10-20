@@ -1,6 +1,6 @@
 # Data loading module parameters
 data_loader: {
-    name: 'Catalog',
+    name: 'FeatureVector',
     params: {}
 }
 data_to_fit: '/proj/des/products/Y3_GOLD_2_2_subsampled_filtered_public_for_dora.trunc1000000.h5'
@@ -19,7 +19,8 @@ features: {
 top_n: None
 outlier_detection: {
     iforest: {
-        n_trees: 100
+        n_trees: 100,
+        fit_single_trees: False,
     },
     pca: {
         k: 3

@@ -18,7 +18,8 @@ def alg_indexes(filename):
     with open(filename, 'r') as f:
         text = f.read().split("\n")[:-1]
         scores = sorted(text, key=lambda x: float(x.split(", ")[0]))
-        scores = [int(i.split(", ")[1]) for i in scores]
+        # Field 2 is the sample id
+        scores = [i.split(", ")[2] for i in scores]
 
     return scores
 
@@ -47,7 +48,7 @@ def validation_labels(filename):
     labels = {}
     for i in text:
         line = i.split(",")
-        labels[int(line[0])] = int(line[1])
+        labels[line[0]] = int(line[1])
 
     return labels
 
@@ -171,7 +172,7 @@ def combine_plots(resultsdir, label_path, precision_at_n):
         plt.savefig(f'{resultsdir}/comparison_plot_combined_p-at-n.png')
         plt.savefig(f'{resultsdir}/comparison_plot_combined_p-at-n.pdf')
     else:
-        axes.set_ylim(1, num_outliers)
+        axes.set_ylim(0, num_outliers)
         plt.savefig(f'{resultsdir}/comparison_plot_combined.png')
         plt.savefig(f'{resultsdir}/comparison_plot_combined.pdf')
 

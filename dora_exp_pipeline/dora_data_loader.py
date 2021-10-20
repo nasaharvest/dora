@@ -177,7 +177,7 @@ class RasterPixelLoader(DataLoader):
                 img = np.reshape(img, [img.shape[0]*img.shape[1],
                                        img.shape[2]])
                 # set the ID to the index of the pixel
-                data_dict['id'] = range(img.shape[0])
+                data_dict['id'] = [str(i) for i in range(img.shape[0])]
                 data_dict['data'] = list(img)
         else:
             raise RuntimeError(f'File extension not supported. '
@@ -236,9 +236,9 @@ raster_patch_loader = RasterPatchLoader()
 register_data_loader(raster_patch_loader)
 
 
-class CatalogLoader(DataLoader):
+class FeatureVectorLoader(DataLoader):
     def __init__(self):
-        super(CatalogLoader, self).__init__('Catalog')
+        super(FeatureVectorLoader, self).__init__('FeatureVector')
 
     def _load(self, dir_path: str) -> dict:
         if not os.path.exists(dir_path):
@@ -256,8 +256,20 @@ class CatalogLoader(DataLoader):
         if dir_path.endswith('.h5'):
             # Load the .h5
             df = pd.read_hdf(dir_path)
-            data_dict['id'] = df.index
+            data_dict['id'] = df.index.astype(str)
             data_dict['data'] = df.values
+
+        elif dir_path.endswith('.csv'):
+            # Read in CSV.  Assume first column is the sample id
+            with open(dir_path, 'r') as csv_file:
+                csv_reader = csv.reader(csv_file)
+                # Read each row into the data_dict
+                for row in csv_reader:
+                    # Assumes the first column is the ID
+                    # and all other columns are (float) feature values
+                    data_dict['id'].append(row[0])
+                    data_dict['data'].append(np.array(
+                        [float(v) for v in row[1:]]))
 
         else:
             raise RuntimeError(f'File extension not supported. '
@@ -267,7 +279,7 @@ class CatalogLoader(DataLoader):
         return data_dict
 
 
-catalog_loader = CatalogLoader()
+catalog_loader = FeatureVectorLoader()
 register_data_loader(catalog_loader)
 
 
@@ -295,7 +307,7 @@ class TimeSeriesLoader(DataLoader):
                 for row in csv_reader:
                     # Assumes the first column is the ID
                     # and all other columns are time steps
-                    data_dict['id'].append(row[0])
+                    data_dict['id'].append(str(int(row[0])))
                     data_dict['data'].append(np.array(row[1:]))
         else:
             raise RuntimeError(f'File extension not supported. '

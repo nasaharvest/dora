@@ -100,14 +100,17 @@ class SaveComparisonPlot(ResultsOrganization):
         # Outliers will be 1s and inliers will be 0s.
         labels = self._get_validation_labels(validation_dir)
 
-        x = list(range(1, len(dts_sels)+1))
+        x = list(range(1, len(labels)+1))
         y = []
         numOutliers = 0
 
-        for i in range(len(dts_sels)):
-            if(labels[dts_sels[i]] == 1):
-                numOutliers += 1
-            y.append(numOutliers)
+        for i in range(len(data_ids)):
+            label = labels.get(data_ids[i])
+            # Only include labelled values in experiment
+            if label is not None:
+                if label == 1:
+                    numOutliers += 1
+                y.append(numOutliers)
 
         fig, axes = plt.subplots()
         area = sum(y)/sum([i for i in range(len(labels))])
@@ -129,7 +132,7 @@ class SaveComparisonPlot(ResultsOrganization):
         labels = {}
         for i in text:
             line = i.split(",")
-            labels[int(line[0])] = int(line[1])
+            labels[line[0]] = int(line[1])
 
         return labels
 

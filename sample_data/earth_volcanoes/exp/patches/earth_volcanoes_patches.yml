@@ -1,0 +1,47 @@
+# Data loading module parameters
+data_loader: {
+    name: 'raster_patches',
+    params: {
+        'patch_size': 11
+    }
+}
+data_to_fit: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210_small.tif'
+data_to_score: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210_small.tif'
+zscore_normalization: False
+out_dir: 'sample_data/earth_volcanoes/exp/patches/results'
+
+# Feature extraction module
+features: {
+    raw_values: {
+        # no args
+    }
+}
+
+# Outlier detection module
+top_n: 'None'
+outlier_detection: {
+    iforest: {
+        n_trees: 100
+    },
+    demud: {
+        k: 3
+    },
+    pca: {
+        k: 3
+    },
+    rx: {},
+    lrx: {
+        inner_window: 7,
+        outer_window: 11,
+        bands: 1
+    },
+    negative_sampling: {
+        percent_increase: 20
+    },
+    random: {}
+}
+
+# Results organization module
+results: {
+    save_scores: {},
+}

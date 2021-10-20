@@ -1,5 +1,7 @@
 on:
   push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
@@ -28,6 +30,5 @@ jobs:
           flake8 --max-line-length 80
         
       - name: Test with pytest
-        if: github.ref == 'refs/heads/issue14-unittests'
         run: |
           pytest
