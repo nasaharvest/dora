@@ -11,6 +11,8 @@
     "@testing-library/user-event": "^12.8.3",
     "csv": "^5.5.3",
     "js-yaml": "^4.1.0",
+    "jsfive": "git+https://github.com/usnistgov/jsfive.git",
+    "plotly.js-dist": "^2.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",

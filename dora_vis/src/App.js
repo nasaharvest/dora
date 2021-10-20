@@ -6,8 +6,14 @@ const parse = window.require('csv-parse');
 const yaml = window.require('js-yaml');
 const fs = window.require('fs');
 const path = window.require('path');
+const hdf5 = window.require('jsfive');
 
-const DATALOADERS = ["image"];
+// All supported data loaders
+// image - imageset, data is directory of image files
+// catalog - h5 export of pandas dataframe
+const DATALOADERS = ["image", "catalog", "featurevector"];
+// Dataloaders that require a directory data root
+const DIRLOADERS = ["image"];
 
 
 class NavBar extends React.Component {
@@ -132,12 +138,12 @@ class ConfigParser extends React.Component {
     this.handleConfigSubmit = this.handleConfigSubmit.bind(this);
 
     this.state = {
-      dataLoader: this.props.configData["data_loader"]["name"],
+      dataLoader: this.props.configData["data_loader"]["name"].trim().toLowerCase(),
       dataRoot: "",
       dataRootPath: this.props.configData["data_to_score"],
       outDir: "",
       outDirPath: this.props.configData["out_dir"],
-      validDataLoader: DATALOADERS.includes(this.props.configData["data_loader"]["name"].trim()),
+      validDataLoader: DATALOADERS.includes(this.props.configData["data_loader"]["name"].trim().toLowerCase()),
       validDataRoot: false,
       validOutDir: false
     };
@@ -173,10 +179,17 @@ class ConfigParser extends React.Component {
 
   handleDataRootChange(e) {
     /* Handle data root input change */
-    this.setState({
-      dataRoot: e.target.value,
-      dataRootPath: path.dirname(e.target.files[0].path)
-    });
+    if (DIRLOADERS.includes(this.state["dataLoader"])) {
+      this.setState({
+        dataRoot: e.target.value,
+        dataRootPath: path.dirname(e.target.files[0].path)
+      });
+    } else {
+      this.setState({
+        dataRoot: e.target.value,
+        dataRootPath: e.target.files[0].path
+      });
+    }
   }
 
   handleDataRootSubmit(e) {
@@ -206,7 +219,8 @@ class ConfigParser extends React.Component {
     this.props.setConfig(
       this.state["dataLoader"],
       this.state["dataRootPath"],
-      this.state['outDirPath']);
+      this.state['outDirPath']
+    );
   }
   
   render() {
@@ -221,8 +235,9 @@ class ConfigParser extends React.Component {
     // Set data root output/input
     var componentDataRoot = null;
     if (this.state["validDataRoot"]) {
-      componentDataRoot = <label>{this.state["dataRootPath"]} is a valid data root directory.</label>;
-    } else {
+      componentDataRoot = <label>{this.state["dataRootPath"]} is a valid data root path.</label>;
+    } else if (DIRLOADERS.includes(this.state["dataLoader"])) {
+      // Only the image dataloader requires a directory data root path.
       componentDataRoot = 
       <div className="col-md-6">
       <div className="form-group">
@@ -231,6 +246,16 @@ class ConfigParser extends React.Component {
         <button type="submit" className="btn btn-primary" onClick={this.handleDataRootSubmit}>Submit</button>
       </div>
       </div>;
+    } else {
+      // Other dataloaders require a single file.
+      componentDataRoot = 
+      <div className="col-md-6">
+      <div className="form-group">
+        <label htmlFor="dataRootField">Can't locate {this.props.configData["data_to_score"]}, Specify the filepath of input data</label>
+        <input type="file" className="form-control" id="dataRootField" onChange={this.handleDataRootChange} value={this.state["dataRoot"]} required/>
+        <button type="submit" className="btn btn-primary" onClick={this.handleDataRootSubmit}>Submit</button>
+      </div>
+      </div>; 
     }
 
     // Set output directory output/input
@@ -343,25 +368,51 @@ class App extends React.Component {
 
     let data = [];
 
-    fs.createReadStream(methodCSVPath)
-      .pipe(parse({delimiter: ', '}))
-      .on('data', csvrow => {
-        data.push(csvrow);
-      })
-      .on('end', () => {
-        const dataObj = data.map(row => {
-          return {
-            rank: parseInt(row[0]),
-            id: parseInt(row[1]),
-            fileName: row[2],
-            imageData: fs.readFileSync(path.join(this.state["dataRoot"], row[2])).toString('base64'),
-            score: parseFloat(row[3])
-          };
+    if (this.state["dataLoader"] === "image") {
+      fs.createReadStream(methodCSVPath)
+        .pipe(parse({delimiter: ', '}))
+        .on('data', csvrow => {
+          data.push(csvrow);
+        })
+        .on('end', () => {
+          const dataObj = data.map(row => {
+            return {
+              rank: parseInt(row[0]),
+              id: parseInt(row[1]),
+              fileName: row[2],
+              imageData: fs.readFileSync(path.join(this.state["dataRoot"], row[2])).toString('base64'),
+              score: parseFloat(row[3])
+            };
+          });
+          this.setState({data: dataObj});
         });
-        this.setState({data: dataObj});
+    } else if (this.state["dataLoader"] === "catalog" || this.state["dataLoader"] === "featurevector") {
+      // jsfive
+      var rawData = fs.readFileSync(this.state["dataRoot"]);
+      var h5File = new hdf5.File(rawData.buffer);
+      var featDim = h5File.get("data/axis0").value.length;
 
-      });
-
+      fs.createReadStream(methodCSVPath)
+        .pipe(parse({delimiter: ', '}))
+        .on('data', csvrow => {
+          data.push(csvrow);
+        })
+        .on('end', () => {
+          const dataObj = data.map(row => {
+            return {
+              rank: parseInt(row[0]),
+              id: parseInt(row[1]),
+              fileName: row[2],
+              score: parseFloat(row[3])
+            };
+          });
+          this.setState({
+            featNames: h5File.get("data/axis0").value,
+            data: dataObj,
+            dataArray: h5File.get("data/block0_values").value
+          });
+        });
+    }
   }
 
   loadAggData() {
@@ -423,7 +474,13 @@ class App extends React.Component {
         view = <ConfigParser configData={this.state["configData"]} setConfig={this.setConfig}/>;
         break;
       case "dataTable":
-        view = <DataTable configData={this.state["configData"]} loadData={this.loadData} data={this.state["data"]}/>;
+        view = <DataTable 
+                  configData={this.state["configData"]}
+                  loadData={this.loadData} data={this.state["data"]}
+                  dataLoader={this.state["dataLoader"]}
+                  dataArray={this.state["dataArray"]}
+                  featNames={this.state["featNames"]}
+               />;
         break;
       case "aggTable":
         view = <AggTable configData={this.state["configData"]} loadAggData={this.loadAggData} data={this.state["aggData"]}/>;

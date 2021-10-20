@@ -19,7 +19,17 @@
 }
 
 .imageHeader {
-  width: 117px;
+  width: 617px;
+  word-wrap: break-word;
+}
+
+.featureCell {
+  overflow: auto;
+  width: 500px
+}
+
+.featureHeader {
+  width: 500px;
   word-wrap: break-word;
 }
 

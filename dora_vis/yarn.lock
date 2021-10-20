@@ -7533,6 +7533,12 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
+"jsfive@git+https://github.com/usnistgov/jsfive.git":
+  version "0.3.5"
+  resolved "git+https://github.com/usnistgov/jsfive.git#5c4e8eff6be855096b49b15e3a431c245756d8f8"
+  dependencies:
+    pako-es "^1.0.9"
+
 json-buffer@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/json-buffer/-/json-buffer-3.0.0.tgz#5b1f397afc75d677bde8bcfc0e47e1f9a3d9a898"
@@ -8727,6 +8733,11 @@ package-json@^6.3.0:
     registry-url "^5.0.0"
     semver "^6.2.0"
 
+pako-es@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/pako-es/-/pako-es-1.0.9.tgz#3d55210dbd5fa5bae2b75046219758951dd8d0a7"
+  integrity sha512-oKskC4DDbIKAF8cjx4UPVd6dJcxPqpeo8oelIRKKz72yCA4m9+CQJlEy/CmDcgFvHSvLFxDo/NhI7R9AH4JlMQ==
+
 pako@~1.0.5:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.11.tgz#6c9599d340d54dfd3946380252a35705a6b992bf"
@@ -8972,6 +8983,11 @@ plist@^3.0.1:
   dependencies:
     base64-js "^1.5.1"
     xmlbuilder "^9.0.7"
+
+plotly.js-dist@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/plotly.js-dist/-/plotly.js-dist-2.5.1.tgz#640bfcb401d508e3539f7dfbe8139a16b24b2719"
+  integrity sha512-6mSqcrgPQNI6HZYfusUTZJdeM9Rym0ktcEwAOxfP3BPXBLQWFTGATZhnm4lW0WMLgpGPVUpKUJUmkcmXnVJ6zQ==
 
 pnp-webpack-plugin@1.6.4:
   version "1.6.4"
