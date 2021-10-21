@@ -161,27 +161,39 @@ class AggTable extends React.Component {
       headerClassName: "rankHeader",
       sortType: "number"
     }]
-
-    for (let methodName of Object.keys(this.props.configData["outlier_detection"])) {
-      columns.push({
-        Header: methodName,
-        className: "imageCell",
-        headerClassName: "imageHeader",
-        Cell: (row) => {
-          return(
-          <div>
-            <a className="imageLink" onClick={() => {clipboard.writeText(row.row.original[methodName+"Name"]);alert(row.row.original[methodName+"Name"]+ " copied to clipboard.");}}>
-              <img src={"data:image/png;base64,"+row.row.original[methodName]} title={row.row.original[methodName+"Name"]}/>
-            </a>
-          </div>
-          );
-        }
-      });
+    if (this.props.configData != null) {
+      for (let methodName of Object.keys(this.props.configData["outlier_detection"])) {
+        columns.push({
+          Header: methodName,
+          className: "imageCell",
+          headerClassName: "imageHeader",
+          Cell: (row) => {
+            return(
+            <div>
+              <a className="imageLink" onClick={() => {clipboard.writeText(row.row.original[methodName+"Name"]);alert(row.row.original[methodName+"Name"]+ " copied to clipboard.");}}>
+                <img src={"data:image/png;base64,"+row.row.original[methodName]} title={row.row.original[methodName+"Name"]}/>
+              </a>
+            </div>
+            );
+          }
+        });
+      }
     }
 
     let datapass = null;
-    if (this.props.data == null) {
-      datapass = <h1> No DORA configuration loaded </h1>;
+    if (this.props.data === null) {
+      datapass =
+      <>
+        <h1> Loading Aggregate Table... </h1>
+        <br/>
+        <p> If stuck, it may be due to: </p>
+        <ul>
+          <li><b>A dataloader that is not "image"</b></li>
+          <li>No configuration being loaded</li>
+          <li>Mismatch between the configuration, data, and results</li>
+          <li>A very large data set</li>
+        </ul>
+      </>;
     } else {
       datapass = <>
         <h1>Aggregate Results</h1>
@@ -224,40 +236,71 @@ class DataTable extends React.Component {
   componentDidUpdate() {
     // Feature vector dataloader requires plotly plots
     if (this.props.dataLoader === "featurevector") {
-      // get length of data and dimension of each feature
-      var dataLength = this.props.dataArray != null ? this.props.dataArray.length : 0;
-      var featLength = this.props.featNames != null ? this.props.featNames.length : 1;
-      // for each data point...
-      for (let i = 0; i < dataLength/featLength; i=i+1) {
+
+      // get dimension of each feature
+      var featLength = this.props.featNames != null ? this.props.featNames.length : 0;
+      var numRows = this.props.data != null ? this.props.data.length : 0;
+      // distribution cache
+      var featDistCache = {};
+      // traces to plot
+      // for each data row...
+      for (let i = 0; i < numRows; i=i+1) {
         // assuming current graph is shown
         if (!!document.getElementById(i.toString()+'table')) {
           // bars to show
-          var x_labels = [];
-          var y_values = [];
-          var y_texts = [];
+          var traces = [];
           // for each feature
           for (let j = 0; j < featLength; j=j+1) {
-            var currFeatDistribution = [];
-            for (let k = j; k < dataLength; k=k+featLength) {
-              currFeatDistribution.push(this.props.dataArray[k]);
+            if (!(j in featDistCache)) {
+              let currDist = this.props.data.map(row => {
+                return row["feature"][j];
+              })
+              featDistCache[j] = currDist;
             }
-            x_labels.push(this.props.featNames[j]);
-            y_values.push(this.props.dataArray[(i*featLength)+j]);
-            var percentile = (percentRank(currFeatDistribution.sort(), this.props.dataArray[(i*featLength)+j]) * 100).toFixed(1)
-            y_texts.push(this.props.dataArray[(i*featLength)+j].toFixed(1).toString() + "@" + percentile.toString() + "th");
+
+            // x_labels.push(this.props.featNames[j]);
+            // y_values.push(this.props.dataArray[(i*featLength)+j]);
+            var percentile = (percentRank(featDistCache[j].sort(), this.props.data[i]["feature"][j]) * 100).toFixed(0)
+            // y_texts.push(this.props.dataArray[(i*featLength)+j].toFixed(1).toString() + "@" + percentile.toString() + "th");
+            
+            // box plot
+            traces.push({
+              name: this.props.featNames[j],
+              y: featDistCache[j],
+              type: 'box',
+              boxpoints: false,
+              line: {
+                color: 'black',
+                width: 1
+              },
+              fillcolor: 'white'
+            });
+
+            traces.push({
+              name: this.props.featNames[j],
+              x: [this.props.featNames[j]],
+              y: [this.props.data[i]["feature"][j]],
+              text: [percentile.toString() + "th"],
+              mode: 'markers',
+              marker: {
+                autocolorscale: false,
+                color: [percentile],
+                colorscale: 'RdBu',
+                cmin: 0,
+                cmax: 100
+              }
+            });
           }
-          var currTrace = {
-            x: x_labels,
-            y: y_values,
-            type: "bar",
-            text: y_texts,
-            textposition: "auto"
-          };
+
           var layout = {
             showlegend: false,
-            width: 80 * featLength
+            width: 80 * featLength,
+            dragmode: 'pan',
+            title: {
+              text: this.props.data[i]["fileName"]
+            }
           };
-          Plotly.react(i.toString()+"table", [currTrace], layout);
+          Plotly.react(i.toString()+"table", traces, layout);
         }
       }
     }
@@ -320,7 +363,7 @@ class DataTable extends React.Component {
           sortType: "number"
         }
       ];
-    } else if (this.props.dataLoader == "featurevector") {
+    } else if (this.props.dataLoader === "featurevector") {
       columns = [
         {
           Header: "Rank",
@@ -341,7 +384,7 @@ class DataTable extends React.Component {
         {
           Header: "Features",
           Cell: (row) => {
-            return (<div id={row.row.original.id+"table"}></div>);
+            return (<div id={row.row.original.rank+"table"}></div>);
           },
           id: "features",
           className: "featureCell",
@@ -369,7 +412,17 @@ class DataTable extends React.Component {
 
     let datapass = null;
     if (this.props.data == null) {
-      datapass = <h1> No DORA configuration loaded </h1>;
+      datapass =
+      <>
+        <h1> Loading Data Table... </h1>
+        <br/>
+        <p> If stuck, it may be due to: </p>
+        <ul>
+          <li>No configuration being loaded</li>
+          <li>Mismatch between the configuration, data, and results</li>
+          <li>A very large data set</li>
+        </ul>
+      </>;
     } else {
       datapass = 
       <>

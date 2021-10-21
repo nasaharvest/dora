@@ -203,7 +203,7 @@ class ConfigParser extends React.Component {
     /* Handle output directory input change */
     this.setState({
       outDir: e.target.value,
-      outDirPath: path.dirname(e.target.files[0].path)
+      outDirPath: e.target.files != null ? path.dirname(e.target.files[0].path) : null
     });
   }
 
@@ -367,7 +367,6 @@ class App extends React.Component {
     const methodCSVPath = path.join(this.state["outDir"], methodDirName, methodCSVName);
 
     let data = [];
-
     if (this.state["dataLoader"] === "image") {
       fs.createReadStream(methodCSVPath)
         .pipe(parse({delimiter: ', '}))
@@ -390,7 +389,6 @@ class App extends React.Component {
       // jsfive
       var rawData = fs.readFileSync(this.state["dataRoot"]);
       var h5File = new hdf5.File(rawData.buffer);
-      var featDim = h5File.get("data/axis0").value.length;
 
       fs.createReadStream(methodCSVPath)
         .pipe(parse({delimiter: ', '}))
@@ -399,31 +397,39 @@ class App extends React.Component {
         })
         .on('end', () => {
           const dataObj = data.map(row => {
+            let elementId = parseInt(row[1]);
+            let flatArray = h5File.get("data/block0_values").value != null ? h5File.get("data/block0_values").value : [];
+            let featDim = h5File.get("data/axis0").value != null ? h5File.get("data/axis0").value.length : 0;
+            
             return {
               rank: parseInt(row[0]),
-              id: parseInt(row[1]),
+              id: elementId,
               fileName: row[2],
+              feature: flatArray.slice(elementId * featDim, (elementId + 1) * featDim),
               score: parseFloat(row[3])
             };
           });
           this.setState({
             featNames: h5File.get("data/axis0").value,
-            data: dataObj,
-            dataArray: h5File.get("data/block0_values").value
+            data: dataObj.sort((a,b) => a.rank < b.rank ? -1 : 1)
           });
         });
     }
   }
 
   loadAggData() {
+    if (this.state["dataLoader"] !== "image") {
+      this.setState({aggData: null});
+      return;
+    }
+
     // Get list of available methods
-    const methods = Object.keys(this.state["configData"]["outlier_detection"]);
-    let data = [];
+    const methods = this.state["configData"] != null ? Object.keys(this.state["configData"]["outlier_detection"]) : [];
+    let dataList = [];
 
     // For each method available
     for (let methodName of methods) {
       const currData = [];
-
       // Define and find CSV
       const methodOptions = [methodName];
       if (this.state["configData"]["outlier_detection"][methodName] != null) {
@@ -442,24 +448,24 @@ class App extends React.Component {
           currData.push(csvrow)
         })
         .on('end', () => {
-          if (data.length == 0) {
+          if (dataList.length === 0) {
             for (let row of currData) {
-              let currRow = {}
+              var currRow = {};
               currRow["rank"] = parseInt(row[0]);
               currRow[methodName] = fs.readFileSync(path.join(this.state["dataRoot"], row[2])).toString('base64');
               currRow[methodName+"Name"] = row[2];
-              data.push(currRow);
+              dataList.push(currRow);
             }
           } else {
             for (let [ind, row] of currData.entries()) {
-              let currRow = {}
+              var currRow = {};
               currRow["rank"] = parseInt(row[0]);
               currRow[methodName] = fs.readFileSync(path.join(this.state["dataRoot"], row[2])).toString('base64');
               currRow[methodName+"Name"] = row[2];
-              data[ind] = {...data[ind], ...currRow};
+              dataList[ind] = {...dataList[ind], ...currRow};
             }
           }
-          this.setState({aggData: data});
+          this.setState({aggData: dataList});
         });
     }
   }
