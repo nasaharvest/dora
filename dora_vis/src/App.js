@@ -464,6 +464,7 @@ class App extends React.Component {
     // For each method available
     for (let methodName of methods) {
       const currData = [];
+      var currRow = {};
       // Define and find CSV
       const methodOptions = [methodName];
       if (this.state["configData"]["outlier_detection"][methodName] != null) {
@@ -484,7 +485,7 @@ class App extends React.Component {
         .on('end', () => {
           if (dataList.length === 0) {
             for (let row of currData) {
-              var currRow = {};
+              currRow = {};
               currRow["rank"] = parseInt(row[0]);
               currRow[methodName] = fs.readFileSync(path.join(this.state["dataRoot"], row[2])).toString('base64');
               currRow[methodName+"Name"] = row[2];
@@ -492,7 +493,7 @@ class App extends React.Component {
             }
           } else {
             for (let [ind, row] of currData.entries()) {
-              var currRow = {};
+              currRow = {};
               currRow["rank"] = parseInt(row[0]);
               currRow[methodName] = fs.readFileSync(path.join(this.state["dataRoot"], row[2])).toString('base64');
               currRow[methodName+"Name"] = row[2];

@@ -3,8 +3,6 @@ import './Table.css';
 
 import { useTable, useSortBy, usePagination} from 'react-table'
 
-const fs = window.require('fs');
-const path = window.require('path');
 const {clipboard} = window.require('electron');
 const Plotly = window.require('plotly.js-dist');
 
