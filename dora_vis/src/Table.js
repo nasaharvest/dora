@@ -235,7 +235,7 @@ class DataTable extends React.Component {
 
   componentDidUpdate() {
     // Feature vector dataloader requires plotly plots
-    if (this.props.dataLoader === "featurevector") {
+    if (this.props.dataLoader === "featurevector" || this.props.dataLoader === "time series") {
 
       // get dimension of each feature
       var featLength = this.props.featNames != null ? this.props.featNames.length : 0;
@@ -363,7 +363,7 @@ class DataTable extends React.Component {
           sortType: "number"
         }
       ];
-    } else if (this.props.dataLoader === "featurevector") {
+    } else if (this.props.dataLoader === "featurevector" || this.props.dataLoader === "time series") {
       columns = [
         {
           Header: "Rank",

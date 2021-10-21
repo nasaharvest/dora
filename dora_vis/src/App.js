@@ -11,7 +11,7 @@ const hdf5 = window.require('jsfive');
 // All supported data loaders
 // image - imageset, data is directory of image files
 // featurevector - h5 export of pandas dataframe
-const DATALOADERS = ["image", "featurevector"];
+const DATALOADERS = ["image", "featurevector", "time series"];
 // Dataloaders that require a directory data root
 const DIRLOADERS = ["image"];
 
@@ -365,9 +365,9 @@ class App extends React.Component {
     const methodDirName = methodOptions.join('-');
     const methodCSVName = "selections-" + methodName + ".csv";
     const methodCSVPath = path.join(this.state["outDir"], methodDirName, methodCSVName);
-
-    let data = [];
+    console.log(methodCSVPath);
     if (this.state["dataLoader"] === "image") {
+      let data = [];
       fs.createReadStream(methodCSVPath)
         .pipe(parse({delimiter: ', '}))
         .on('data', csvrow => {
@@ -386,6 +386,7 @@ class App extends React.Component {
           this.setState({data: dataObj});
         });
     } else if (this.state["dataLoader"] === "featurevector") {
+      let data = [];
       // jsfive
       var rawData = fs.readFileSync(this.state["dataRoot"]);
       var h5File = new hdf5.File(rawData.buffer);
@@ -414,6 +415,39 @@ class App extends React.Component {
             data: dataObj.sort((a,b) => a.rank < b.rank ? -1 : 1)
           });
         });
+    } else if (this.state["dataLoader"] === "time series") {
+      let dataArray = [];
+      let data = [];
+
+      fs.createReadStream(this.state["dataRoot"])
+        .pipe(parse({delimiter: ','}))
+        .on('data', datarow => {
+          dataArray.push(datarow.slice(1));
+        })
+        .on('end', () => {
+          fs.createReadStream(methodCSVPath)
+            .pipe(parse({delimiter: ', '}))
+            .on('data', csvrow => {
+              data.push(csvrow);
+            })
+            .on('end', () => {
+              const dataObj = data.map(row => {
+                return {
+                  rank: parseInt(row[0]),
+                  id: parseInt(row[1]),
+                  fileName: row[2],
+                  feature: dataArray[parseInt(row[1])].map(num => Number(num)),
+                  score: parseFloat(row[3])
+                };
+              });
+              console.log(dataArray);
+              this.setState({
+                featNames: [...Array(dataArray[0].length).keys()],
+                data: dataObj
+              });
+            });
+        });
+
     }
   }
 
