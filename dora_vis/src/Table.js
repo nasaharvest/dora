@@ -7,7 +7,8 @@ const {clipboard} = window.require('electron');
 const Plotly = window.require('plotly.js-dist');
 
 function percentRank(arr, v) {
-  // https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2
+  /* Get the percentile of a value given a sorted array
+     From https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2 */
   if (typeof v !== 'number') throw new TypeError('v must be a number');
   for (var i = 0, l = arr.length; i < l; i++) {
       if (v <= arr[i]) {
@@ -23,16 +24,15 @@ function percentRank(arr, v) {
 }
 
 function Table({ columns, data, forceUpdate = () => ({}) }) {
-  // Use the state and functions returned from useTable to build your UI
+  /* Table for showing results from a single method
+     ReactTable template, taken from the documentation example */
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    page, // Instead of using 'rows', we'll use page,
-    // which has only the rows for the active page
+    page,
 
-    // The rest of these things are super handy, too ;)
     canPreviousPage,
     canNextPage,
     pageOptions,
@@ -52,7 +52,7 @@ function Table({ columns, data, forceUpdate = () => ({}) }) {
     usePagination
   )
 
-  // Render the UI for your table
+  // Render the UI for the table
   return (
     <>
       <table className="table table-striped" {...getTableProps()}>
@@ -62,7 +62,6 @@ function Table({ columns, data, forceUpdate = () => ({}) }) {
               {headerGroup.headers.map(column => (
                 <th {...column.getHeaderProps({...column.getSortByToggleProps(),...{className: column.headerClassName}})}>
                 {column.render('Header')}
-                {/* Add a sort direction indicator */}
                 <span>
                   {column.canSort
                     ? column.isSorted
@@ -90,10 +89,6 @@ function Table({ columns, data, forceUpdate = () => ({}) }) {
           })}
         </tbody>
       </table>
-      {/* 
-        Pagination can be built however you'd like. 
-        This is just a very basic UI implementation:
-      */}
       <div className="pagination">
         <button type="button" className="btn btn-outline-dark btn-sm" onClick={() => {gotoPage(0); forceUpdate();}} disabled={!canPreviousPage}>
           {'<<'}
@@ -143,15 +138,18 @@ function Table({ columns, data, forceUpdate = () => ({}) }) {
 }
 
 class AggTable extends React.Component {
+  /* Table component for showing results from all methods of image dataloader */
   constructor(props) {
     super(props);
   }
 
   componentDidMount() {
+    // Load aggregate data once component is mounted
     this.props.loadAggData();
   }
 
   render() {
+    // Define columns of the table
     const columns = [{
       Header: "Rank",
       accessor: "rank",
@@ -161,11 +159,13 @@ class AggTable extends React.Component {
     }]
     if (this.props.configData != null) {
       for (let methodName of Object.keys(this.props.configData["outlier_detection"])) {
+        // Add a column for each method
         columns.push({
           Header: methodName,
           className: "imageCell",
           headerClassName: "imageHeader",
           Cell: (row) => {
+            // custom html for viewing an image encoded in base64, and click-to-copy
             return(
             <div>
               <a className="imageLink" onClick={() => {clipboard.writeText(row.row.original[methodName+"Name"]);alert(row.row.original[methodName+"Name"]+ " copied to clipboard.");}}>
@@ -178,8 +178,10 @@ class AggTable extends React.Component {
       }
     }
 
+    // Display the table
     let datapass = null;
     if (this.props.data === null) {
+      // Message if table has not loaded or there is an error
       datapass =
       <>
         <h1> Loading Aggregate Table... </h1>
@@ -193,6 +195,7 @@ class AggTable extends React.Component {
         </ul>
       </>;
     } else {
+      // Show the table once data is not null
       datapass = <>
         <h1>Aggregate Results</h1>
         <Table columns={columns} data={this.props.data}/>
@@ -209,19 +212,27 @@ class AggTable extends React.Component {
 }
 
 class DataTable extends React.Component {
+  /* Table component for showing results from a single method */
   constructor(props) {
     super(props);
+
+    // change which method's results are shown
     this.switchMethod = this.switchMethod.bind(this);
+    // force the component to update, redrawing plotly plots
     this.updateWrapper = this.updateWrapper.bind(this);
 
+    /* Component States
+    methods:      Methods for which results are available
+    currMethod:   Current method displayed in table
+    */
     this.state = {
       methods: [],
-      currMethod: null,
-      distCache: []
+      currMethod: null
     };
   }
 
   componentDidMount() {
+    // Initialize states and load data for first method
     if (this.props.configData != null) {
       this.props.loadData(this.props.configData["outlier_detection"], Object.keys(this.props.configData["outlier_detection"])[0]);
       this.setState({
@@ -232,22 +243,20 @@ class DataTable extends React.Component {
   }
 
   componentDidUpdate() {
-    // Feature vector dataloader requires plotly plots
+    /* Refresh plots if dataloader is featurevector or time series */
     if (this.props.dataLoader === "featurevector" || this.props.dataLoader === "time series") {
 
       // get dimension of each feature
       var featLength = this.props.featNames != null ? this.props.featNames.length : 0;
+      // get number of rows in the data
       var numRows = this.props.data != null ? this.props.data.length : 0;
-      // distribution cache
-      var featDistCache = {};
-      // traces to plot
-      // for each data row...
+      
       for (let i = 0; i < numRows; i=i+1) {
-        // assuming current graph is shown
+        // only plot if it is currently visible
         if (!!document.getElementById(i.toString()+'table')) {
-          // bars to show
           var traces = [];
-          // for each feature
+          var featDistCache = {};
+          // build feature distribution cache if it doesn't exist
           for (let j = 0; j < featLength; j=j+1) {
             if (!(j in featDistCache)) {
               let currDist = this.props.data.map(row => {
@@ -255,11 +264,10 @@ class DataTable extends React.Component {
               })
               featDistCache[j] = currDist;
             }
+            console.log(this.state['distCache'])
 
-            // x_labels.push(this.props.featNames[j]);
-            // y_values.push(this.props.dataArray[(i*featLength)+j]);
+            // calculate percentile of current data point w.r.t. full feature distribution
             var percentile = (percentRank(featDistCache[j].sort(), this.props.data[i]["feature"][j]) * 100).toFixed(0)
-            // y_texts.push(this.props.dataArray[(i*featLength)+j].toFixed(1).toString() + "@" + percentile.toString() + "th");
             
             // box plot
             traces.push({
@@ -274,6 +282,7 @@ class DataTable extends React.Component {
               fillcolor: 'white'
             });
 
+            // marker for current data point
             traces.push({
               name: this.props.featNames[j],
               x: [this.props.featNames[j]],
@@ -290,6 +299,7 @@ class DataTable extends React.Component {
             });
           }
 
+          // plotly layout parameters
           var layout = {
             showlegend: false,
             width: 80 * featLength,
@@ -298,6 +308,8 @@ class DataTable extends React.Component {
               text: this.props.data[i]["fileName"]
             }
           };
+          
+          // plotly plot
           Plotly.react(i.toString()+"table", traces, layout);
         }
       }
@@ -305,6 +317,7 @@ class DataTable extends React.Component {
   }
 
   switchMethod(e) {
+    /* Switch to results from a different method */
     this.props.loadData(this.props.configData["outlier_detection"], e.target.value);
     this.setState({currMethod: e.target.value});
   }
@@ -316,6 +329,7 @@ class DataTable extends React.Component {
   render() {
     var columns = []
     if (this.props.dataLoader === "image") {
+      // columns for an image dataloader
       columns = [
         {
           Header: "Rank",
@@ -362,6 +376,7 @@ class DataTable extends React.Component {
         }
       ];
     } else if (this.props.dataLoader === "featurevector" || this.props.dataLoader === "time series") {
+      // columns for a 1D vector dataloader
       columns = [
         {
           Header: "Rank",
@@ -407,9 +422,9 @@ class DataTable extends React.Component {
       ];
     }
 
-
     let datapass = null;
     if (this.props.data == null) {
+      // message shown if table is loading or there is an error
       datapass =
       <>
         <h1> Loading Data Table... </h1>

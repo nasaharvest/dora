@@ -8,22 +8,27 @@ const fs = window.require('fs');
 const path = window.require('path');
 const hdf5 = window.require('jsfive');
 
-// All supported data loaders
-// image - imageset, data is directory of image files
-// featurevector - h5 export of pandas dataframe
+/* Define Supported Data Loaders
+image: data is directory of image files
+featurevector: data is hdf5 export of pandas dataframe
+time series: data is a csv file, first column is dropped
+*/
 const DATALOADERS = ["image", "featurevector", "time series"];
-// Dataloaders that require a directory data root
+// These dataloaders require a directory path for data
 const DIRLOADERS = ["image"];
 
 
 class NavBar extends React.Component {
+  /* Navigation bar component */
   constructor(props) {
     super(props);
 
+    // Handle changing views
     this.handleNavClick = this.handleNavClick.bind(this);
   }
 
   handleNavClick(e) {
+    /* Handle changing views */
     e.preventDefault();
     switch(e.target.innerText) {
       case "Configure":
@@ -41,6 +46,7 @@ class NavBar extends React.Component {
   }
 
   render() {
+    // Logic to bold current view
     let configureActive = "";
     let aggregateActive = "";
     let tableActive = "";
@@ -56,6 +62,8 @@ class NavBar extends React.Component {
     } else {
       configureActive = aggregateActive = tableActive = "";
     }
+
+    // NavBar JSX
     return(
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
@@ -83,13 +91,22 @@ class NavBar extends React.Component {
 }
 
 class ConfigLoader extends React.Component {
+  /* Initial configuration loader component */
   constructor(props) {
     super(props);
-    this.handleConfigPathChange = this.handleConfigPathChange.bind(this);
-    this.handleConfigPathSubmit = this.handleConfigPathSubmit.bind(this);
 
+    // Handle config file input field change
+    this.handleConfigPathChange = this.handleConfigPathChange.bind(this);
+    // Handle submission of file input field
+    this.handleConfigPathSubmit = this.handleConfigPathSubmit.bind(this);
+    
+    /* Component states
+    configFile:   Filename of config
+    configPath:   Filepath of config
+    */
     this.state = {configFile: "",
-                  configPath: ""};
+                  configPath: ""
+    };
   }
 
   handleConfigPathChange(e) {
@@ -108,6 +125,7 @@ class ConfigLoader extends React.Component {
   }
 
   render() {
+    /* Configuration loader JSX */
     return(
       <div className="container-fluid">
         <h1>Load DORA Config</h1>
@@ -126,17 +144,35 @@ class ConfigLoader extends React.Component {
 }
 
 class ConfigParser extends React.Component {
+  /* Configuration parsing and resolving component */
   constructor(props) {
     super(props);
 
+    // Verify that the data root directory exists
     this.checkDataRoot = this.checkDataRoot.bind(this);
+    // Verify that the results directory exists
     this.checkOutDir = this.checkOutDir.bind(this);
+    // Handle data root input change
     this.handleDataRootChange = this.handleDataRootChange.bind(this);
+    // Handle data root input submission
     this.handleDataRootSubmit = this.handleDataRootSubmit.bind(this);
+    // Handle results directory input change
     this.handleOutDirChange = this.handleOutDirChange.bind(this);
+    // Handle results directory input submission
     this.handleOutDirSubmit = this.handleOutDirSubmit.bind(this);
+    // Handle resolved configuration submission
     this.handleConfigSubmit = this.handleConfigSubmit.bind(this);
 
+    /* Component states
+    dataLoader:       specified DORA data loader
+    dataRoot:         directory name OR filename of data
+    dataRootPath:     filepath OR dirpath of data
+    outDir:           name of results directory
+    outDirPath:       path of results directory
+    validDataLoader:  boolean, whether a dataloader is supported
+    validDataRoot:    boolean, whether the current config or input data path exists
+    validOutDir:      boolean, whether the current config or input results dir exists
+    */
     this.state = {
       dataLoader: this.props.configData["data_loader"]["name"].trim().toLowerCase(),
       dataRoot: "",
@@ -156,7 +192,7 @@ class ConfigParser extends React.Component {
   }
   
   checkDataRoot() {
-    /* Verify that the submitted data root directory exists */
+    /* Verify that the data root directory exists */
     fs.access(this.state["dataRootPath"], error => {
       if (error) {
         this.setState({validDataRoot: false});
@@ -167,7 +203,7 @@ class ConfigParser extends React.Component {
   }
 
   checkOutDir() {
-    /* Verify that the submitted output directory exists */
+    /* Verify that the results directory exists */
     fs.access(this.state["outDirPath"], error => {
       if (error) {
         this.setState({validOutDir: false});
@@ -215,6 +251,7 @@ class ConfigParser extends React.Component {
   }
 
   handleConfigSubmit(e) {
+    /* Handle configuration submission */
     e.preventDefault()
     this.props.setConfig(
       this.state["dataLoader"],
@@ -224,7 +261,7 @@ class ConfigParser extends React.Component {
   }
   
   render() {
-    // Set data loader output
+    // Show whether the current data loader is supported
     var componentDataLoader = null;
     if (this.state["validDataLoader"]) {
       componentDataLoader = <label>{this.state["dataLoader"]} is a supported data loader.</label>;
@@ -232,7 +269,7 @@ class ConfigParser extends React.Component {
       componentDataLoader = <label>Fatal: {this.state["dataLoader"]} is not a supported data loader.</label>;
     }
 
-    // Set data root output/input
+    // Show whether the current datapath is valid
     var componentDataRoot = null;
     if (this.state["validDataRoot"]) {
       componentDataRoot = <label>{this.state["dataRootPath"]} is a valid data root path.</label>;
@@ -247,7 +284,7 @@ class ConfigParser extends React.Component {
       </div>
       </div>;
     } else {
-      // Other dataloaders require a single file.
+      // Other dataloaders require a single file
       componentDataRoot = 
       <div className="col-md-6">
       <div className="form-group">
@@ -258,7 +295,7 @@ class ConfigParser extends React.Component {
       </div>; 
     }
 
-    // Set output directory output/input
+    // Show whether the current results dir is valid
     var componentOutDir = null;
     if (this.state["validOutDir"]) {
       componentOutDir = <label>{this.state["outDirPath"]} is a valid output directory.</label>;
@@ -273,6 +310,7 @@ class ConfigParser extends React.Component {
       </div>;
     }
 
+    // Submit the resolved configuration
     var componentConfigButton = null;
     if (this.state["validDataLoader"] && this.state["validDataRoot"] && this.state["validOutDir"]) {
       componentConfigButton = <button type="submit" className="btn btn-primary" onClick={this.handleConfigSubmit}>Continue</button>;
@@ -301,15 +339,31 @@ class ConfigParser extends React.Component {
 }
 
 class App extends React.Component {
+  /* Main application component */
   constructor(props) {
     super(props);
 
+    // load a configuration file
     this.loadConfig = this.loadConfig.bind(this);
+    // set a configuration file
     this.setConfig = this.setConfig.bind(this);
+    // load results from a single method for the table
     this.loadData = this.loadData.bind(this);
+    // load data for the aggregate table
     this.loadAggData = this.loadAggData.bind(this);
+    // change the current view of the application
     this.changeView = this.changeView.bind(this);
 
+    /* Component states
+    viewset:      list of available application views
+    view:         current view
+    configData:   full YAML configuration data
+    dataLoader:   specified DORA dataloader
+    dataRoot:     path to data file or directory
+    outDir:       path to results directory
+    data:         data structure to be shown in results table
+    aggData:      data structure to be shown in aggregate table
+    */
     this.state = {
       viewset: ["loadConfig", "parseConfig", "dataTable", "aggTable"],
       view: "loadConfig",
@@ -323,11 +377,10 @@ class App extends React.Component {
   }
 
   loadConfig(configPath) {
+    /* Load a configuration file */
     try {
       const doc = yaml.load(fs.readFileSync(configPath, "utf8"));
-      this.setState({
-        configData: doc
-      });
+      this.setState({ configData: doc });
       this.changeView("parseConfig");
     } catch (e) {
       console.log(e);
@@ -335,6 +388,7 @@ class App extends React.Component {
   }
 
   setConfig(setDataLoader, setDataRoot, setOutDir) {
+    /* Set a configuration file */
     this.setState({
       dataLoader: setDataLoader,
       dataRoot: setDataRoot,
@@ -344,6 +398,7 @@ class App extends React.Component {
   }
 
   changeView(view) {
+    /* Change the current view of the application */
     if (this.state["viewset"].includes(view)) {
       this.setState({
         view: view
@@ -355,25 +410,37 @@ class App extends React.Component {
   }
 
   loadData(methodObject, methodName) {
+    /* Load results from a single method to be shown in results table */
+
+    // From the list of methods, build paths to result CSVs
     const methodOptions = [methodName];
+    // Build "methodName-parameter=value"
     if (methodObject[methodName] != null) {
       for (const [key, value] of Object.entries(methodObject[methodName])) {
         methodOptions.push(key + '=' + value);
       }
     }
-
+    // method results directory name
     const methodDirName = methodOptions.join('-');
+    // method CSV file name
     const methodCSVName = "selections-" + methodName + ".csv";
+    // method CSV full filepath
     const methodCSVPath = path.join(this.state["outDir"], methodDirName, methodCSVName);
-    console.log(methodCSVPath);
+
+    // Depending on dataloader, fill data
     if (this.state["dataLoader"] === "image") {
+      // buffer for results csv
       let data = [];
+
+      // read csv
       fs.createReadStream(methodCSVPath)
         .pipe(parse({delimiter: ', '}))
         .on('data', csvrow => {
           data.push(csvrow);
         })
         .on('end', () => {
+          // for each row, build data objects
+          // for imageData, image is read and stored as a base64 string
           const dataObj = data.map(row => {
             return {
               rank: parseInt(row[0]),
@@ -386,22 +453,25 @@ class App extends React.Component {
           this.setState({data: dataObj});
         });
     } else if (this.state["dataLoader"] === "featurevector") {
+      // buffer for results csv
       let data = [];
-      // jsfive
+
+      // jsfive data reading for hdf5
       var rawData = fs.readFileSync(this.state["dataRoot"]);
       var h5File = new hdf5.File(rawData.buffer);
+      var flatArray = h5File.get("data/block0_values").value != null ? h5File.get("data/block0_values").value : [];
+      var featDim = h5File.get("data/axis0").value != null ? h5File.get("data/axis0").value.length : 0;
 
+      // read csv
       fs.createReadStream(methodCSVPath)
         .pipe(parse({delimiter: ', '}))
         .on('data', csvrow => {
           data.push(csvrow);
         })
         .on('end', () => {
+          // for each row, slice feature from h5 array
           const dataObj = data.map(row => {
             let elementId = parseInt(row[1]);
-            let flatArray = h5File.get("data/block0_values").value != null ? h5File.get("data/block0_values").value : [];
-            let featDim = h5File.get("data/axis0").value != null ? h5File.get("data/axis0").value.length : 0;
-            
             return {
               rank: parseInt(row[0]),
               id: elementId,
@@ -416,15 +486,20 @@ class App extends React.Component {
           });
         });
     } else if (this.state["dataLoader"] === "time series") {
-      let dataArray = [];
+      // buffer for results csv
       let data = [];
+      // buffer for data csv
+      let dataArray = [];
 
+      // read data csv
       fs.createReadStream(this.state["dataRoot"])
         .pipe(parse({delimiter: ','}))
         .on('data', datarow => {
+          // drop first column, which is row index
           dataArray.push(datarow.slice(1));
         })
         .on('end', () => {
+          // read results csv
           fs.createReadStream(methodCSVPath)
             .pipe(parse({delimiter: ', '}))
             .on('data', csvrow => {
@@ -432,6 +507,7 @@ class App extends React.Component {
             })
             .on('end', () => {
               const dataObj = data.map(row => {
+                // for each row, get csv row
                 return {
                   rank: parseInt(row[0]),
                   id: parseInt(row[1]),
@@ -440,7 +516,6 @@ class App extends React.Component {
                   score: parseFloat(row[3])
                 };
               });
-              console.log(dataArray);
               this.setState({
                 featNames: [...Array(dataArray[0].length).keys()],
                 data: dataObj
@@ -452,7 +527,10 @@ class App extends React.Component {
   }
 
   loadAggData() {
+    /* Load data from all methods for display in aggregate table */
+
     if (this.state["dataLoader"] !== "image") {
+      // only image dataloader is supported
       this.setState({aggData: null});
       return;
     }
@@ -465,15 +543,19 @@ class App extends React.Component {
     for (let methodName of methods) {
       const currData = [];
       var currRow = {};
-      // Define and find CSV
+      
+      // From the list of methods, build paths to result CSVs
       const methodOptions = [methodName];
       if (this.state["configData"]["outlier_detection"][methodName] != null) {
         for (const [key, value] of Object.entries(this.state["configData"]["outlier_detection"][methodName])) {
           methodOptions.push(key + '=' + value);
         }
       }
+      // method results directory name
       const methodDirName = methodOptions.join('-');
+      // method CSV file name
       const methodCSVName = "selections-" + methodName + ".csv";
+      // method CSV full filepath
       const methodCSVPath = path.join(this.state["outDir"], methodDirName, methodCSVName);
       
       // Read imagepaths from CSV
@@ -484,6 +566,7 @@ class App extends React.Component {
         })
         .on('end', () => {
           if (dataList.length === 0) {
+            // if dataList is empty, initialize with first column of methods
             for (let row of currData) {
               currRow = {};
               currRow["rank"] = parseInt(row[0]);
@@ -492,6 +575,7 @@ class App extends React.Component {
               dataList.push(currRow);
             }
           } else {
+            // if dataList is not empty, add column of new method
             for (let [ind, row] of currData.entries()) {
               currRow = {};
               currRow["rank"] = parseInt(row[0]);
@@ -507,6 +591,8 @@ class App extends React.Component {
 
   render() {
     var view = null;
+
+    // Show different components depending on current view
     switch(this.state["view"]) {
       case "loadConfig":
         view = <ConfigLoader loadConfig={this.loadConfig} />;
