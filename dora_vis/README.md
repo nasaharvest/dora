@@ -8,6 +8,11 @@ This is a visualization tool for DORA results.
 
 **Windows:** A windows binary is not yet available.
 
+The following need to be available:
+1. The original DORA configuration.
+2. The results directory from said DORA configuration.
+3. The original `data_to_score` directory, hdf5, or csv file.
+
 ## Development Instructions
 
 ### Dependencies
