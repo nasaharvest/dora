@@ -6,7 +6,7 @@ This is a visualization tool for DORA results.
 
 **OS X:** Install from `dora_vis/release/dora-vis-0.1.0.dmg`
 
-**Windows:** TBD...
+**Windows:** A windows binary is not yet available.
 
 ## Development Instructions
 
