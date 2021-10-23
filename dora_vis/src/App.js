@@ -452,77 +452,78 @@ class App extends React.Component {
           });
           this.setState({data: dataObj});
         });
-    } else if (this.state["dataLoader"] === "featurevector") {
-      // buffer for results csv
-      let data = [];
+    } else if (this.state["dataLoader"] === "featurevector" || this.state["dataLoader"] === "time series") {
+      if (this.state["dataRoot"].split('.').pop() === "h5") {
+        // buffer for results csv
+        let data = [];
 
-      // jsfive data reading for hdf5
-      var rawData = fs.readFileSync(this.state["dataRoot"]);
-      var h5File = new hdf5.File(rawData.buffer);
-      var flatArray = h5File.get("data/block0_values").value != null ? h5File.get("data/block0_values").value : [];
-      var featDim = h5File.get("data/axis0").value != null ? h5File.get("data/axis0").value.length : 0;
+        // jsfive data reading for hdf5
+        var rawData = fs.readFileSync(this.state["dataRoot"]);
+        var h5File = new hdf5.File(rawData.buffer);
+        var flatArray = h5File.get("data/block0_values").value != null ? h5File.get("data/block0_values").value : [];
+        var featDim = h5File.get("data/axis0").value != null ? h5File.get("data/axis0").value.length : 0;
 
-      // read csv
-      fs.createReadStream(methodCSVPath)
-        .pipe(parse({delimiter: ', '}))
-        .on('data', csvrow => {
-          data.push(csvrow);
-        })
-        .on('end', () => {
-          // for each row, slice feature from h5 array
-          const dataObj = data.map(row => {
-            let elementId = parseInt(row[1]);
-            return {
-              rank: parseInt(row[0]),
-              id: elementId,
-              fileName: row[2],
-              feature: flatArray.slice(elementId * featDim, (elementId + 1) * featDim),
-              score: parseFloat(row[3])
-            };
-          });
-          this.setState({
-            featNames: h5File.get("data/axis0").value,
-            data: dataObj.sort((a,b) => a.rank < b.rank ? -1 : 1)
-          });
-        });
-    } else if (this.state["dataLoader"] === "time series") {
-      // buffer for results csv
-      let data = [];
-      // buffer for data csv
-      let dataArray = [];
-
-      // read data csv
-      fs.createReadStream(this.state["dataRoot"])
-        .pipe(parse({delimiter: ','}))
-        .on('data', datarow => {
-          // drop first column, which is row index
-          dataArray.push(datarow.slice(1));
-        })
-        .on('end', () => {
-          // read results csv
-          fs.createReadStream(methodCSVPath)
-            .pipe(parse({delimiter: ', '}))
-            .on('data', csvrow => {
-              data.push(csvrow);
-            })
-            .on('end', () => {
-              const dataObj = data.map(row => {
-                // for each row, get csv row
-                return {
-                  rank: parseInt(row[0]),
-                  id: parseInt(row[1]),
-                  fileName: row[2],
-                  feature: dataArray[parseInt(row[1])].map(num => Number(num)),
-                  score: parseFloat(row[3])
-                };
-              });
-              this.setState({
-                featNames: [...Array(dataArray[0].length).keys()],
-                data: dataObj
-              });
+        // read csv
+        fs.createReadStream(methodCSVPath)
+          .pipe(parse({delimiter: ', '}))
+          .on('data', csvrow => {
+            data.push(csvrow);
+          })
+          .on('end', () => {
+            // for each row, slice feature from h5 array
+            const dataObj = data.map(row => {
+              let elementId = parseInt(row[1]);
+              return {
+                rank: parseInt(row[0]),
+                id: elementId,
+                fileName: row[2],
+                feature: flatArray.slice(elementId * featDim, (elementId + 1) * featDim),
+                score: parseFloat(row[3])
+              };
             });
-        });
+            this.setState({
+              featNames: h5File.get("data/axis0").value,
+              data: dataObj.sort((a,b) => a.rank < b.rank ? -1 : 1)
+            });
+          });
+      } else if (this.state["dataRoot"].split('.').pop() === "csv") {
+        // buffer for results csv
+        let data = [];
+        // buffer for data csv
+        let dataArray = [];
 
+        // read data csv
+        fs.createReadStream(this.state["dataRoot"])
+          .pipe(parse({delimiter: ','}))
+          .on('data', datarow => {
+            // drop first column, which is row index
+            dataArray.push(datarow.slice(1));
+          })
+          .on('end', () => {
+            // read results csv
+            fs.createReadStream(methodCSVPath)
+              .pipe(parse({delimiter: ', '}))
+              .on('data', csvrow => {
+                data.push(csvrow);
+              })
+              .on('end', () => {
+                const dataObj = data.map(row => {
+                  // for each row, get csv row
+                  return {
+                    rank: parseInt(row[0]),
+                    id: parseInt(row[1]),
+                    fileName: row[2],
+                    feature: dataArray[parseInt(row[1])].map(num => Number(num)),
+                    score: parseFloat(row[3])
+                  };
+                });
+                this.setState({
+                  featNames: [...Array(dataArray[0].length).keys()],
+                  data: dataObj
+                });
+              });
+          });
+      }
     }
   }
 
