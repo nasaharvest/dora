@@ -18,17 +18,18 @@ features: {
 # Outlier detection module
 top_n: 'None'
 outlier_detection: {
-    # iforest: {
-    #     n_trees: 100
-    # },
-    # pca: {
-    #     k: 3
-    # },
+    iforest: {
+        n_trees: 100,
+        fit_single_trees: False
+    },
+    pca: {
+        k: 3
+    },
     rx: {},
-    # negative_sampling: {
-    #     percent_increase: 20
-    # },
-    # random: {}
+    negative_sampling: {
+        percent_increase: 20
+    },
+    random: {}
 }
 
 # Results organization module

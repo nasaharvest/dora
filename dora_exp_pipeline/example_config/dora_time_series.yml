@@ -16,10 +16,11 @@ features: {
 }
 
 # Outlier detection module
-top_n: 10
+top_n: None
 outlier_detection: {
     iforest: {
-        n_trees: 100
+        n_trees: 100,
+        fit_single_trees: False
     },
     pca: {
         k: 3
@@ -43,8 +44,6 @@ results: {
        'validation_dir': 'sample_data/earth_fieldsamples/kenya_labels.csv'
     },
     save_scores: {},
-    histogram: {
-         'bins': 25
-    }
+    histogram: {}
     
 }
