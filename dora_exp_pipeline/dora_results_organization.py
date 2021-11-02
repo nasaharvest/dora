@@ -8,9 +8,13 @@ from six import add_metaclass
 from abc import ABCMeta, abstractmethod
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime
 import rasterio as rio
+import rasterio.mask
+import fiona
 from sklearn.cluster import KMeans
 from sklearn_som.som import SOM
+from sklearn.metrics import average_precision_score
 
 
 METHOD_POOL = []
@@ -141,6 +145,73 @@ save_comparison_plot = SaveComparisonPlot()
 register_org_method(save_comparison_plot)
 
 
+class RasterMDR(ResultsOrganization):
+    def __init__(self):
+        super(RasterMDR, self).__init__('raster_mdr')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, top_n, raster_path,
+             patch_size, shp_path):
+        if (not(os.path.exists(out_dir))):
+            os.makedirs(out_dir)
+
+        with fiona.open(shp_path) as shapefile:
+            if shapefile:
+                shapes = [feature['geometry'] for feature in shapefile]
+            else:
+                raise RuntimeError(f'Unable to load {shp_path}')
+
+        with rio.open(raster_path) as src:
+            labels, _, _ = rasterio.mask.raster_geometry_mask(src, shapes,
+                                                              invert=True)
+
+        # score_sum = np.zeros(labels.shape)
+        score_max = np.ones(labels.shape) * np.NINF
+        # counts = np.zeros(labels.shape)
+        for idx, score in zip(data_ids, dts_scores):
+            i, j = idx.split('-')
+            i, j = int(i), int(j)
+
+            # Average
+            # score_sum[i:i+patch_size, j:j+patch_size] += score
+            # counts[i:i+patch_size, j:j+patch_size] += 1
+
+            # Max
+            max_slice = score_max[i:i+patch_size, j:j+patch_size]
+            max_slice[max_slice < score] = score
+
+        # Calculate pixel average
+        # counts[counts == 0] = np.nan
+        # score_avg = score_sum / counts
+        # avg_labels = labels[np.isfinite(score_avg)]
+        # score_avg = score_avg[np.isfinite(score_avg)]
+        # avg_auc = roc_auc_score(avg_labels.flatten(), score_avg.flatten())
+
+        max_labels = labels[np.isfinite(score_max)]
+        num_outliers = np.count_nonzero(max_labels)
+        sorted_scores, sorted_labels = zip(*sorted(zip(score_max.flatten(), max_labels.flatten()), reverse=True))
+        outliers_found = 0
+        y = []
+        x = []
+        for i in range(num_outliers):
+            print(sorted_scores[i])
+            if sorted_labels[i]:
+                outliers_found += 1
+                y.append(outliers_found)
+            x.append(i)
+        mdr = sum(y)/sum(x)
+        score_max = score_max[np.isfinite(score_max)]
+        max_recall = average_precision_score(max_labels.flatten(), score_max.flatten())
+        fname = str(datetime.datetime.now())
+        with open(os.path.join(out_dir, f'{fname}.txt'), 'w') as f:
+            res = " ".join([outlier_alg_name, shp_path, str(mdr), str(max_recall)])
+            f.write(res)
+
+
+raster_mdr = RasterMDR()
+register_org_method(raster_mdr)
+
+
 class KmeansCluster(ResultsOrganization):
     def __init__(self):
         super(KmeansCluster, self).__init__('kmeans')
@@ -246,8 +317,7 @@ class ReshapeRaster(ResultsOrganization):
             for ex, idx in enumerate(data_ids):
                 # get the patch top left coordinates
                 i, j = idx.split('-')
-                i = int(i)
-                j = int(j)
+                i, j = int(i), int(j)
                 # fill in the score for that patch
                 score = dts_scores[ex]
                 scores[i:i+patch_size, j:j+patch_size] += score
