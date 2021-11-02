@@ -194,7 +194,6 @@ class RasterMDR(ResultsOrganization):
         y = []
         x = []
         for i in range(num_outliers):
-            print(sorted_scores[i])
             if sorted_labels[i]:
                 outliers_found += 1
                 y.append(outliers_found)
