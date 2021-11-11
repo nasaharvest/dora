@@ -188,22 +188,26 @@ class RasterMDR(ResultsOrganization):
         # avg_auc = roc_auc_score(avg_labels.flatten(), score_avg.flatten())
 
         max_labels = labels[np.isfinite(score_max)]
+        score_max = score_max[np.isfinite(score_max)]
         num_outliers = np.count_nonzero(max_labels)
         sorted_scores, sorted_labels = zip(*sorted(zip(score_max.flatten(), max_labels.flatten()), reverse=True))
         outliers_found = 0
-        y = []
-        x = []
+        y = [0]
+        x = [0]
         for i in range(num_outliers):
             if sorted_labels[i]:
                 outliers_found += 1
                 y.append(outliers_found)
-            x.append(i)
+            x.append(i + 1)
         mdr = sum(y)/sum(x)
+        precision_at_n = y[-1]/x[-1]
         score_max = score_max[np.isfinite(score_max)]
-        max_recall = average_precision_score(max_labels.flatten(), score_max.flatten())
+        max_recall = average_precision_score(max_labels.flatten(), 
+                                             score_max.flatten())
         fname = str(datetime.datetime.now())
         with open(os.path.join(out_dir, f'{fname}.txt'), 'w') as f:
-            res = " ".join([outlier_alg_name, shp_path, str(mdr), str(max_recall)])
+            res = " ".join([outlier_alg_name, shp_path, str(patch_size),
+            str(mdr), str(max_recall), str(precision_at_n)])
             f.write(res)
 
 

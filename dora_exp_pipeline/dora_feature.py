@@ -122,15 +122,17 @@ class FlattenedPixelValuesExtractor(FeatureExtractor):
             ret_features = np.zeros((len(data_cube),
                                     rows * cols * channels),
                                     dtype=np.uint8)
-
-        for ind, data in enumerate(data_cube):
-            if do_resizing:
-                ret_features[ind, :] = transform.resize(
-                    data, (height, width), anti_aliasing=True,
-                    preserve_range=True
-                ).flatten()
-            else:
-                ret_features[ind, :] = data.flatten()
+        if kwargs.get('flatten_pixels'):
+          for ind, data in enumerate(data_cube):
+              if do_resizing:
+                  ret_features[ind, :] = transform.resize(
+                      data, (height, width), anti_aliasing=True,
+                      preserve_range=True
+                  ).flatten()
+              else:
+                  ret_features[ind, :] = data.flatten()
+        else:
+          ret_features = np.array(data_cube)
 
         if kwargs.get('normalize_pixels'):
             min_val = np.min(ret_features)

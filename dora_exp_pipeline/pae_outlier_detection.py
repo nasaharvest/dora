@@ -35,7 +35,7 @@ class PAEOutlierDetection(OutlierDetection):
     def _rank_internal(self, data_to_fit, data_to_score, data_to_score_ids,
                        top_n, seed, latent_dim, max_epochs=1000, patience=10,
                        val_split=0.25, optimizer='adam', log_dir=None,
-                       use_flow=True):
+                       use_flow=True, conv_mode=False):
         if data_to_fit is None:
             data_to_fit = deepcopy(data_to_score)
 
@@ -45,6 +45,9 @@ class PAEOutlierDetection(OutlierDetection):
 
         # Autoencoder used in convolutional mode if list of images passed in
         if is_list_of_images(data_to_fit):
+            if not conv_mode:
+                raise RuntimeError('PAE must be use in convolutional mode with ' 
+                                   'image directory loader')
             sample_shape = get_image_dimensions(data_to_fit)
             train_fn = train_and_run_conv_PAE
         else:
@@ -253,7 +256,6 @@ class ConvAutoencoder(Model):
 
         self._encoder_layers = [
             layers.InputLayer(input_shape=input_shape),
-            layers.experimental.preprocessing.Rescaling(1./255)
         ]
         self._decoder_layers = [
             layers.InputLayer(input_shape=(latent_dim,))
@@ -315,7 +317,6 @@ class ConvAutoencoder(Model):
                 kernel_size=3,
                 strides=1,
                 padding='same'),
-            layers.experimental.preprocessing.Rescaling(255)
         ])
 
         self.encoder = keras.Sequential(self._encoder_layers)
