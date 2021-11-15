@@ -155,6 +155,7 @@ class RasterMDR(ResultsOrganization):
         if (not(os.path.exists(out_dir))):
             os.makedirs(out_dir)
 
+        # Load the shapefile identifying region(s) of outlying pixels
         with fiona.open(shp_path) as shapefile:
             if shapefile:
                 shapes = [feature['geometry'] for feature in shapefile]
@@ -162,52 +163,54 @@ class RasterMDR(ResultsOrganization):
                 raise RuntimeError(f'Unable to load {shp_path}')
 
         with rio.open(raster_path) as src:
+            # Inverting the mask makes the region inside of the mask true
             labels, _, _ = rasterio.mask.raster_geometry_mask(src, shapes,
                                                               invert=True)
 
-        # score_sum = np.zeros(labels.shape)
-        score_max = np.ones(labels.shape) * np.NINF
-        # counts = np.zeros(labels.shape)
+        # Create a 2d array to hold the max outlier score found for each pixel
+        max_scores = np.ones(labels.shape) * np.NINF
+
+        # Iterate through the scores for every patch, taking the highest score
+        # for each pixel
         for idx, score in zip(data_ids, dts_scores):
             i, j = idx.split('-')
             i, j = int(i), int(j)
 
-            # Average
-            # score_sum[i:i+patch_size, j:j+patch_size] += score
-            # counts[i:i+patch_size, j:j+patch_size] += 1
+            # Select the slice in max_scores corresponding to the current patch
+            curr_slice = max_scores[i:i+patch_size, j:j+patch_size]
+            curr_slice[curr_slice < score] = score
 
-            # Max
-            max_slice = score_max[i:i+patch_size, j:j+patch_size]
-            max_slice[max_slice < score] = score
+        # Only keep pixels where we had scores
+        labels = labels[np.isfinite(max_scores)]
+        max_scores = max_scores[np.isfinite(max_scores)]
 
-        # Calculate pixel average
-        # counts[counts == 0] = np.nan
-        # score_avg = score_sum / counts
-        # avg_labels = labels[np.isfinite(score_avg)]
-        # score_avg = score_avg[np.isfinite(score_avg)]
-        # avg_auc = roc_auc_score(avg_labels.flatten(), score_avg.flatten())
+        # Sort scores and labels together, by score
+        sorted_scores, sorted_labels = zip(*sorted(zip(max_scores.flatten(),
+                                                       labels.flatten()),
+                                                   reverse=True))
 
-        max_labels = labels[np.isfinite(score_max)]
-        score_max = score_max[np.isfinite(score_max)]
-        num_outliers = np.count_nonzero(max_labels)
-        sorted_scores, sorted_labels = zip(*sorted(zip(score_max.flatten(), max_labels.flatten()), reverse=True))
+        # Calculate MDR
+        y = [0]  # Correct selections at each iteration
+        x = [0]  # Total selections at each iteration
         outliers_found = 0
-        y = [0]
-        x = [0]
+        num_outliers = np.count_nonzero(labels)
         for i in range(num_outliers):
             if sorted_labels[i]:
                 outliers_found += 1
                 y.append(outliers_found)
             x.append(i + 1)
         mdr = sum(y)/sum(x)
+
+        # Calculate other metrics
         precision_at_n = y[-1]/x[-1]
-        score_max = score_max[np.isfinite(score_max)]
-        max_recall = average_precision_score(max_labels.flatten(), 
-                                             score_max.flatten())
+        max_recall = average_precision_score(labels.flatten(),
+                                             max_scores.flatten())
+
+        # Save results to txt file
         fname = str(datetime.datetime.now())
         with open(os.path.join(out_dir, f'{fname}.txt'), 'w') as f:
             res = " ".join([outlier_alg_name, shp_path, str(patch_size),
-            str(mdr), str(max_recall), str(precision_at_n)])
+                            str(mdr), str(max_recall), str(precision_at_n)])
             f.write(res)
 
 
@@ -312,21 +315,21 @@ class ReshapeRaster(ResultsOrganization):
             scores = np.reshape(np.array(scores), [height, width])
         elif data_format == 'patches':
             # Check that top_n wasn't specified to be a subset of the pixels
+            # TODO: figure out correct number of patches
             if top_n != len(data_ids):
                 raise RuntimeError('Cannot use top_n with ReshapeRaster')
-            scores = np.zeros([height, width])
-            # Keep track of overlapping patches at each pixel
-            counts = np.zeros([height, width])
-            for ex, idx in enumerate(data_ids):
+            scores = np.ones([height, width]) * np.NINF
+            for idx, score in zip(data_ids, dts_scores):
                 # get the patch top left coordinates
                 i, j = idx.split('-')
                 i, j = int(i), int(j)
-                # fill in the score for that patch
-                score = dts_scores[ex]
-                scores[i:i+patch_size, j:j+patch_size] += score
-                counts[i:i+patch_size, j:j+patch_size] += 1
-            counts[counts == 0] = np.nan
-            scores /= counts
+
+                # Select the slice in max_scores corresponding to the current
+                # patch
+                curr_slice = scores[i:i+patch_size, j:j+patch_size]
+                curr_slice[curr_slice < score] = score
+
+            scores[scores == np.NINF] = np.nan
         else:
             raise RuntimeError("data_format must be 'pixels' or 'patches'")
 
