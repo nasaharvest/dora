@@ -246,7 +246,7 @@ class FeatureVectorLoader(DataLoader):
                                f'{os.path.abspath(dir_path)}')
 
         # List of supported file types
-        file_types = ['.h5']
+        file_types = ['.h5', '.csv']
 
         data_dict = dict()
         data_dict.setdefault('id', [])
