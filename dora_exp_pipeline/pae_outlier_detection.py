@@ -46,7 +46,7 @@ class PAEOutlierDetection(OutlierDetection):
         # Autoencoder used in convolutional mode if list of images passed in
         if is_list_of_images(data_to_fit):
             if not conv_mode:
-                raise RuntimeError('PAE must be use in convolutional mode with ' 
+                raise RuntimeError('PAE must be use in convolutional mode with '
                                    'image directory loader')
             sample_shape = get_image_dimensions(data_to_fit)
             train_fn = train_and_run_conv_PAE

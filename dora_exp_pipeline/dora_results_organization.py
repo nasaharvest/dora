@@ -145,9 +145,9 @@ save_comparison_plot = SaveComparisonPlot()
 register_org_method(save_comparison_plot)
 
 
-class RasterMDR(ResultsOrganization):
+class RasterMetrics(ResultsOrganization):
     def __init__(self):
-        super(RasterMDR, self).__init__('raster_mdr')
+        super(RasterMetrics, self).__init__('raster_metrics')
 
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
              outlier_alg_name, out_dir, logger, seed, top_n, raster_path,
@@ -183,11 +183,7 @@ class RasterMDR(ResultsOrganization):
         # Only keep pixels where we had scores
         labels = labels[np.isfinite(max_scores)]
         max_scores = max_scores[np.isfinite(max_scores)]
-
-        # Sort scores and labels together, by score
-        sorted_scores, sorted_labels = zip(*sorted(zip(max_scores.flatten(),
-                                                       labels.flatten()),
-                                                   reverse=True))
+        sorted_labels = labels[max_scores.argsort()[::-1]]
 
         # Calculate MDR
         y = [0]  # Correct selections at each iteration
@@ -203,19 +199,18 @@ class RasterMDR(ResultsOrganization):
 
         # Calculate other metrics
         precision_at_n = y[-1]/x[-1]
-        max_recall = average_precision_score(labels.flatten(),
-                                             max_scores.flatten())
+        ap_score = average_precision_score(labels, max_scores)
 
         # Save results to txt file
         fname = str(datetime.datetime.now())
         with open(os.path.join(out_dir, f'{fname}.txt'), 'w') as f:
             res = " ".join([outlier_alg_name, shp_path, str(patch_size),
-                            str(mdr), str(max_recall), str(precision_at_n)])
+                            str(mdr), str(ap_score), str(precision_at_n)])
             f.write(res)
 
 
-raster_mdr = RasterMDR()
-register_org_method(raster_mdr)
+raster_metrics = RasterMetrics()
+register_org_method(raster_metrics)
 
 
 class KmeansCluster(ResultsOrganization):
