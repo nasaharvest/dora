@@ -23,6 +23,7 @@
 \usepackage{graphicx}
 \usepackage{siunitx}
 \usepackage{amsmath}
+\usepackage{booktabs}
 \usepackage[dvipsnames]{xcolor}
 \newcommand{\todo}[1]{\textcolor{blue}{#1}}
 
@@ -40,7 +41,7 @@ Eric Huff\,$^{2}$, Jake Lee\,$^{2}$, Vinay Raman\,$^{3}$, and
 Sakshum Kulshrestha\,$^{1}$}
 % Affiliations should be keyed to the author's name with superscript numbers and be listed as follows: Laboratory, Institute, Department, Organization, City, State abbreviation (USA, Canada, Australia), and Country (without detailed address information such as city zip codes or street names).
 % If one of the authors has a change of address, list the new address below the correspondence details using a superscript symbol and use the same symbol to indicate the author in the author list.
-\def\Address{$^{1}$Department of Geographical Sciences, University of Maryland, College Park, MD, USA \\
+\def\Address{$^{1}$University of Maryland, College Park, MD, USA \\
 $^{2}$Jet Propulsion Laboratory, California Institute of Technology, Pasadena, California, USA \\
 $^{3}$Montgomery Blair High School, Silver Spring, MD, USA}
 % The Corresponding Author should be marked with an asterisk
@@ -389,16 +390,16 @@ ordered by dataset size.}
 \label{tab:datasets}
 \centering
 \begin{tabular}{l|c|cc}
-  \hline
+  \toprule
   Dataset & Training & \multicolumn{2}{c}{Test}\\
    & Unlabeled &  Outliers &  Inliers \\
   
-  \hline
+  \midrule
   Planetary & 992 &  9 & 49 \\
   Earth & 6,757 & 37 & 76  \\
   F-MNIST & 60,000 & 1,000 & 1,000  \\
   Astrophysics & 100,000   &  25,339 &  74,661 \\
-  \hline
+  \bottomrule
 \end{tabular}
 \end{table}
 
@@ -528,22 +529,22 @@ each from MNIST (outliers) and F-MNIST (inliers).
 \label{tab:faw_results}
 \centering
 \begin{tabular}{l|cccc}
-  \hline
+  \toprule
   Algorithm & Astro. & Earth & Planetary & F-MNIST \\
-  \hline
+  \midrule
   PCA               & \textbf{0.42} & 0.41 & 0.44 & \textbf{0.84} \\
   DEMUD             & ---- & 0.41 & 0.44 & \textbf{0.84} \\
-  \hline
+  \midrule
   RX                & 0.40 & 0.43 & ---- & 0.82 \\
   LRX               & ----& ---- & 0.33 & 0.56 \\
-  \hline
+  \midrule
   Iso. Forest  & 0.34 & 0.46 & \textbf{0.56} & 0.74 \\
-  \hline
+  \midrule
   PAE               & 0.35 & 0.41 & 0.44 & 0.83 \\
   Neg. Sampling & 0.32 & \textbf{0.49} & 0.33 & 0.43 \\
-  \hline
+  \midrule
   Random            & 0.25 & 0.32 & 0.14 & 0.50 \\
-  \hline
+  \bottomrule
 \end{tabular}
 \end{table}
 
@@ -709,7 +710,8 @@ open-sourced, enabling DORA to be improved and expanded by the
 machine learning and domain science communities. 
 In addition, DORA will be infused into the scientific workflows for the
 three use cases we demonstrated results for in this study.
-\todo{Add link to github since open now.}
+The DORA code is openly accessible via Github at
+\url{https://github.com/nasaharvest/dora}.
 %the use cases from this will also lead to infusion in real scenarios
 
 \section{Conclusion}
@@ -742,23 +744,23 @@ including causal inference graphs.
 The authors declare that the research was conducted in the absence of any commercial or financial relationships that could be construed as a potential conflict of interest.
 
 \section*{Author Contributions}
-
-The Author Contributions section is mandatory for all articles, including articles by sole authors. If an appropriate statement is not provided on submission, a standard one will be inserted during the production process. The Author Contributions statement must describe the contributions of individual authors referred to by their initials and, in doing so, all authors agree to be accountable for the content of the work. Please see  \href{http://home.frontiersin.org/about/author-guidelines#AuthorandContributors}{here} for full authorship criteria. \todo{Fill this in.}
+HRK, UR, and KLW developed the conception of the project. HK oversaw the overall implementation and led the analysis of the Earth science dataset. UR led the analysis of the astrophysics dataset. KLW led the analysis of the planetary science dataset. SL led the development of the DORA software architecture. BD led the analysis of the FMNIST/MNIST dataset. EH supported the analysis of the astrophysics dataset. JL developed the desktop application for results visualization. VR supported the analysis of the Earth science dataset. SK supported the analysis of the planetary science dataset. All authors contributed to the overall system implementation and manuscript writing/editing. 
 
 \section*{Funding}
-We thank the NASA Center Innovation Fund and the NASA Science Mission 
-Directorate (under the NASA Cross-Divisional AI Use Case Demonstration grants)
- for supporting this work. \todo{Add grant numbers if possible.}
+We thank the NASA Center Innovation Fund (\todo{Award number?})
+and the NASA Science Mission Directorate 
+(under the NASA Cross-Divisional AI Use Case Demonstration grants;
+Award \#80NSSC21K0720) for supporting this work. 
 
 \section*{Acknowledgments}
 We thank the UN Food and Agriculture Organization (FAO) and Dr. Ritvik Sahajpal
 (University of Maryland/NASA Harvest) for providing the maize ground
- observation dataset.
- 
- We thank Raymond Francis for analyzing the Navcam rover images to
-identify targets considered to be ``novel'' for evaluating outlier
-detection in the planetary rover scenario.
-
+ observation dataset. 
+%
+We thank Raymond Francis for analyzing the Navcam 
+rover images to identify targets considered to be ``novel'' for evaluating
+outlier detection in the planetary rover scenario.
+%
 Part of this research was carried out at the Jet Propulsion
 Laboratory, California Institute of Technology, under a contract with
 the National Aeronautics and Space Administration.
@@ -772,7 +774,6 @@ the National Aeronautics and Space Administration.
 
 \section*{Data Availability Statement}
 The datasets [GENERATED/ANALYZED] for this study can be found in the [NAME OF REPOSITORY] [LINK]. 
-\todo{Can we make our datasets available here? We can at least add the github link to the code.}
 % Please see the availability of data guidelines for more information, at https://www.frontiersin.org/about/author-guidelines#AvailabilityofData
 
 %\bibliographystyle{frontiersinSCNS_ENG_HUMS} % for Science, Engineering and Humanities and Social Sciences articles, for Humanities and Social Sciences articles please include page numbers in the in-text citations
