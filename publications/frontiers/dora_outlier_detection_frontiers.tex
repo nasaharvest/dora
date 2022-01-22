@@ -137,7 +137,7 @@ configuration file. DORA supports image, raster, time series,
 or feature vector input data types and outlier detection methods that include
 Isolation Forest, Discovery via Eigenbasis Modeling of Uninteresting Data 
 (DEMUD)~\citep{wagstaff:demud13}, principal component analysis (PCA),
-Reed-Xiaoli (RX) detector,  
+Reed-Xiaoli (RX) detector~\citep{reed1990adaptive},  
 Local RX, negative sampling~\cite{sipple:neg-sampling20}, and probabilistic 
 autoencoder (PAE). 
 Each algorithm assigns an outlier 
@@ -226,7 +226,7 @@ outlier detection methods as well as compare results across datasets.
 While there have been some efforts to develop tools for facilitating the
 application of outlier detection methods~\cite{zhao2019pyod}, they cover
 limited data formats and algorithms. DORA aims to fill the need 
-for tools that faciliate application, evaluation, and interpretation of outlier
+for tools that facilitate application, evaluation, and interpretation of outlier
 detection methods.
 
 
@@ -258,7 +258,7 @@ arrays indexed by the sample id. This \texttt{data\_dict} is then passed to
 each of the ranking algorithms.
 
 \subsection{Outlier ranking algorithms} 
-We implemented 7 unsupervised 
+We implemented seven unsupervised 
 algorithms for scoring and 
 ranking samples by outlierness. 
 We chose these algorithms to include a diverse
@@ -295,8 +295,7 @@ The
 Reed-Xiaoli (RX) detector is commonly used for anomaly detection in
 multispectral and hyperspectral remote sensing. RX scores samples using
 the Mahalanobis
-distance between a sample and a background mean and covariance
-~\citep{reed1990adaptive}. The local variant of RX (Local
+distance between a sample and a background mean and covariance~\citep{reed1990adaptive}. The local variant of RX (Local
 RX or LRX) can be used for image or raster data and scores each pixel in
 an image with respect to a window ``ring'' of pixels surrounding 
 it~\citep{molero2013analysis}. 
@@ -309,8 +308,8 @@ Isolation forests are a common sparsity-based method
 that constructs many random binary trees from a 
 dataset~\cite{liu2008isolation}. The outlier score for
 a sample is quantified as the average distance from the root to the item’s 
-leaf. Shorter distances are indicative of outliers because fewer splits were 
-required to isolate the sample.
+leaf. Shorter distances are indicative of outliers because the number
+of random splits required to isolate the sample is small.
 
 \subsubsection{Probability}
 The negative sampling algorithm is implemented by converting the unsupervised 
@@ -517,7 +516,7 @@ visual inspection of the satellite images.
 %\subsubsection{Volcanic thermal anomalies}
 
 \subsection{Benchmark: MNIST and Fashion-MNIST}
-We used MNIST and F-MNIST to demonstrate DORA with a
+We used MNIST and Fashion-MNIST (F-MNIST) to demonstrate DORA with a
 traditional benchmark dataset. We used 60,000 images from 
 F-MNIST as the training set and a test set of 1,000 images 
 each from MNIST (outliers) and F-MNIST (inliers). 
@@ -744,10 +743,10 @@ including causal inference graphs.
 The authors declare that the research was conducted in the absence of any commercial or financial relationships that could be construed as a potential conflict of interest.
 
 \section*{Author Contributions}
-HRK, UR, and KLW developed the conception of the project. HK oversaw the overall implementation and led the analysis of the Earth science dataset. UR led the analysis of the astrophysics dataset. KLW led the analysis of the planetary science dataset. SL led the development of the DORA software architecture. BD led the analysis of the FMNIST/MNIST dataset. EH supported the analysis of the astrophysics dataset. JL developed the desktop application for results visualization. VR supported the analysis of the Earth science dataset. SK supported the analysis of the planetary science dataset. All authors contributed to the overall system implementation and manuscript writing/editing. 
+HRK, UR, and KLW developed the conception of the project. HRK oversaw the overall implementation and led the analysis of the Earth science dataset. UR led the analysis of the astrophysics dataset. KLW led the analysis of the planetary science dataset. SL led the development of the DORA software architecture. BD led the analysis of the FMNIST/MNIST dataset. EH supported the analysis of the astrophysics dataset. JL developed the desktop application for results visualization. VR supported the analysis of the Earth science dataset. SK supported the analysis of the planetary science dataset. All authors contributed to the overall system implementation and manuscript writing/editing. 
 
 \section*{Funding}
-We thank the NASA Center Innovation Fund (\todo{Award number?})
+We thank the NASA Center Innovation Fund 
 and the NASA Science Mission Directorate 
 (under the NASA Cross-Divisional AI Use Case Demonstration grants;
 Award \#80NSSC21K0720) for supporting this work. 
@@ -786,7 +785,7 @@ The datasets [GENERATED/ANALYZED] for this study can be found in the [NAME OF RE
 %\section*{Figure captions}
 
 %%% Please be aware that for original research articles we only permit a combined number of 15 figures and tables, one figure with multiple subfigures will count as only one figure.
-%%% Use this if adding the figures directly in the mansucript, if so, please remember to also upload the files when submitting your article
+%%% Use this if adding the figures directly in the manuscript, if so, please remember to also upload the files when submitting your article
 %%% There is no need for adding the file termination, as long as you indicate where the file is saved. In the examples below the files (logo1.eps and logos.eps) are in the Frontiers LaTeX folder
 %%% If using *.tif files convert them to .jpg or .png
 %%%  NB logo1.eps is required in the path in order to correctly compile front page header %%%
@@ -812,3 +811,5 @@ The datasets [GENERATED/ANALYZED] for this study can be found in the [NAME OF RE
 %%% The use of LaTeX coding to draw Diagrams/Figures/Structures should be avoided. They should be external callouts including graphics.
 
 \end{document}
+
+% LocalWords:  cls
