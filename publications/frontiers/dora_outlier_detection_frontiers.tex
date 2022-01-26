@@ -295,7 +295,8 @@ The
 Reed-Xiaoli (RX) detector is commonly used for anomaly detection in
 multispectral and hyperspectral remote sensing. RX scores samples using
 the Mahalanobis
-distance between a sample and a background mean and covariance~\citep{reed1990adaptive}. The local variant of RX (Local
+distance between a sample and a background mean and 
+covariance~\citep{reed1990adaptive}. The local variant of RX (Local
 RX or LRX) can be used for image or raster data and scores each pixel in
 an image with respect to a window ``ring'' of pixels surrounding 
 it~\citep{molero2013analysis}. 
@@ -304,7 +305,7 @@ surrounding the pixel and the inner window
 around the target pixel to exclude from the background distribution. 
 
 \subsubsection{Sparsity}
-Isolation forests are a common sparsity-based method
+Isolation forest (iForest) is a common sparsity-based method
 that constructs many random binary trees from a 
 dataset~\cite{liu2008isolation}. The outlier score for
 a sample is quantified as the average distance from the root to the item’s 
@@ -384,20 +385,18 @@ summarizes the number of unlabeled samples used for training and evaluation for
 each dataset. We describe each dataset in detail below.
 
 \begin{table}
-\caption{Number of samples in the training and test sets for each dataset,
-ordered by dataset size.}
+\caption{Number of samples in the training and test sets for each dataset.}
 \label{tab:datasets}
 \centering
 \begin{tabular}{l|c|cc}
   \toprule
   Dataset & Training & \multicolumn{2}{c}{Test}\\
    & Unlabeled &  Outliers &  Inliers \\
-  
   \midrule
+  Astrophysics & 100,000   &  25,339 &  74,661 \\
   Planetary & 992 &  9 & 49 \\
   Earth & 6,757 & 37 & 76  \\
   F-MNIST & 60,000 & 1,000 & 1,000  \\
-  Astrophysics & 100,000   &  25,339 &  74,661 \\
   \bottomrule
 \end{tabular}
 \end{table}
@@ -529,20 +528,20 @@ each from MNIST (outliers) and F-MNIST (inliers).
 \centering
 \begin{tabular}{l|cccc}
   \toprule
-  Algorithm & Astro. & Earth & Planetary & F-MNIST \\
+  Algorithm & Astro. & Planetary & Earth & F-MNIST \\
   \midrule
-  PCA               & \textbf{0.42} & 0.41 & 0.44 & \textbf{0.84} \\
-  DEMUD             & ---- & 0.41 & 0.44 & \textbf{0.84} \\
+  PCA               & \textbf{0.42} & 0.44 & 0.41 & \textbf{0.84} \\
+  DEMUD             & --- & 0.44 & 0.41 & \textbf{0.84} \\
   \midrule
-  RX                & 0.40 & 0.43 & ---- & 0.82 \\
-  LRX               & ----& ---- & 0.33 & 0.56 \\
+  RX                & 0.40 & --- & 0.43 & 0.82 \\
+  LRX               & --- & 0.33 & --- & 0.56 \\
   \midrule
-  Iso. Forest  & 0.34 & 0.46 & \textbf{0.56} & 0.74 \\
+  iForest  & 0.34 & \textbf{0.56} & 0.46 & 0.74 \\
   \midrule
-  PAE               & 0.35 & 0.41 & 0.44 & 0.83 \\
-  Neg. Sampling & 0.32 & \textbf{0.49} & 0.33 & 0.43 \\
+  PAE               & 0.35 & 0.44 & 0.41 & 0.83 \\
+  Neg. Sampling & 0.32 & 0.33 & \textbf{0.49} & 0.43 \\
   \midrule
-  Random            & 0.25 & 0.32 & 0.14 & 0.50 \\
+  Random            & 0.25 & 0.14 & 0.32 & 0.50 \\
   \bottomrule
 \end{tabular}
 \end{table}
@@ -550,42 +549,50 @@ each from MNIST (outliers) and F-MNIST (inliers).
 
 \section{Results}
 
-% TODO: Tried to make these a 2x2 panel of subfigures, but was getting
+% Tried to make these a 2x2 panel of subfigures, but was getting
 % errors using the subfigure package (Error: 'Not in outer par mode'). It seems
 % this option may not be available for Frontiers articles 
 % (see bottom of document). May combine them as a single figure manually.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.6\linewidth]{figures/planetary_combined_plot.pdf}
+\includegraphics[width=\linewidth]{figures/combined_results.pdf}
 \caption{Number of known outliers ranked in top $N$ selections for 
-planetary rover dataset.}
-\label{fig:planetary_results}
+the (a) astrophysics, (b) planetary, (c) Earth, and (d) FMNIST datasets.}
+\label{fig:combined_results}
 \end{figure}
 
-\begin{figure}
-\centering
-\includegraphics[width=0.6\linewidth]{figures/faw_combined_plot.pdf}
-\caption{Number of known outliers ranked in top $N$ selections for 
-Earth science dataset.}
-\label{fig:faw_results}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.6\linewidth]{figures/des_combined_plot.pdf}
-\caption{Number of known outliers ranked in top $N$ selections for 
-the astrophysics (DES) dataset.}
-\label{fig:des_results}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\linewidth]{figures/fmnist_combined_plot.pdf}
-    \caption{Number of known outliers ranked in top $N$ selections for 
-    F-MNIST dataset.}
-    \label{fig:fmnist_results}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.6\linewidth]{figures/des_combined_plot.pdf}
+%\caption{Number of known outliers ranked in top $N$ selections for 
+%the astrophysics (DES) dataset.}
+%\label{fig:des_results}
+%\end{figure}
+%
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.6\linewidth]{figures/planetary_combined_plot.pdf}
+%\caption{Number of known outliers ranked in top $N$ selections for 
+%planetary rover dataset.}
+%\label{fig:planetary_results}
+%\end{figure}
+%
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.6\linewidth]{figures/faw_combined_plot.pdf}
+%\caption{Number of known outliers ranked in top $N$ selections for 
+%Earth science dataset.}
+%\label{fig:faw_results}
+%\end{figure}
+%
+%\begin{figure}
+%    \centering
+%    \includegraphics[width=0.6\linewidth]{figures/fmnist_combined_plot.pdf}
+%    \caption{Number of known outliers ranked in top $N$ selections for 
+%    F-MNIST dataset.}
+%    \label{fig:fmnist_results}
+%\end{figure}
 
 The experimental setup for each dataset was to fit or train a model for
 each ranking algorithm using a larger unlabeled dataset and then apply 
@@ -594,7 +601,8 @@ labels of known outliers were available (Table \ref{tab:datasets}).
 For each test set, we created a plot of the number of known outliers 
 detected out of the top $N$ selections. We also 
 reported the Mean Discovery Rate (MDR) in the legend
-for each algorithm to give a quantitative comparison across the datasets. We defined MDR as:
+for each algorithm to give a quantitative comparison across the datasets. 
+We defined MDR as:
 \begin{equation}
 MDR = \frac{\sum^{N_s}_{i=1} n_i}{\sum^{N_s}_{i=1} s_i}
 \end{equation}
@@ -617,18 +625,18 @@ Random'' using the expected value of $n_i$ for $i$ random selections:
 &= \frac{n_{outlier}i}{D}
 \end{align}
 
-%\todo{Hannah: Consider merging all three data set discussions since they are
-%in one table? with their own figures? The point here isn't really to
-%compare algs or data sets but instead to show that we CAN compare
-%them, using DORA.}
-% We initialized each algorithm with $D_s$ and requested a ranking of
-% targets in $D_{s+}$.
-%
+For the astrophysics dataset (Figure~\ref{fig:combined_results}a), 
+DEMUD was omitted due to computational time 
+and LRX was omitted as it applies only to image data.  
+Of the remaining methods, 
+PCA achieved the highest precision, followed by RX.  Negative sampling 
+performs well initially before its performance drops off.  
+The PAE finds the most outliers overall. 
 
 For the planetary dataset, we found that
 the Isolation Forest achieved the highest precision (best outlier
 detection) when allowed to select only \num{9} images.
-Figure~\ref{fig:planetary_results} shows the complete (cumulative)
+Figure~\ref{fig:combined_results}b shows the complete (cumulative)
 outlier detection performance for each algorithm when ranking
 all \num{58} target images in $D_{1694-1703}$. We could not
 employ RX since the data dimensionality ($64 \times 64 =
@@ -637,20 +645,14 @@ employ RX since the data dimensionality ($64 \times 64 =
 For the Earth dataset, negative sampling had the best performance
 in both metrics. DEMUD, PCA, and PAE tied for the lowest precision at 
 $N=n_{outlier}$ while DEMUD and PCA tied for the lowest
-MDR (Figure \ref{fig:faw_results}). We did not evaluate LRX for this time 
+MDR (Figure \ref{fig:combined_results}c). We did not evaluate LRX for this time 
 series dataset because LRX can only be applied to gridded image or raster 
 data types.
-
-For the astrophysics dataset (Figure~\ref{fig:des_results}), DEMUD was omitted due to computational time 
-and LRX was omitted as it applies only to image data.  Of the remaining methods, 
-PCA achieved the highest precision, followed by RX.  Negative sampling 
-performs well initially before its performance drops off.  The PAE finds the most outliers 
-overall.  
 
 For the MNIST and F-MNIST dataset, PCA and DEMUD tied for the highest
 precision at $N=n_{outlier}$
 while DEMUD, PCA, and PAE tied for the highest MDR 
-(Figure \ref{fig:fmnist_results}). 
+(Figure \ref{fig:combined_results}d). 
 Negative sampling had the 
 lowest performance in both metrics. 
 
