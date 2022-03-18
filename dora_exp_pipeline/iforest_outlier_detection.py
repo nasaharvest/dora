@@ -58,7 +58,7 @@ def train_and_run_ISO(train, test, n_trees, seed):
     # novelty scores of the test items
     scores_iso = clf_iso.decision_function(test)
 
-    return scores_iso
+    return np.negative(scores_iso)
 
 
 # Copyright (c) 2021 California Institute of Technology ("Caltech").

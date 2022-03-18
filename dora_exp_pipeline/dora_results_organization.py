@@ -8,9 +8,13 @@ from six import add_metaclass
 from abc import ABCMeta, abstractmethod
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime
 import rasterio as rio
+import rasterio.mask
+import fiona
 from sklearn.cluster import KMeans
 from sklearn_som.som import SOM
+from sklearn.metrics import average_precision_score
 
 
 METHOD_POOL = []
@@ -60,7 +64,7 @@ class ResultsOrganization(object):
 
     @abstractmethod
     def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
-             outlier_alg_name, logger, seed, top_n, **params):
+             outlier_alg_name, out_dir, logger, seed, top_n, **params):
         raise RuntimeError('This function must be implemented in a child class')
 
 
@@ -139,6 +143,74 @@ class SaveComparisonPlot(ResultsOrganization):
 
 save_comparison_plot = SaveComparisonPlot()
 register_org_method(save_comparison_plot)
+
+
+class RasterMetrics(ResultsOrganization):
+    def __init__(self):
+        super(RasterMetrics, self).__init__('raster_metrics')
+
+    def _run(self, data_ids, dts_scores, dts_sels, data_to_score,
+             outlier_alg_name, out_dir, logger, seed, top_n, raster_path,
+             patch_size, shp_path):
+        if (not(os.path.exists(out_dir))):
+            os.makedirs(out_dir)
+
+        # Load the shapefile identifying region(s) of outlying pixels
+        with fiona.open(shp_path) as shapefile:
+            if shapefile:
+                shapes = [feature['geometry'] for feature in shapefile]
+            else:
+                raise RuntimeError(f'Unable to load {shp_path}')
+
+        with rio.open(raster_path) as src:
+            # Inverting the mask makes the region inside of the mask true
+            labels, _, _ = rasterio.mask.raster_geometry_mask(src, shapes,
+                                                              invert=True)
+
+        # Create a 2d array to hold the max outlier score found for each pixel
+        max_scores = np.ones(labels.shape) * np.NINF
+
+        # Iterate through the scores for every patch, taking the highest score
+        # for each pixel
+        for idx, score in zip(data_ids, dts_scores):
+            i, j = idx.split('-')
+            i, j = int(i), int(j)
+
+            # Select the slice in max_scores corresponding to the current patch
+            curr_slice = max_scores[i:i+patch_size, j:j+patch_size]
+            curr_slice[curr_slice < score] = score
+
+        # Only keep pixels where we had scores
+        labels = labels[np.isfinite(max_scores)]
+        max_scores = max_scores[np.isfinite(max_scores)]
+        sorted_labels = labels[max_scores.argsort()[::-1]]
+
+        # Calculate MDR
+        y = [0]  # Correct selections at each iteration
+        x = [0]  # Total selections at each iteration
+        outliers_found = 0
+        num_outliers = np.count_nonzero(labels)
+        for i in range(num_outliers):
+            if sorted_labels[i]:
+                outliers_found += 1
+                y.append(outliers_found)
+            x.append(i + 1)
+        mdr = sum(y)/sum(x)
+
+        # Calculate other metrics
+        precision_at_n = y[-1]/x[-1]
+        ap_score = average_precision_score(labels, max_scores)
+
+        # Save results to txt file
+        fname = str(datetime.datetime.now())
+        with open(os.path.join(out_dir, f'{fname}.txt'), 'w') as f:
+            res = " ".join([outlier_alg_name, shp_path, str(patch_size),
+                            str(mdr), str(ap_score), str(precision_at_n)])
+            f.write(res)
+
+
+raster_metrics = RasterMetrics()
+register_org_method(raster_metrics)
 
 
 class KmeansCluster(ResultsOrganization):
@@ -238,16 +310,21 @@ class ReshapeRaster(ResultsOrganization):
             scores = np.reshape(np.array(scores), [height, width])
         elif data_format == 'patches':
             # Check that top_n wasn't specified to be a subset of the pixels
-            if top_n != ((height-(patch_size-1))*(width-(patch_size-1))):
+            # TODO: figure out correct number of patches
+            if top_n != len(data_ids):
                 raise RuntimeError('Cannot use top_n with ReshapeRaster')
-            scores = np.zeros([height, width])
-            for ex, idx in enumerate(data_ids):
-                # get the patch center coordinates
+            scores = np.ones([height, width]) * np.NINF
+            for idx, score in zip(data_ids, dts_scores):
+                # get the patch top left coordinates
                 i, j = idx.split('-')
-                i = int(i)
-                j = int(j)
-                # fill in the score for that index
-                scores[i, j] = dts_scores[ex]
+                i, j = int(i), int(j)
+
+                # Select the slice in max_scores corresponding to the current
+                # patch
+                curr_slice = scores[i:i+patch_size, j:j+patch_size]
+                curr_slice[curr_slice < score] = score
+
+            scores[scores == np.NINF] = np.nan
         else:
             raise RuntimeError("data_format must be 'pixels' or 'patches'")
 
