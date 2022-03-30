@@ -110,15 +110,21 @@ referred to as out-of-distribution (OOD) detection. In general, the goal of
 OOD detection systems is to identify samples that deviate from the majority
 of samples in a dataset in an unsupervised manner~\cite{pimentel2014review}. 
 In machine learning, these methods are commonly used for identifying 
-mislabeled or otherwise invalid samples in a dataset. When working with 
-science datasets, OOD detection can be used for 
+mislabeled or otherwise invalid samples in a dataset 
+~\citep{liang2018enhancing,bohm2020probabilistic}. 
+%
+When working with science datasets, OOD detection can be used for 
 cleaning datasets, e.g., flagging ground-truth labels with GPS or human
-entry error or identifying wrongly categorized objects in a catalog. 
+entry error or identifying wrongly categorized objects in a catalog
+~\citep{wagstaff:des-anom20,lochner2021astronomaly}. 
 It could also be used for discovery, e.g., to flag novel samples in order 
-to guide instrument acquisition or scientific analysis. Another application
+to guide instrument acquisition or scientific analysis
+~\citep{wagstaff:demud13,wagstaff:rover-novelty20,
+kerner2020comparison,kerner2020analysis}.
+Another application
 is the detection of rare objects that are known to exist but the known
 examples are too few to create a large enough labeled dataset for 
-supervised classification algorithms. 
+supervised classification algorithms~\citep{chang2002anomaly,zhou2016novel}. 
 
 Despite wide differences in applications, data types, and dimensionality,
 the same underlying machine learning algorithms can be employed across 
@@ -151,10 +157,24 @@ facilitates application, evaluation, and interpretation of outlier detection
 methods by performing
 experiments for three real-world datasets from Earth science, planetary
 science, and astrophysics, as well as one benchmark dataset 
-(MNIST/Fashion-MNIST). We found that no single algorithm
-performed best across all datasets, underscoring the need for a tool 
-that enables comparison of multiple algorithms.
+(MNIST/Fashion-MNIST). 
+%We found that no single algorithm
+%performed best across all datasets, underscoring the need for a tool 
+%that enables comparison of multiple algorithms.
 
+The key contributions of this paper are:
+\begin{itemize}
+\item A new pipeline, DORA, for performing outlier detection experiments using 
+several AI algorithms that reduces the effort and expertise required for 
+performing experiments and comparing results from multiple algorithms
+\item Using experiments for a diverse set of real world datasets and 
+application areas, we show that no single algorithm performs best for all 
+datasets and use cases, underscoring the need for a tool that compares 
+multiple algorithms
+\item We provide publicly available code for running and contributing to the 
+DORA pipeline and datasets that can be used for reproducing experiments or 
+benchmarking outlier detection methods 
+\end{itemize}
 
 
 \section{Related Work}
@@ -205,7 +225,8 @@ In astrophysics,
 outlier detection methods have been used to identify astrophysical
 objects with unique characteristics~\cite{hayat2021self} 
 as well as data or modeling 
-artifacts in astronomical surveys~\citep{wagstaff:des-anom20}. 
+artifacts in astronomical 
+surveys~\citep{wagstaff:des-anom20,lochner2021astronomaly}. 
 Example outlier detection applications in 
 Earth science include detecting anomalous objects or materials
 ~\cite{zhou2016novel}, data artifacts or noise 
@@ -375,7 +396,6 @@ side-by-side.
   \label{fig:doravis}
 \end{figure}
 
-
 \section{Datasets}
 We constructed three datasets to evaluate the utility of DORA and 
 algorithm performance for a variety of scientific domains
@@ -383,6 +403,15 @@ algorithm performance for a variety of scientific domains
 benchmark dataset that uses MNIST and Fashion-MNIST. Table \ref{tab:datasets}
 summarizes the number of unlabeled samples used for training and evaluation for
 each dataset. We describe each dataset in detail below.
+
+\subsection{Astrophysics: objects in Dark Energy Survey}
+Astronomical data sets are large and growing. Large modern optical
+imaging surveys are producing catalogs of order $10^8$ stars
+and galaxies, with dozens or hundreds of distinct measured features
+for each entry. Discovery science becomes difficult at this data
+volume: the scale is too large for expert human inspection, and separating real
+astrophysical anomalies from non-astrophysical sources like detector artifacts or
+satellite trails is a challenging problem for current methods.
 
 \begin{table}
 \caption{Number of samples in the training and test sets for each dataset.}
@@ -400,15 +429,6 @@ each dataset. We describe each dataset in detail below.
   \bottomrule
 \end{tabular}
 \end{table}
-
-\subsection{Astrophysics: objects in Dark Energy Survey}
-Astronomical data sets are large and growing. Large modern optical
-imaging surveys are producing catalogs of order $10^8$ stars
-and galaxies, with dozens or hundreds of distinct measured features
-for each entry. Discovery science becomes difficult at this data
-volume: the scale is too large for expert human inspection, and separating real
-astrophysical anomalies from non-astrophysical sources like detector artifacts or
-satellite trails is a challenging problem for current methods.
 
 The Dark Energy Survey (DES) is an ongoing imaging survey of
 $5000~{\rm deg}^2$ of the southern sky from the Cerro-Tololo
@@ -697,22 +717,33 @@ are counted as false positives.
 
 % This section was specific to IAAI, can change the name, remove, or keep
 % as is if we want.
-\subsection{Path to deployment} 
+\subsection{Open code and data} 
 Our goal is for DORA to enable increased application and benefit of
 outlier detection methods in real-world scientific use cases. We have 
 designed DORA to make it as easy as possible for scientists to apply
-algorithms and to compare and interpret their results; users need only
+algorithms and to compare and interpret their results. Users need only
 to specify the specifics of their data (e.g., path, data type) in a 
-configuration file to start running experiments and seeing results. We will
-make DORA publicly available as a pip-installable package to make it
+configuration file to start running experiments and seeing results for 
+their own datasets and use cases. DORA is
+publicly available and can be installed using pip via Github, making it
 easy to integrate into existing scientific workflows. 
-The source code and example datasets used in this study will also be 
-open-sourced, enabling DORA to be improved and expanded by the 
+The datasets used in this study are also publicly available via Zenodo. 
+This enables DORA to be improved and expanded by the 
 machine learning and domain science communities. 
+If a researcher wants to use DORA for a dataset with a type that is not yet
+supported, they can contribute a new data loader by creating a subclass
+that extends the \texttt{DataLoader} abstract base class. Similarly, new 
+results interpretation modules can be added by creating a subclass of the 
+\texttt{ResultsOrganization} abstract base class. A new outlier ranking
+algorithm can be added by writing a new python module that defines
+a subclass of the \texttt{OutlierDetection} abstract base class and implements 
+the required functions for scoring and ranking samples, following the 
+existing algorithm modules named \texttt{*\_outlier\_detection.py}.
 In addition, DORA will be infused into the scientific workflows for the
 three use cases we demonstrated results for in this study.
-The DORA code is openly accessible via Github at
-\url{https://github.com/nasaharvest/dora}.
+The DORA code can be accessed at
+\url{https://github.com/nasaharvest/dora} and datasets 
+at \url{https://doi.org/10.5281/zenodo.5941338}.
 %the use cases from this will also lead to infusion in real scenarios
 
 \section{Conclusion}
