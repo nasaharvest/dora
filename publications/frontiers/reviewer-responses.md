@@ -10,6 +10,8 @@ Please do not hesitate to contact me if you have any questions.
 
 Sincerely,
 Bala Poduval
+
+
 -------------------------
 
 Reviewer 2:
@@ -25,7 +27,6 @@ Reviewer 3:
 This article is particularly well written and very pleasant to read. The proposed python package, called DORA and already available to the scientific community, allowing the detection of outliers via many approaches already available in the literature, is of great interest for users. As mentioned by the authors and observed on the 4 datasets considered, obviously no method dominates the others, each one having its own numerical qualities in the detection of outliers.
 
 There is just one clarification that I missed when reading the article: it concerns the outlier score. Has this been standardized so that it is comparable for all methods, or does each method remain on its own score scale (the latter potentially changing depending on the data set considered)? And how, if at all?
-----------------
 
 
 --------------------------------------------------------------
