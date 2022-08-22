@@ -3,10 +3,10 @@ data_loader: {
     name: 'image',
     params: {}
 }
-data_to_fit: '/PATH/TO/DIR/'
-data_to_score: '/PATH/TO/DIR/'
+data_to_fit: 'sample_data/planetary_rover/png/images-fit'
+data_to_score: 'sample_data/planetary_rover/png/images-score'
 zscore_normalization: False
-out_dir: 'PATH/TO/OUTPUT/DIR'
+out_dir: 'results'
 
 # Feature extraction module
 features: {
@@ -21,7 +21,7 @@ features: {
 }
 
 # Outlier detection module
-top_n: 10
+top_n: None
 outlier_detection: {
     pca: {
         k: 5
