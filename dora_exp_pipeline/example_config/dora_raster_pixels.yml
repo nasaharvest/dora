@@ -22,9 +22,6 @@ outlier_detection: {
         n_trees: 100,
         fit_single_trees: False
     },
-    pca: {
-        k: 3
-    },
     rx: {},
     negative_sampling: {
         percent_increase: 20
