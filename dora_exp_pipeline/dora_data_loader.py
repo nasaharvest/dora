@@ -205,6 +205,7 @@ class RasterPatchLoader(DataLoader):
 
         # List of supported file types
         file_types = ['.tif']
+        s = int(patch_size/2)
 
         data_dict = dict()
         data_dict.setdefault('id', [])
@@ -218,21 +219,26 @@ class RasterPatchLoader(DataLoader):
                 # we want to put it in channels-last order
                 img = np.moveaxis(img, 0, -1)
                 # extract patches from raster image
-                # i, j are patch top left coordinates
-                i = 0
-                while (i + patch_size) <= img.shape[0]:
-                    j = 0
-                    while (j + patch_size) <= img.shape[1]:
-                        patch = img[i:i+patch_size, j:j+patch_size]
+                # i, j are patch center coordinates
+
+                w = int(patch_size/2)
+
+                for i in range(w, img.shape[0]-w):
+
+                    for j in range(w, img.shape[1]-w):
+
+                        patch = img[i-w:i+(w + 1), j-w:j+(w + 1)]
                         if np.any(patch == nodata):
                             j += 1
-                        else:
+
+                        else: 
                             # append the patch coordinate as the id
                             data_dict['id'].append('%d-%d' % (i, j))
                             # append the patch data
                             data_dict['data'].append(patch)
                             j += stride
                     i += stride
+                    
         else:
             raise RuntimeError(f'File extension not supported. '
                                f'Valid file extensions: '
