@@ -11,17 +11,16 @@ zscore_normalization: False
 out_dir: 'sample_data/earth_volcanoes/exp/patches/results'
 
 # Feature extraction module
-features: {
-    raw_values: {
-        # no args
-    }
-}
+features:
+    flattened_pixel_values:
+        normalize_pixels: false
 
 # Outlier detection module
 top_n: 'None'
 outlier_detection: {
     iforest: {
-        n_trees: 100
+        n_trees: 100,
+        fit_single_trees: False
     },
     demud: {
         k: 3

@@ -5,8 +5,8 @@ data_loader: {
         'patch_size': 5
     }
 }
-data_to_fit: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
-data_to_score: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif'
+data_to_fit: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210_small.tif'
+data_to_score: 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210_small.tif'
 zscore_normalization: False
 out_dir: 'results/raster_patch_test'
 
@@ -44,7 +44,7 @@ results: {
     save_scores: {},
     reshape_raster: {
         # the path to the input raster that was scored
-        'raster_path': 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210.SurfaceKineticTemperature.KineticTemperature.tif',
+        'raster_path': 'sample_data/earth_volcanoes/AST_08_00310252015145234_20170919180811_13210_small.tif',
         # the raster data loader format used: pixels or patches
         'data_format': 'patches',
         # must be specified if data_format is patches; if pixels, use 0 for patch_size
