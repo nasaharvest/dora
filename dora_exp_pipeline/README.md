@@ -95,6 +95,12 @@ dora_exp config.yml
 
 NOTE: dora_exp may not be fully up to date with the latest dev changes.  In order to run dora_exp locally, please run: `python dora_exp_pipeline/dora_exp.py -h`.  Running dora_exp.py below the dora_exp_pipeline directory will break the package structure.
 
+### Volcano Example Config ###
+
+Test that you are able to run sample volcano patches on the terminal with
+```
+python dora_exp_pipeline/dora_exp.py sample_data/earth_volcanoes/exp/patches/earth_volcanoes_patches.yml
+```
 
 (TODO: Add a section in the README for config file. For now, please see the 
 example config files in `dora_exp_pipeline/example_config/`.)
@@ -113,4 +119,4 @@ python dora_exp.py config.yml
 
 Note that running `dora_exp.py` as a python script is only recommended for 
 development. Please follow the instructions in the Installation section to 
-properly install `dora_exp` once the development is complete.  
+properly install `dora_exp` once the development is complete.
